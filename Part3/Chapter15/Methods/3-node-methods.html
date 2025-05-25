@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Demonstration of node methods</title>
+</head>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    const nestedFile = "../data/sample-hierarchy.json";
+    const hierarchy = await d3.json(nestedFile);
+
+    console.log("Original hierarchy", hierarchy);
+
+    // 1) d3.hierarchy() and configuration
+    const root = d3.hierarchy(hierarchy);
+    root.count(); // set values property with leaf count
+    console.log("1. Root", root);
+
+    // 2) leaves()
+    const leaves = root.leaves();
+    console.log("2. root.leaves()", leaves);
+
+    // 3) descendants()
+    const descendants = root.descendants();
+    console.log("3. root.descendants()", descendants);
+
+    // 4) descendants() after sorting the hierarchy by height
+    root.sort((a,b) => b.height - a.height);
+    console.log("4. Descendant array of height-sorted root", root.descendants());
+
+    // 5) Create and detach a subtree (deep copy): node.copy()
+    const subgroup1 = root.children.filter(d => d.data.id === 'a')[0].copy();
+    console.log("5. subgroup1 (deep copy)", subgroup1);
+
+    const leaves2 = subgroup1.leaves();
+    console.log("6. subgroup1.leaves()", leaves2);
+
+    const descendants2 = subgroup1.descendants();
+    console.log("7. subgroup1.descendants()", descendants2);
+
+    // 6) Make a map of all descendants (to facilitate retrieval)
+    const descendantMap = new Map(root.descendants().map(d => [d.data.id, d]));
+    console.log(descendantMap);
+
+    // 7) Reference a subtree of the main hierarchy
+    const subgroup3 = descendantMap.get("c");
+    console.log("8. Subgroup 3 (reference)", subgroup3);
+
+    // 8) ancestors() of the subtree
+    const ancestors = subgroup3.ancestors();
+    console.log("9. subgroup3.ancestors()", ancestors);
+
+    // 9) root.links() to obtain {source,target objects)
+    const links = root.links();
+    console.log("10. root.links()", links);
+    console.log("11. subgroup1.links()", subgroup1.links());
+
+    // 10) node.path(other) to obtain shortest path
+    const destination = descendantMap.get("c");
+    const origin = descendantMap.get("aaa");
+    const steps = origin.path(destination);
+    console.log("13. Path from leaf c to leaf aaa node.path(other)", steps);
+
+</script>
+<h1>Demonstration of node retrieval methods</h1>
+<p>See commented code in this file and results in JavaScript console.</p>
+</body>
+</html>

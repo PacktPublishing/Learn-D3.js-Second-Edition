@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tree rendered in Canvas</title>
+</head>
+<body>
+<h1>Tree rendered in Canvas</h1>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {dim, chart, root} from "./js/treedata-csv.js";
+
+    // Set up canvas
+    d3.select("svg").remove(); // remove previous SVG
+    const canvas = d3.select("body").append("canvas")
+                     .attr("height", dim.height)
+                     .attr("width", dim.width);
+    const ctx = canvas.node().getContext("2d");
+    ctx.translate(dim.margin*2, dim.height * .55);  // height first, width second, for horizontal tree
+
+    // labels and sorting
+    root.sort((a,b) => d3.descending(a.height, b.height) );  // taller nodes first
+
+    // Generate horizontal tree (nodeSize: height first, width second)
+    d3.tree()
+        .nodeSize([80, 200])
+        .separation((a,b) => (a.parent === b.parent) ? a.depth === 3 ? .5 : .75 : 1)(root);
+
+    // Nodes, links, scales
+    const nodes = root.descendants();
+    const links = root.links();
+    const color = d3.scaleOrdinal(d3.schemeCategory10).domain(d3.extent(nodes, n => n.depth));
+    const width = d3.scaleLinear().range([1,16]).domain(d3.extent(links, k => k.target.height));
+
+    // Pathlinks
+    const horizontalLink = d3.linkHorizontal()
+                             .x(d => d.y).y(d => d.x)
+                             .context(ctx); // generate path commands for canvas
+
+    drawLinks();
+    drawNodes();
+    drawLabels();
+
+    // Canvas rendering functions
+    function drawNodes() {
+        ctx.save();
+        ctx.strokeStyle = "black";
+        ctx.fillStyle = "none";
+        nodes.forEach(function(d) {
+            ctx.fillStyle = color(d.depth);
+            ctx.beginPath();
+            ctx.ellipse(d.y, d.x,                   // horizontal tree - invert x and y
+                (root.height + 1 - d.depth) * 25,
+                (root.height + 1 - d.depth) * 12,
+                0, 0, 2 * Math.PI
+            );
+            ctx.stroke();
+            ctx.fill();
+        });
+        ctx.restore();
+    }
+
+    function drawLinks() {
+        ctx.save();
+        ctx.fillStyle = "transparent";
+        links.forEach(function(d) {
+            ctx.lineWidth = (d.target.height + 1) * (d.target.height + 1);
+            ctx.globalAlpha =  d.target.depth *.15 + .4;
+            ctx.beginPath();
+            horizontalLink(d);
+            ctx.stroke();
+        });
+        ctx.restore();
+    }
+
+    function drawLabels() {
+        const font = 'px "Arial narrow", sans-serif';
+        ctx.textBaseline = "middle";
+
+        nodes.forEach(function(d,i) {
+            ctx.save(); // save current canvas state
+            ctx.fillStyle = d.height !== 0 ? 'white' : 'black';
+            ctx.textAlign = "center";
+
+            const fontSize = width((4 - d.depth) * 1.1);
+            ctx.font = fontSize + font;
+            ctx.translate(d.y, d.x);   // invert x and y for horizontal tree
+
+            ctx.fillText(d.data.name, 0, 0);
+            ctx.restore(); // recover saved canvas state
+        });
+    }
+
+</script>
+</body>
+</html>

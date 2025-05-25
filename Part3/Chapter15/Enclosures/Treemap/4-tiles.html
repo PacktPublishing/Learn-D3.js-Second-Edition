@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Treemap: tiling algorithms</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        text {
+            font-family: monospace;
+            alignment-baseline: hanging;
+            fill: black;
+            font-size: 12pt;
+        }
+    </style>
+</head>
+<body>
+<h1>Treemap: tiling algorithms</h1>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {dim, chart, root} from "./js/treedata-json.js";
+
+    dim.width = 1200, dim.height = 900;
+    d3.select("svg")
+        .attr("width", dim.width)
+        .attr("height", dim.height);
+
+    root.sort((a,b) => d3.ascending(a.height, b.height) )
+        .count();
+
+    const nodes = root.descendants();
+
+    const colorScale = d3.scaleOrdinal(d3.schemeCategory10)
+                         .domain(d3.extent(nodes, n => n.height));
+
+    const tiles = [
+        [d3.treemapSquarify.ratio(1.61), d3.treemapSquarify.ratio(1.25), d3.treemapBinary],
+        [d3.treemapDice, d3.treemapSlice, d3.treemapSliceDice]
+    ];
+    const labels = [
+        ["d3.treemapSquarify.ratio(1.61)", "d3.treemapSquarify.ratio(1.25)", "d3.treemapBinary"],
+        ["d3.treemapDice", "d3.treemapSlice", "d3.treemapSliceDice"]
+    ];
+
+    drawCharts();
+
+    function drawCharts() {
+        const w = dim.width / 3 - 30;
+        const h = dim.height / 2 - 60;
+        for(let i = 0; i < 3; i++) {
+            for(let j = 0; j < 2; j++) {
+                const c = chart.append("g")
+                                .attr("transform", `translate(${[i*w, j*h]})`);
+                const treemap = d3.treemap()
+                                  .size([w - 30, h - 120])
+                                  .padding(3)
+                                  .tile(tiles[j][i]);
+                const nodes = treemap(root).descendants();
+                colorScale.domain(d3.extent(nodes, n => n.height));
+                drawTreemap(c, nodes)
+                c.append("text")
+                        .attr("x", w/2)
+                        .attr("y", h - 100)
+                        .text(labels[j][i])
+            }
+        }
+    }
+
+    function drawTreemap(chart, nodes) {
+        chart.selectAll("rect")
+            .data(nodes)
+            .join("rect")
+                .attr("x", d => d.x0)
+                .attr("y", d => d.y0)
+                .attr("width", d => d.x1 - d.x0)
+                .attr("height", d => d.y1 - d.y0)
+                .attr("fill", d => colorScale(d.height));
+    }
+
+</script>
+</body>
+</html>

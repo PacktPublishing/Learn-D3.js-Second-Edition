@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>A sample hierarchical table view - CSV</title>
+    <link rel="stylesheet" href="../css/table-styles.css">
+</head>
+<body>
+<h1>A sample hierarchical table view - using a tabular data source</h1>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {makeTable, display} from "../js/table-view.js";
+
+    // 1) Raw tabular data
+    const file = "../../data/sample-hierarchy.csv";
+    const result = await d3.csv(file, d3.autoType);
+    console.log("tabular data", result);
+
+    // 2) Generate d3.hierarchy object using d3.stratify (generates depth, length, and methods)
+    const hierarchy = d3.stratify()
+                       .id(d => d.id)
+                       .parentId(d => d.context);
+    const root = hierarchy(result);
+    console.log("D3 hierarchy", root);
+
+    // 3) Generate labels
+    root.eachBefore(function(d) {
+        if(!d.parent) {
+            d.number = 1;
+        } else {
+            d.number = d.parent.number + "." + (d.parent.children.indexOf(d) + 1);
+        }
+    });
+
+    // 4) Sum some values
+    root.sum(d => d.content1 + d.content2);
+    root.descendants().forEach(d => d.total = d.value);
+
+    // 5) Draw the table
+    draw(root);
+
+    // Visual presentation as a table
+    function draw(root) {
+        const displayMap = new Map();
+        displayMap.set("total", d => display(d.total, "Total"));
+        displayMap.set("number", d => display(d.number, "Generated number"));
+        makeTable(d3.select("body"), root, displayMap);
+    }
+
+</script>
+</body>
+</html>

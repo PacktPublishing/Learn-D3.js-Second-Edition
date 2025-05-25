@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hierarchy with d3.stratify</title>
+    <link rel="stylesheet" href="../css/table-styles.css">
+</head>
+<body>
+<h1>Hierarchy with d3.stratify</h1>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {makeTable, display} from "../js/table-view.js";
+
+    // d3.stratify is the best option for this file.
+
+    // 1) Raw tabular data
+    const file = "../../data/venue.csv";  // different file
+    const result = await d3.csv(file, d3.autoType);
+    console.log("tabular data", result);
+
+    // 2) No previous grouping necessary (d3.stratify converts straight from tabular to d3.hierarchy)
+    // 3) Generate d3.hierarchy object using d3.stratify (generates depth, length, and methods)
+    const hierarchy = d3.stratify()
+                       .id(d => d.name)
+                       .parentId(d => d.location);
+    const root = hierarchy(result);
+    console.log("D3 hierarchy", root);
+
+    // 4) Calculate the sum of the values for each node (stored in standard value property)
+    root.sum(d => d.capacity);
+    root.descendants().forEach(d => d.capacity = d.value);
+
+    // 5) Draw the table
+    draw(root);
+
+    // Visual presentation as a table
+    function draw(root) {
+        const displayMap = new Map();
+        displayMap.set("capacity", d => display(d.capacity, "Capacity"));
+        makeTable(d3.select("body"), root, displayMap);
+    }
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tree using labels and pathlinks</title>
+    <style>
+        path {
+            stroke: black;
+            fill: none;
+        }
+        text {
+            font-family: 'Yanone Kaffeesatz', sans-serif;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+<h1>Tree using labels and pathlinks</h1>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {cht, chart, root} from "./js/treedata-json.js";
+
+    d3.cluster().size([cht.w, cht.h])(root);
+
+    // Nodes, links, scales
+    const nodes = root.descendants();
+    const links = root.links();
+    const color = d3.scaleOrdinal(d3.schemeCategory10).domain(d3.extent(nodes, n => n.depth));
+    const width = d3.scaleLinear().range([1,16]).domain(d3.extent(links, k => k.target.height));
+
+    // Pathlinks
+    const verticalLink = d3.linkVertical().x(d => d.x).y(d => d.y);
+
+    drawLinks();
+    drawNodes();
+    drawLabels();
+
+    // Functions
+    function drawNodes() {
+        chart.selectAll("g")
+             .data(nodes)
+                .join("g").attr("class", "node")
+                    .attr("transform", d => `translate(${[d.x, d.y]})`)
+                    .append("circle")
+                        .attr("r", d => (d.height + 1) * 10)
+                        .style("fill", d => color(d.depth));
+    }
+
+    function drawLinks() {
+        chart.selectAll("path")
+             .data(links)
+                .join("path")
+                    .attr("d", verticalLink)
+                    .style("stroke-width", d => width(d.target.height))
+                    .style("opacity", d => d.target.depth *.15 + .4);
+    }
+
+    function drawLabels() { // relative to node <g>
+        chart.selectAll("g.node")
+             .append("text")
+                .text(d => d.data.id)
+                .style("fill", d => d.height !== 0 ? 'white' : 'black')
+                .attr("transform", d => d.height === 0 ? `rotate(-90) translate(-15,5)` : "translate(0,5)")
+                .style("text-anchor", d => d.height !== 0 ? "middle" : "end")
+                .style("font-size", d => 14 + (d.height*d.height));
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Interactive treemap</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<h1>Interactive treemap</h1>
+<p>Click to change root. Click again to reset.</p>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    import {cht, chart, root} from "./js/treedata-json.js";
+
+    root.sort((a,b) => d3.descending(a.height, b.height) )
+        .sum(d => d.content ? d.content[0] : 0)
+        .eachBefore(d => d.number = d.parent ? `${d.parent.number}.${d.parent.children.indexOf(d) + 1}` : 1); // number labels
+
+    const treemap = d3.treemap()
+        .size([cht.w, cht.h])
+        .paddingInner(2)
+        .paddingOuter(5)
+        .paddingTop(40);
+    treemap(root);
+
+    const nodes = root.descendants();
+
+    const colorScale = d3.scaleOrdinal(d3.schemeCategory10)
+                         .domain(d3.extent(root.descendants(), n => n.height));
+    const fontScale = d3.scaleLinear()
+                        .domain(d3.extent(root.descendants(), d => d.depth).reverse())
+                        .range([14,35]);
+
+    draw(root);
+
+    function draw(data) {
+        chart.selectAll("g.node")
+             .data(data, d => d.number)
+                .join(enter => appendNodes(enter), update => update, exit => exit.remove())
+                    .attr("transform", d => `translate(${[d.x0, d.y0]})`)
+                    .on("click", (evt, d) => changeRoot(data, d.number))
+                    .each(function(d) { updateNodes(d3.select(this), d); });
+    }
+
+    function appendNodes(enter) {
+        return enter.append("g")
+            .attr("class", "node")
+            .each(function() {
+                d3.select(this).append("rect");
+                d3.select(this).append("text")
+                    .style("pointer-events", "none")
+            });
+    }
+
+    function updateNodes(node, d) {
+        node.select("rect")
+            .attr("width", d.x1 - d.x0)
+            .attr("height", d.y1 - d.y0)
+            .attr("fill", colorScale(d.height));
+        node.select("text")
+            .text(d.data.id)
+            .style("alignment-baseline", d.children ? "hanging" : "middle")
+            .attr("x", (d.x1 - d.x0) / 2)
+            .attr("y", d.children ? 10 : (d.y1 - d.y0 + 5)/2)
+            .text(d.x1 - d.x0 > 50 ? d.number : '')
+            .style("font-size", d => fontScale(d.depth));
+    }
+
+    function changeRoot(nodes, nodeId) {
+        const node = root.find(d => d.number === nodeId);
+        if(!node) return;
+        if(nodeId !== nodes.number) {
+            const subtree = node.copy();
+            subtree.eachBefore(d => d.number = d.parent ? `${d.parent.number}.${d.parent.children.indexOf(d) + 1}` : nodeId);
+            treemap.tile(d3.treemapSliceDice)(subtree);
+            draw(subtree);
+        } else {
+            draw(root);
+        }
+    }
+</script>
+</body>
+</html>

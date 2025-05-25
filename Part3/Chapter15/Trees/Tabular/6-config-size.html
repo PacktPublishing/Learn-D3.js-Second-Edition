@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Using size()</title>
+    <style>
+        line {
+            stroke: black;
+        }
+        svg {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+<h1>Using <code>size()</code></h1>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {cht, chart, root} from "./js/treedata-csv.js";
+    d3.select("svg").attr("height", 500).attr("width", 700);
+
+    // const size = [cht.w, cht.h]; // previous size (relative to chart dimensions)
+    const size = [600, 350]; // testing different size
+    d3.tree().size(size)(root);
+
+    drawSizeBox();  // draw a box to show the computed size of the chart
+
+    // Nodes, links, scales
+    const nodes = root.descendants();
+    const links = root.links();
+    const color = d3.scaleOrdinal(d3.schemeCategory10).domain(d3.extent(nodes, n => n.depth));
+    const width = d3.scaleLinear().range([1,16]).domain(d3.extent(links, k => k.target.height));
+
+    drawLinks();
+    drawNodes();
+
+    // Functions
+    function drawSizeBox() {
+        chart.append("rect")    // starting at 0,0 (chart dimensions, which have a margin from the SVG origin)
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("width", size[0])
+            .attr("height", size[1])
+            .style("fill", "none")
+            .style("stroke", "red");
+    }
+
+    function drawNodes() {
+        chart.selectAll("circle")
+            .data(nodes)
+            .join("circle")
+            .attr("r", 20)
+            .attr("cx", d => d.x)
+            .attr("cy", d => d.y)
+            .style("fill", d => color(d.depth));
+    }
+
+    function drawLinks() {
+        chart.selectAll("line")
+            .data(links)
+            .join("line")
+            .attr("x1", d => d.source.x)
+            .attr("y1", d => d.source.y)
+            .attr("x2", d => d.target.x)
+            .attr("y2", d => d.target.y)
+            .style("stroke-width", d => (d.target.height + 1) * (d.target.height + 1))
+            .style("opacity", d => d.target.depth *.25 * .6 + .4);
+    }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Using nodeSize() and separation()</title>
+    <style>
+        line {
+            stroke: black;
+        }
+    </style>
+</head>
+<body>
+<h1>Using <code>nodeSize()</code> and <code>separation()</code></h1>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {dim, chart, root} from "./js/treedata-json.js";
+
+    // Must move tree to visible area since when using nodeSize default is (0,0)
+    chart.attr("transform", `translate(${[dim.width/2, dim.margin]})`);
+
+    // Node size: default is null
+    let nodeSize = [50, 100];
+
+    // Uncomment to override and see the effect of different node sizes:
+    // nodeSize = [50,50]; // square
+    // nodeSize = [100,50];
+
+    // Node separation: default - single space between children of the same parent, double space for others
+    let separation = (a,b) => a.parent === b.parent ? 1 : 2;
+
+    // Uncomment to override and see the effect of other separations:
+    // separation = () => 1;     // no space between nodes
+    // separation = () => 1.5;   // half node width between nodes
+    // separation = (a,b) => a.children || b.children ? 2 : 1.2; // default
+    separation = n => n.data.name === 'Chamber1' ? 2 : 1;  // separating the first leaf
+
+    d3.tree()
+        .nodeSize(nodeSize)
+        .separation(separation)(root);
+
+    // Nodes, links, scales
+    const nodes = root.descendants();
+    const links = root.links();
+    const color = d3.scaleOrdinal(d3.schemeCategory10).domain(d3.extent(nodes, n => n.depth));
+    const width = d3.scaleLinear().range([1,16]).domain(d3.extent(links, k => k.target.height));
+
+    // Draw bounding box of each node
+    drawNodeSizeBoxes(nodeSize);
+
+    drawLinks();
+    drawNodes();
+
+    // Functions
+    function drawNodeSizeBoxes(nodeSize) {
+        chart.selectAll("rect")
+            .data(nodes)
+            .join("rect")
+            .attr("x", d => d.x - nodeSize[0] / 2)
+            .attr("y", d => d.y - nodeSize[1] / 2)
+            .attr("width", nodeSize[0])
+            .attr("height", nodeSize[1])
+            .style("fill", "none")
+            .style("stroke", "blue");
+    }
+
+    function drawNodes() {
+        chart.selectAll("circle")
+            .data(nodes)
+            .join("circle")
+            .attr("r", 20)
+            .attr("cx", d => d.x)
+            .attr("cy", d => d.y)
+            .style("fill", d => color(d.depth));
+    }
+
+    function drawLinks() {
+        chart.selectAll("line")
+            .data(links)
+            .join("line")
+            .attr("x1", d => d.source.x)
+            .attr("y1", d => d.source.y)
+            .attr("x2", d => d.target.x)
+            .attr("y2", d => d.target.y)
+            .style("stroke-width", d => width(d.target.height))
+            .style("opacity", d => d.target.depth *.15 + .4);
+    }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Circle pack enclosure: not showing root circle</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<h1>Circle pack enclosure: not showing root circle</h1>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {dim, cht, chart, root} from "./js/treedata-json.js";
+
+    // Must configure either sum() or count()
+    root.sort((a,b) => d3.descending(a.depth, b.depth))
+        .sum(d => d.content ? d.content[1] * d.content[1] : 0)
+        .eachBefore(d => d.number = d.parent ? `${d.parent.number}.${d.parent.children.indexOf(d) + 1}` : 1); // number labels
+
+    const colorScale = d3.scaleOrdinal(d3.schemeCategory10)
+                         .domain(d3.extent(root, n => n.depth));
+
+    const pack = d3.pack()
+                   .size([cht.w, cht.h])
+                   .padding(d => d.children.length === 1 ? 25 : 10); // larger padding on single-child nodes
+    pack(root);
+
+    draw(root.descendants().filter(d => d.depth > 0)); // filter out root node
+
+    chart.attr("transform", `translate(${[dim.margin, -dim.margin*2]})`);
+    d3.select("svg").attr("height", cht.h - dim.margin*4);
+
+    function draw(nodes) {
+        chart.selectAll("g")
+             .data(nodes)
+                .join("g")
+                .attr("transform", d => `translate(${[d.x, d.y]})`)
+                .each(function(d) {
+                    const cell = d3.select(this);
+                    cell.append("circle")
+                        .attr("r", d.r)
+                        .style("fill", colorScale(d.depth));
+                    cell.append("text")
+                        .text(d.number)
+                        .attr("y", d.height === 0 ? 3 : -d.r + 14) // places in center if leaf
+                        .style("opacity", d.r > 12 ? 1 : 0); // don't show labels for small circles
+                    });
+    }
+</script>
+</body>
+</html>

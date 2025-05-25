@@ -4,11 +4,11 @@ Files and exercises for chapter 15.
 
 ## 1) Description of each subfolder in this folder
 
-__`Introduction/`__
+__`Hierarchies/`__
 
 Description.
 
-__`Hierarchy/`__
+__`Methods/`__
 
 Description.
 
@@ -16,43 +16,24 @@ __`TableView/`__
 
 Description.
 
-__`TreeFromCSV/`__
+__`Trees/`__
+
 
 Description.
 
-__`TreeFromJSON/`__
+__`Partitions/`__
 
 Description.
 
-__`TreeRadial/`__
+__`Enclosures/`__
 
 Description.
 
-__`TreeExamples/`__
+__`Examples/`__
 
 Description.
 
-__`Partition/`__
-
-Description.
-
-__`PartitionExamples/`__
-
-Description.
-
-__`CirclePack/`__
-
-Description.
-
-__`CirclePackExamples/`__
-
-Description.
-
-__`Treemap/`__
-
-Description.
-
-__`TreemapExamples/`__
+__`Exercises/`__
 
 Description.
 

@@ -1,0 +1,13 @@
+text {
+    font-family: 'Arial narrow', sans-serif;
+    text-anchor: middle;
+    fill: white;
+    font-size: 11px;
+}
+circle {
+    stroke: white;
+    stroke-width: 1px;
+}
+svg {
+    border: solid 1px green;
+}

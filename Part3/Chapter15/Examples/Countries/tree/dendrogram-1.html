@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sample dendrogram</title>
+    <link rel="stylesheet" href="css/countries.css">
+</head>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {makeTree, draw} from "./js/tree-countries.js";
+
+    const dim = {width: 600, height: 1200};
+    const margin = {top: 50, right: 90, bottom: 10, left: 30};
+
+    // chart dimensions (used to limit the dendrogram layout)
+    const cht = {w: dim.width - margin.left - margin.right, h: dim.height - margin.top - margin.bottom};
+
+    // Load the data
+    const csvFile = "../../../data/un_regions.csv";
+    const tabular = await d3.csv(csvFile);
+    console.log('\nTabular data', tabular);
+
+    const data = makeTree(tabular, [cht.h, cht.w], false);  // isTidyTree = false
+    console.log('D3 hierarchy', data);
+
+    // Prepare SVG
+    const chart = d3.select("body")
+                    .append("svg")
+                    .attr("height", dim.height)
+                    .attr("width", dim.width)
+                    .append("g")
+                        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    // 7) Link function
+    const link = d3.linkHorizontal().x(d => d.y).y(d => d.x);  // same as d3.link(d3.curveBumpX)
+
+    // 8) Draw the chart
+    draw('horizontal', data, chart, 'link', link);
+
+</script>
+</body>
+</html>
+

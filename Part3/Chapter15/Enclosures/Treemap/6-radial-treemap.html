@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Radial treemap</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        path {
+            stroke: lightgray;
+            fill-opacity: .5;
+        }
+        text {
+            fill: black;
+
+        }
+    </style>
+</head>
+<body>
+<h1>Radial treemap</h1>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {dim, cht, chart, root} from "./js/treedata-json.js";
+
+    root.sort((a,b) => d3.descending(a.height, b.height))
+        .sum(d => d.content ? d.content[1] : 0)
+        .eachBefore(d => d.number = d.parent ? `${d.parent.number}.${d.parent.children.indexOf(d) + 1}` : 1); // number labels
+
+    const nodes = root.descendants();
+    const colorScale = d3.scaleOrdinal(d3.schemeCategory10).domain(d3.extent(nodes, n => n.height));
+
+    const arc = d3.arc()
+                .startAngle(d => d.x0 * Math.PI / 180) // angles in radians
+                .endAngle(d => d.x1 * Math.PI / 180)
+                .innerRadius(d => d.y0)
+                .outerRadius(d => d.y1);
+
+    const treemap = d3.treemap().size([cht.w, cht.h])
+                      .size([360, dim.height/2 - 10]) // angles in degrees
+                      .paddingInner(2)
+                      .paddingOuter(5)
+                      .paddingTop(d => d.parent ? 0 : 100)
+                      .paddingBottom(20);
+    treemap(root);
+
+    chart.attr("transform", `translate(${[dim.width/2, dim.height/2]})`);
+
+    drawTreemap(nodes);
+
+    function drawTreemap(nodes) {
+        drawCells(chart, nodes);
+        drawLabels(chart, nodes);
+    }
+
+    function drawCells(chart, nodes) {
+        chart.selectAll("path")
+            .data(nodes)
+            .join("path")
+            .attr("d", arc)
+            .attr("fill", d => colorScale(d.height));
+    }
+
+    function anchor(node, padding) {
+        const startAngle = arc.startAngle(); // radians
+        const endAngle   = arc.endAngle();   // radians
+        const outerRadius = arc.outerRadius();
+        const angle  = (startAngle(node) + endAngle(node)) / 2;
+        const radius = outerRadius(node) - padding;
+        return d3.pointRadial(angle, radius);
+    }
+
+    function drawLabels(chart, nodes) {
+        chart.selectAll("text")
+             .data(nodes)
+             .join("text")
+                .attr("x", d => d.height === 0 ? arc.centroid(d)[0] : anchor(d,15)[0])
+                .attr("y", d => d.height === 0 ? arc.centroid(d)[1] : anchor(d,15)[1])
+                .attr("transform", d => `rotate(${(d.x0+d.x1)/2},${d.height === 0 ? arc.centroid(d) : anchor(d,15)})`)
+                .style("alignment-baseline", d => d.height === 0 ? "middle" : "baseline")
+                .text(d => arc.endAngle()(d) - arc.startAngle()(d) > .5 || arc.outerRadius()(d) > 200 ? d.number : '')
+    }
+</script>
+</body>
+</html>

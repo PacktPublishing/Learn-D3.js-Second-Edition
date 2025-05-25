@@ -1,0 +1,15 @@
+text {
+    font-family: 'Arial Narrow', sans-serif;
+    font-size: 12px;
+    text-anchor: middle;
+    alignment-baseline: middle;
+}
+circle {
+    stroke-width: .5px;
+    opacity: .8;
+}
+h1 {
+    font-family: 'Arial Narrow', sans-serif;
+    font-size: 30px;
+    text-align: left;
+}

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Treemap: countries by population</title>
+    <style>
+        text {
+            font-family: 'arial narrow', sans-serif;
+            text-anchor: middle;
+            font-size: 10px;
+            fill: black;
+            font-weight: 100;
+        }
+        .root-text tspan {
+            font-size: 16px;
+            text-anchor: start;
+        }
+    </style>
+</head>
+<body>
+<h1>Continents and countries by population</h1>
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {rootFromRollup} from "../../../js/nest.js";
+
+    const width = 1000, height = 800, margin = 25;
+
+    const chart = d3.select("body").append("svg").attr("height", height).attr("width", width)
+                    .append("g").attr("transform", `translate(${[margin,margin*2]})`);
+
+    const rootText = chart.append("text").attr("class", "root-text")
+                          .attr("y", -margin -6)
+                          .attr("x", margin);
+    rootText.append("tspan")
+            .attr("id", "continent")
+            .attr("font-weight", "bold")
+            .attr("x", 0)
+            .text("World");
+    rootText.append("tspan")
+            .attr("id", "population")
+            .attr("x", 0)
+            .attr("dy", "1.2em")
+            .text("Population: ");
+
+    const result = await d3.csv("../../../data/un_regions.csv");
+
+    const keyFunctions = [
+        d => d.Supercontinent,
+        d => d.Continent,
+        d => d.UN_Region,
+        d => d.Country
+    ];
+    const reductionFunction = d => ({area: +d[0].Area_km2, population: +d[0].Pop_2016});
+    const rollupRoot = d3.rollup(result, reductionFunction, ...keyFunctions);
+    const hierarchy = rootFromRollup(rollupRoot, "World", false);
+    const root = d3.hierarchy(hierarchy);
+
+    root.sum(d => d.value ? d.value[0].population : d.population);
+    root.descendants().forEach(d => d.pop = d.value);
+    root.sort((a,b) => b.height - a.height || a.value - b.value);
+
+    const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+    const fmt = d3.format(",.0f");
+
+    const treemap = d3.treemap().size([width-margin*2,height-margin*2]);
+
+    treemap(root);
+
+    draw(root);
+    d3.select("#population").text(`Population: ${fmt(root.value)}`);
+
+    function draw(data) {
+        chart.selectAll("g.node")
+             .data(data.children, d => d.data.id)
+                .join(enter => appendNodes(enter), update => update, exit => exit.remove())
+                    .on("click", changeRoot)
+                    .transition()
+                        .attr("transform", d => `translate(${[d.x0, d.y0]})`)
+                        .each(function(d) { updateNodes(d3.select(this), d); });
+    }
+
+    function appendNodes(enter) {
+        return enter.append("g")
+                    .attr("class", "node")
+                    .each(function() {
+                        d3.select(this).append("rect");
+                        d3.select(this).append("text")
+                            .style("pointer-events", "none")
+                            .style("alignment-baseline", "hanging")
+                            .style("text-anchor", "start")
+                            .attr("x", 5)
+                            .attr("y", 18)
+                            .each(function() {
+                                d3.select(this).append("tspan").attr("class", "title")
+                                    .style("font-size", "16px");
+                                d3.select(this).append("tspan").attr("class", "value")
+                                    .attr("dy", "1.2em").attr("x", 5)
+                                    .style("font-size", "14px");
+                            });
+                    });
+    }
+
+    function updateNodes(node, d) {
+        node.select("rect")
+            .attr("width", d.x1 - d.x0)
+            .attr("height", d.y1 - d.y0)
+            .attr("fill", colorScale);
+
+        const text = node.select("text");
+        text.select(".title").text(d => d.data.id);
+        text.select(".value")
+            .text(d => `Population: ${fmt(d.value).replace("G", "B")}`);
+
+        requestAnimationFrame(() => {              // necessary to get correct bbox
+            const bbox = text.node().getBBox();    // get bounding box to fit text in rectangle
+            const width = d.x1 - d.x0;
+            const height = d.y1 - d.y0;
+
+            if (bbox.width > width && bbox.width > height) {
+                text.attr("opacity", 0);
+            } else if (bbox.width > width && bbox.width < height) {
+                text.attr("transform", `rotate(-90) translate(${[-height, 0]})`);
+            } else {
+                text.attr("opacity", 1);
+            }
+        });
+    }
+
+    function changeRoot(evt, node) {
+        if (node.children) {
+            const subtree = node.copy();
+            treemap(subtree);
+            node = subtree;
+        } else {
+            node = root;
+        }
+        draw(node);
+        d3.select("#continent").text(`${node.data.id}`);
+        d3.select("#population").text(`Population: ${fmt(node.value).replace("G", "B")}`);
+    }
+
+</script>
+</body>
+</html>
