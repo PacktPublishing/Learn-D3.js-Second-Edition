@@ -3,8 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script src="https://d3js.org/d3.v5.min.js"></script>
-    <script src="../js/dvj-all.js"></script>
     <style>
         .faded {
             opacity: .3;
@@ -22,7 +20,10 @@
     </style>
 </head>
 <body>
-<script>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as dvj from "../js/network-utils.js";
+
     const width = 700;
     const height = 700;
     const margin = 100;
@@ -60,8 +61,7 @@
 
     const cell = chart.selectAll('g.cell')
             .data(data)
-            .enter()
-            .append("g").attr("class", 'cell')
+            .join("g").attr("class", 'cell')
             .attr("transform", d => `translate(${[d.x, d.y]})`)
             .on("mouseover", highlight)
             .on("mouseout", unHighlight);
@@ -76,8 +76,7 @@
 
     chart.selectAll('text.source')
             .data(data.filter(d => d.y == 0))
-            .enter()
-            .append("text").attr("class",'source')
+            .join("text").attr("class",'source')
             .attr("x", d => d.x + d.w/2)
             .style("text-anchor", 'middle')
             .attr("y", -15)
@@ -92,8 +91,7 @@
 
     chart.selectAll('text.target')
             .data(data.filter(d => d.x == 0))
-            .enter()
-            .append("text").attr("class",'target')
+            .join("text").attr("class",'target')
             .attr("y", d => d.y + d.h/2 + 7)
             .style("text-anchor", 'end')
             .attr("x", -10)
@@ -118,16 +116,16 @@
             .style("alignment-baseline", 'middle')
             .style("text-anchor", 'middle')
 
-    function unHighlight(d,i,nodes) {
+    function unHighlight() {
         d3.selectAll(".cell, text.source, text.target").classed('faded highlight', false);
         d3.select('.tooltip').style("opacity", 0);
     }
 
-    function highlight(d) {
-            d3.selectAll(".cell").classed('faded', k => !(k.x == d.x || k.y == d.y))
-            d3.selectAll(".cell").classed('highlight', k => k.x == d.x || k.y == d.y)
-            d3.selectAll("text.source").classed('highlight', k => k.x == d.x)
-            d3.selectAll("text.target").classed('highlight', k => k.y == d.y)
+    function highlight(evt, d) {
+            d3.selectAll(".cell").classed('faded', k => !(k.x === d.x || k.y === d.y))
+            d3.selectAll(".cell").classed('highlight', k => k.x === d.x || k.y === d.y)
+            d3.selectAll("text.source").classed('highlight', k => k.x === d.x)
+            d3.selectAll("text.target").classed('highlight', k => k.y === d.y)
 
             d3.select('.tooltip').select("text")
                  .attr("x", d.w * .625)

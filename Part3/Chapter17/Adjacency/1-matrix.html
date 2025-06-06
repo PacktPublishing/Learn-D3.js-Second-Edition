@@ -3,8 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script src="https://d3js.org/d3.v5.min.js"></script>
-    <script src="../js/dvj-all.js"></script>
     <style>
         rect {
             stroke: black;
@@ -18,7 +16,10 @@
     </style>
 </head>
 <body>
-<script>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as dvj from "../js/network-utils.js";
+
     const width = 700;
     const height = 700;
     const margin = 100;
@@ -58,7 +59,7 @@
             .style("fill", d => d.value ? color(d.value) : 'white');
 
     chart.selectAll('text.source')
-            .data(data.filter(d => d.x == 0))
+            .data(data.filter(d => d.x === 0))
             .enter()
             .append("text").attr("class",'source')
             .attr("y", d => d.y + d.h/2 + 7)      // using d.y and d.h
@@ -67,7 +68,7 @@
 
 
     chart.selectAll('text.target')
-            .data(data.filter(d => d.y == 0))
+            .data(data.filter(d => d.y === 0))
             .enter()
             .append("text").attr("class",'target')
             .attr("x", d => d.x + d.w/2)          // using d.x and d.w

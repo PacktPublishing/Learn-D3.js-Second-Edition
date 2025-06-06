@@ -3,8 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script src="https://d3js.org/d3.v5.min.js"></script>
-    <script src="../js/dvj-all.js"></script>
     <style>
         text {
             font-family: 'Yanone Kaffeesatz', sans-serif;
@@ -22,7 +20,10 @@
     </style>
 </head>
 <body>
-<script>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as dvj from "../js/network-utils.js";
+
     const width = 800;
     const height = 600;
     const margin = 100;
@@ -139,7 +140,7 @@
             .text(d => d.node)
             .style("pointer-events",'none');
 
-    function highlight(d) {
+    function highlight(evt, d) {
         d3.selectAll("path").classed('faded', s => !(s.source === d || s.target === d))
         d3.selectAll("circle").classed('faded', n => !(n === d
                                                    || n.sources.filter(s => s.target === d).length > 0

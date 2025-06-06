@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script src="https://d3js.org/d3.v5.min.js"></script>
     <style>
         text {
             font-family: 'Yanone Kaffeesatz', sans-serif;
@@ -19,7 +18,8 @@
     </style>
 </head>
 <body>
-<script>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
 
     const width = 800;
     const height = 800;
@@ -85,15 +85,15 @@
             .text(d => headers[d.index])
             .attr("transform",d => `rotate(${(arc.endAngle()(d) + arc.startAngle()(d))*90/Math.PI},${arc.centroid(d)})`);
 
-    function highlightNode(node) {
+    function highlightNode(evt, node) {
         d3.selectAll("path.arc").classed('faded', d => !(d === node));
         d3.selectAll("path.ribbon").classed('faded', edge => !(edge.source.index === node.index));
     }
-    function highlightRibbon(edge) {
+    function highlightRibbon(evt, edge) {
         d3.selectAll("path.arc").classed('faded', node => !(node.index === edge.source.index || node.index === edge.target.index))
         d3.selectAll("path.ribbon").classed('faded', d => !(d === edge));
     }
-    function fade(node) {
+    function fade() {
         d3.selectAll("path").classed('faded', false);
     }
 </script>

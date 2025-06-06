@@ -71,7 +71,7 @@
     const fmt = d3.format(".2f");
 
     // a color scale
-    colorScale = d3.scaleLinear()
+    color = d3.scaleLinear()
             .domain([0, d3.max(distances, d => d.distance)])
             .range([0,1])
 
@@ -94,7 +94,7 @@
         entry.append("div").attr("class", "bar")
              .style("width", barScale(d.distance) + "px")
              .style("background-color", d3.color('orange')
-                                          .darker(colorScale(d.distance)))
+                                          .darker(color(d.distance)))
 
         entry.append("div").attr("class", "label value")
              .style("left", (barScale(d.distance) + 100) + "px")

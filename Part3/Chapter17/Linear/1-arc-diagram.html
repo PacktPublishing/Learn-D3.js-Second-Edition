@@ -3,8 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script src="https://d3js.org/d3.v5.min.js"></script>
-    <script src="../js/dvj-all.js"></script>
     <style>
         text {
             font-family: 'Yanone Kaffeesatz', sans-serif;
@@ -20,7 +18,10 @@
     </style>
 </head>
 <body>
-<script>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as dvj from "../js/network-utils.js";
+
     const width = 800;
     const height = 600;
     const margin = 100;
@@ -71,8 +72,6 @@
             .join("text")
             .attr("x", d => d.x)
             .text(d => d.node);
-
-
 
 </script>
 </body>

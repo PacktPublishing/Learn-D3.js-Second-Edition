@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        text {
+            font-family: 'Arial Narrow', sans-serif;
+            font-size: 12px;
+            alignment-baseline: middle;
+            text-anchor: middle;
+        }
+        .faded {
+            opacity: .3;
+        }
+        .highlight {
+            font-weight: bold;
+            font-size: 150%;
+        }
+        .highlight rect {
+            stroke-width: 1px;
+        }
+        text.node {
+            pointer-events: none;
+        }
+        .tooltip text {
+            font-size: 150%;
+        }
+    </style>
+</head>
+<body>
+<h1>Migrations in Asia</h1>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as dvj from "../../js/network-utils.js";
+    import {draw} from "./js/adjacency-countries.js";
+
+    const dim = {width: 900, height: 900, margin: 250};
+
+    const svg = d3.select("body").append("svg").attr("width", dim.width).attr("height", dim.height);
+    export const chart = svg.append("g").attr("transform", `translate(${[dim.margin/2, dim.margin/2]})`);
+
+    const nodes = [];
+
+    d3.csv("../../data/migrations_2017_continent.csv", function(row) {
+        nodes.push({node: row.Destination, total: +row.Total, code: row.Code, pop: +row.Population, continent: row.Continent});
+
+        const line = [];
+        for(let key in row) {
+            if(key !== 'Population' && key !== 'Destination' && key !== 'Total' && key !== 'Code') {
+                if(isNaN(row[key]) || +row[key] <= 0) continue;
+                const obj = {
+                    value: +row[key] ,
+                    target: row.Destination,
+                    source: key
+                }
+                line.push(obj);
+            }
+        }
+        return line;
+
+    }).then(function(data) {
+
+        const edges = d3.merge(data);
+
+        // Filter by continent and limit to 25 total
+        const filteredNodes  = nodes.filter(d => d.continent === 'Asia')
+                                    .sort((a,b) => d3.descending(a.total, b.total))
+                                    .filter((d,i) => i < 25)
+
+        const filteredEdges = edges.filter(edge => filteredNodes.find(n => n.node === edge.target))
+                                   .filter(edge => filteredNodes.find(n => n.node === edge.source));
+
+        filteredEdges.forEach(function(edge) {
+            edge.source = filteredNodes.map(n => n.node).indexOf(edge.source);
+            edge.target = filteredNodes.map(n => n.node).indexOf(edge.target);
+        });
+
+        // Create adjacency matrix
+        const matrixLayout = dvj.adjacencyMatrix().size([dim.width-dim.margin, dim.height-dim.margin]);
+        const matrix = dvj.linksToMatrix(filteredNodes, filteredEdges);
+        const result = matrixLayout(filteredNodes, matrix);
+
+        // Coloring
+        const color = d3.scaleSqrt().range(['lightyellow','red'])
+            .domain([0,d3.max(result, d => d.value)]);
+
+        result.forEach(item => {
+            item.color = item.value ? color(item.value) : 'white';
+        });
+
+        draw(dim, chart, filteredNodes, result);
+    });
+
+</script>
+</body>
+</html>

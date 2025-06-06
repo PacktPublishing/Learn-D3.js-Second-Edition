@@ -3,8 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script src="https://d3js.org/d3.v5.min.js"></script>
-    <script src="../js/dvj-all.js"></script>
     <style>
         .faded {
             opacity: .3;
@@ -28,7 +26,10 @@
     </style>
 </head>
 <body>
-<script>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as dvj from "../js/network-utils.js";
+
     const width = 700;
     const height = 700;
     const margin = 100;
@@ -106,11 +107,11 @@
             .attr("transform",`translate(${[width/2 - margin/2, -35]})`)
             .text('TO');
 
-    function highlight(d) {
-            d3.selectAll("rect").classed('faded', k => !(k.x == d.x || k.y == d.y));
-            d3.selectAll("rect").classed('highlight', k => k.x == d.x || k.y == d.y);
-            d3.selectAll("text.source").classed('highlight', k => k.x == d.x);
-            d3.selectAll("text.target").classed('highlight', k => k.y == d.y);
+    function highlight(evt, d) {
+            d3.selectAll("rect").classed('faded', k => !(k.x === d.x || k.y === d.y));
+            d3.selectAll("rect").classed('highlight', k => k.x === d.x || k.y === d.y);
+            d3.selectAll("text.source").classed('highlight', k => k.x === d.x);
+            d3.selectAll("text.target").classed('highlight', k => k.y === d.y);
     }
 
     function fade(d) {
