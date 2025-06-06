@@ -11,7 +11,9 @@
     text {
         font-family: 'Arial narrow', sans-serif;
         text-anchor: middle;
+        alignment-baseline: middle;
         fill: white;
+        font-size: 12px;
     }
     </style>
 </head>
@@ -22,7 +24,7 @@
     import {cht, chart, root} from "./js/treedata-json.js";
 
     root.sort((a,b) => d3.ascending(a.height, b.height))
-        .sum(d => d.content ? d.content[0]+1 : 1);
+        .sum(d => d.weight);  // adding values
 
     // Generating labels
     root.eachBefore(d => d.number = d.parent ? `${d.parent.number}.${d.parent.children.indexOf(d) + 1}` : 1);
@@ -31,10 +33,10 @@
     d3.partition().size([cht.w, cht.h])(root);
 
     const nodes = root.descendants();
-    const colorScale = d3.scaleOrdinal(d3.schemeCategory10).domain(d3.extent(nodes, n => n.depth));
-    const fontScale = d3.scaleLinear()
-                        .domain(d3.extent(root.descendants(), d => d.depth).reverse())
-                        .range([14,40]);
+    const color = d3.scaleOrdinal(d3.schemeGnBu[6].slice(1).reverse());
+    const font = d3.scaleLinear()
+                   .domain(d3.extent(root.descendants(), d => d.depth).reverse())
+                   .range([14,40]);
 
     drawPartition();
     drawLabels();
@@ -47,16 +49,22 @@
                 .attr("y", d => d.y0)
                 .attr("width", d => d.x1 - d.x0)
                 .attr("height", d => d.y1 - d.y0)
-                .style("fill", d => colorScale(d.depth));
+                .style("fill", d => d3.color(color(d.depth)).darker());
     }
 
     function drawLabels() {
-        chart.selectAll("text")
+        const label = chart.selectAll("text")
             .data(nodes).join("text")
             .attr("x", d => (d.x0 + d.x1) / 2)
-            .attr("y", d => (d.y0 + d.y1) / 2 + 8)
-            .text(d => d.x1 - d.x0 > 50 ? d.number : '')
-            .style("font-size", d => fontScale(d.depth));
+            .attr("y", d => (d.y0 + d.y1) / 2 + 8);
+
+        label.append("tspan")
+             .text(d => d.x1 - d.x0 > 20 ? d.data.id : '')
+             .style("font-size", d => font(d.depth));
+        label.append("tspan")
+             .attr("dy", "1.2em")
+             .attr("x", d => (d.x0 + d.x1) / 2)
+             .text(d => !d.children && d.x1 - d.x0 > 20 ? d.data.weight : '');
     }
 </script>
 </body>

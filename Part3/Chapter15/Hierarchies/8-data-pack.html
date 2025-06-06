@@ -43,7 +43,7 @@
     // Draw a rectangle showing the computed chart size and a 100x100px grid for reference
     drawChartSize(chart, chartSize);
 
-    const colorScale = d3.scaleOrdinal(d3.schemeObservable10)
+    const color = d3.scaleOrdinal(d3.schemeObservable10)
                          .domain(d3.extent(root, n => n.depth));
 
     chart.selectAll("circle")
@@ -54,7 +54,7 @@
             .attr("r", d => d.r)
             .style("stroke", "black")
             .style("fill-opacity", 0.3)
-            .style("fill", d => colorScale(d.depth));
+            .style("fill", d => color(d.depth));
 
     // Remove the generated parent property (circular reference) to allow JSON.stringify to work
     const noParentRoot = root.each(d => d.parent = '#link_to_parent#');

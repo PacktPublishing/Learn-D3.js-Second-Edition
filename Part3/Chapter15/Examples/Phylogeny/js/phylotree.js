@@ -1,3 +1,6 @@
+/**
+ * Simple Phylogenetic Tree Parser (TNT format)
+ */
 import * as d3 from "https://cdn.skypack.dev/d3@7";
 
 export function parseTree(input) {

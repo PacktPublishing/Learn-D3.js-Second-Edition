@@ -44,7 +44,7 @@
     drawChartSize(chart, chartSize);
     d3.selectAll("line").style("stroke", "black");
 
-    const colorScale = d3.scaleOrdinal(d3.schemeObservable10)
+    const color = d3.scaleOrdinal(d3.schemeObservable10)
                          .domain(d3.extent(root, n => n.depth));
 
     chart.selectAll("rect.node")
@@ -56,7 +56,7 @@
                 .attr("height", d => d.y1 - d.y0)
                 .style("stroke", "black")
                 .style("fill-opacity", .5)
-                .style("fill", d => colorScale(d.depth));
+                .style("fill", d => color(d.depth));
 
     // Remove the generated parent property (circular reference) to allow JSON.stringify to work
     const noParentRoot = root.each(d => d.parent = '#link_to_parent#');

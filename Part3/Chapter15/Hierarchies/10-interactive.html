@@ -49,9 +49,9 @@
     // Draw a rectangle showing the computed chart size and a 100x100px grid for reference
     drawChartSize(chart, chartSize);
 
-    const colorScale = d3.scaleOrdinal(d3.schemeObservable10)
+    const color = d3.scaleOrdinal(d3.schemeObservable10)
         .domain(d3.extent(root, n => n.depth));
-    const rScale = d3.scaleSqrt()
+    const radius = d3.scaleSqrt()
         .domain(d3.extent(root.descendants(), d => d.value))
         .range([10, 30]);
 
@@ -81,8 +81,8 @@
                 .join("circle")
                     .attr("cx", d => d.x)
                     .attr("cy", d => d.y)
-                    .attr("r", d => rScale(d.value))
-                    .style("fill", d => colorScale(d.depth));
+                    .attr("r", d => radius(d.value))
+                    .style("fill", d => color(d.depth));
 
         chart.selectAll("text")
              .data(nodes)

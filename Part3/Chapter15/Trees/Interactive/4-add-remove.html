@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add and remove tree nodes</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        text {
+            text-anchor: middle;
+            fill: white;
+        }
+        svg {
+            border: solid 1px #ccc;
+        }
+    </style>
+</head>
+<body>
+<h1>Interactive tree: add and remove nodes</h1>
+<p>Click on a node to add a child. Double-click to remove it (except for the root).</p>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {cht, chart} from "./js/treedata-json.js";
+
+    const color = d3.scaleOrdinal(d3.schemeObservable10);
+    const width = d3.scaleLinear().range([1,10]);
+    const font = d3.scaleLinear().range([11,24]);
+    const radius = d3.scaleLinear().range([14,25]);
+
+    const data = {id: "root", children: []};
+    let root = d3.hierarchy(data);
+    root.sum(() => 1);
+
+    const tree = d3.tree().size([cht.w, cht.h]);
+
+    const MAX_LEVELS = 5; // maximum levels in the tree
+    const MAX_CHILDREN = 20; // maximum children per node
+
+    tree(root);
+    draw();
+
+    function redraw() {
+        // Recompute the heights for tree
+        root.eachAfter(d => {
+            if (d.children) {
+                d.height = Math.max(...d.children.map(c => c.height)) + 1;
+            } else {
+                d.height = 0; // leaf nodes have height 0
+            }
+        });
+
+        // Recalculate the tree layout
+        tree(root);
+        root.sum(() => 1);
+
+        // Redraw the tree
+        draw();
+    }
+
+    function draw() {
+        const nodes = root.descendants();
+        const links = root.links();
+        color.domain(d3.extent(nodes, n => n.height));
+        width.domain(d3.extent(links, k => k.target.value)); // thicker links for nodes with mode descendants
+        font.domain(d3.extent(nodes, d => d.height));
+        radius.domain(d3.extent(nodes, d => d.height));
+
+        chart.selectAll("path")
+             .data(links)
+                .join("path").lower()
+                   .attr("d", d3.linkVertical().x(d => d.x).y(d => d.y))
+                   .style("stroke-width", d => width(d.target.value))
+                   .style("opacity", d => d.target.depth *.15 + .4);
+
+        chart.selectAll("g.node")
+             .data(nodes, d => d.data.id)
+                .join(
+                    enter => enter.append("g")
+                                  .each(function() {
+                                      d3.select(this).append("circle");
+                                      d3.select(this).append("text");
+                                  }),
+                    update => update,
+                    exit => exit.remove()
+                ).attr("class","node")
+                   .classed("leaf", d => !d.children)
+                   .attr("transform", d => `translate(${[d.x, d.y]})`)
+                   .each(function(d) {
+                        const g = d3.select(this);
+                        g.select("circle")
+                           .attr("r", radius(d.height))
+                           .style("fill", color(d.height));
+                        g.select("text")
+                           .text(d.data.id)
+                           .attr("transform", "translate(0,5)")
+                           .style("font-size", font(d.height));
+                }
+            );
+
+        addEventListeners();
+    }
+
+    function addEventListeners() {
+        let clicks = 0;
+        let timer;
+        const delay = 200;
+
+        // Add node on single click, remove node on double click
+        chart.selectAll("g.node")
+            .on("click", (evt, d) => {
+                clicks++;
+                if (clicks === 1) {
+                    timer = setTimeout(function() {
+                        addNode(evt, d);
+                        clicks = 0;
+                    }, delay);
+                } else {
+                    clearTimeout(timer);
+                    removeNode(evt, d);
+                    clicks = 0;
+                }});
+    }
+
+    function createName(parent) {
+        const count = parent.children?.length || 0;
+        const parentName = parent.data.id === "root" ? '' : parent.data.id;
+        return parentName + String.fromCharCode(97 + count);
+    }
+
+    function addNode(evt, parent) {
+        // limit the depth of the tree
+        if( parent.depth >= MAX_LEVELS) {
+            return;
+        }
+
+        // limit the number of children per node
+        if( parent.children && parent.children.length >= MAX_CHILDREN) {
+            return; // cannot add more children
+        }
+
+        // Create a new child node
+        const childData = {id: createName(parent), children: []};
+
+        // create a new hierarchy node for the child
+        const child = d3.hierarchy(childData);
+
+        // attach parent to the child
+        child.parent = parent;
+
+        // compute depth for node
+        child.depth = parent.depth + 1;
+
+        // append the child to the parent's children array
+        parent.children = parent.children || [];
+        parent.children.push(child);
+
+        redraw();
+    }
+
+    function removeNode(evt, node) {
+        if (node.data.id === "root") return; // cannot remove root
+
+        // Remove the node from its parent's children array
+        const parent = node.parent;
+        parent.children = parent.children.filter(c => c !== node);
+        if(parent.children.length === 0) {
+            parent.children = null;
+        }
+
+        redraw();
+    }
+
+</script>
+</body>
+</html>

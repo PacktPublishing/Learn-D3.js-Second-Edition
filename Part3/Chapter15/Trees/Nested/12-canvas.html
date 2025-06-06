@@ -41,7 +41,7 @@
         ctx.save();
         ctx.strokeStyle = "black";
         ctx.fillStyle = "none";
-        nodes.forEach(function(d) {
+        nodes.forEach(d => {
             ctx.fillStyle = color(d.depth);
             ctx.beginPath();
             ctx.arc(d.x, d.y, (d.height + 1) * 10, 0, 2 * Math.PI);
@@ -54,7 +54,7 @@
     function drawLinks() {
         ctx.save();
         ctx.fillStyle = "transparent";
-        links.forEach(function(d) {
+        links.forEach(d => {
             ctx.lineWidth = width(d.target.height);
             ctx.globalAlpha =  d.target.depth *.15 + .4;
             ctx.beginPath();
@@ -68,7 +68,7 @@
         const font = 'px "Arial narrow", sans-serif';
         ctx.textBaseline = "baseline";
 
-        nodes.forEach(function(d,i) {
+        nodes.forEach(d => {
             ctx.save(); // save current canvas state
             ctx.fillStyle = d.height !== 0 ? 'white' : 'black';
             ctx.textAlign = d.height !== 0 ? "center" : "end";

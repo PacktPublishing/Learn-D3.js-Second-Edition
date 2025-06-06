@@ -13,10 +13,10 @@
 
     // Must configure either sum() or count()
     root.sort((a,b) => b.height - a.height )
-        .sum(d => d.content ? d.content[1] * d.content[1] : 0);
+        .sum(d => d.weight*d.weight);
 
-    const colorScale = d3.scaleOrdinal(d3.schemeObservable10)
-                         .domain(d3.extent(root, n => n.depth));
+    const color = d3.scaleOrdinal(d3.schemeObservable10)
+                     .domain(d3.extent(root, n => n.height));
 
     d3.pack().size([cht.w, cht.h])(root);
 
@@ -26,8 +26,7 @@
            .attr("cx", d => d.x)
            .attr("cy", d => d.y)
            .attr("r", d => d.r)
-           .style("stroke-width", d => d.depth + 1)
-           .style("fill", d => colorScale(d.depth));
+           .style("fill", d => color(d.height));
 
 </script>
 </body>

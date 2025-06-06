@@ -19,7 +19,8 @@
     const cht = {w: dim.width - 2 * dim.margin, h: dim.height - 2 * dim.margin};
     const chart = d3.select("body").append("svg").attr("height", dim.height).attr("width", dim.width)
                     .append("g").attr("transform", `translate(${[dim.margin,dim.margin]})`);
-    const hierarchy = await d3.json("../data/sample-hierarchy.json");
+
+    const hierarchy = await d3.json("../../data/sample.json");
     const root = d3.hierarchy(hierarchy);
 
     // Tree

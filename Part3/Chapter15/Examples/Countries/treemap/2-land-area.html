@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Treemap: countries by land area</title>
+    <style>
+        text {
+            font-family: 'arial narrow', sans-serif;
+            text-anchor: middle;
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+<h1>Continents and countries <span id="continent"></span> by land area</h1>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {rootFromRollup} from "../../../js/nest.js";
+
+    const width = 1600, height = 1200, margin = 25;
+
+    const chart = d3.select("body").append("svg").attr("height", height).attr("width", width)
+        .attr("viewBox", `0 0 ${width*2} ${height*2}`)
+                    .append("g").attr("transform", `translate(${[margin,margin]})`);
+
+    // define a clipPath to round the corners of the outer rectangle
+    chart.append("defs").append("clipPath")
+         .attr("id", "clip")
+         .append("rect")
+            .attr("width", width - margin * 2)
+            .attr("height", height - margin * 2)
+            .attr("rx", 15)
+            .attr("ry", 15);
+
+    const result = await d3.csv("../../../data/un_regions.csv");
+
+    const keyFunctions = [
+        d => d.Supercontinent,
+        d => d.Continent,
+        d => d.UN_Region,
+        d => d.Country
+    ];
+    const reductionFunction = d => ({area: +d[0].Area_km2, population: +d[0].Pop_2016});
+    const rollupRoot = d3.rollup(result, reductionFunction, ...keyFunctions);
+    const hierarchy = rootFromRollup(rollupRoot, "World", false);
+    const root = d3.hierarchy(hierarchy);
+
+    root.sum(d => d.value ? d.value[0].area : d.area);  // this is the only line that changes
+    root.descendants().forEach(d => d.area = d.value);
+    root.sort((a,b) => b.height - a.height || a.value - b.value);
+
+    const colorScale = d3.scaleOrdinal(d3.schemeGreens[5].reverse());
+
+    const treemap = d3.treemap()
+            .size([width-margin*2,height-margin*2])
+            .paddingInner(2)
+            .paddingOuter(3)
+            .paddingTop(25);
+    treemap(root);
+
+    drawTooltip();
+
+    draw(root);
+
+    function draw(data, _chart) {
+        chart.selectAll("g.node")
+            .data(data, d => d.data.id)
+            .join(enter => appendNodes(enter), update => update, exit => exit.remove())
+            .attr("transform", d => `translate(${[d.x0, d.y0]})`)
+            .on("click", (e,d) => changeRoot(data, d))
+            .each(function(d) { updateNodes(d3.select(this), d); });
+    }
+
+    function appendNodes(enter) {
+        return enter.append("g").attr("clip-path", d => d.children ? "url(#clip)" : null)
+            .attr("class", "node")
+            .each(function() {
+                d3.select(this).append("rect");
+                d3.select(this).append("text")
+                    .style("pointer-events", "none")
+            });
+    }
+
+    function updateNodes(node, d) {
+        node.select("rect")
+            .on("mouseover", showArea)
+            .on("mouseout", () => d3.select("#tooltip").style("opacity", 0))
+            .attr("width", d.x1 - d.x0)
+            .attr("height", d.y1 - d.y0)
+            .attr("fill", colorScale(d.height));
+
+        node.select("text").raise()
+            .text(d => d.data.id)
+            .style("alignment-baseline", d.children ? "hanging" : "middle")
+            .style("text-anchor", "middle")
+            .attr("x", d => (d.x1 - d.x0) / 2)
+            .attr("y", d => d.height !== 0 ? 5 : (d.y1 - d.y0) / 2)
+            .style("font-size", function() {
+                requestAnimationFrame(() => {       // necessary to get correct bbox
+                    const bbox = this.getBBox();    // get bounding box to fit text in rectangle
+                    const width = d.x1 - d.x0;
+                    const height = d.y1 - d.y0;
+                    const size = Math.min(width/(bbox.width), height/(bbox.height)) * 9;
+                    if (d.children && size > 10) {
+                        d3.select(this).style("font-size", Math.min(width*2/(bbox.width),4)*4);
+                    } else {
+                        d3.select(this).style("font-size", size > 9 ? size : 0);
+                    }
+                });
+            });
+    }
+
+    function changeRoot(newRoot, node) {
+        if(!node.children) {
+            node = node.parent;  // clicked on leaf, go to continent view
+        }
+
+        if(node.data.id !== newRoot.data.id) {
+            const subtree = node.copy();
+            treemap(subtree);
+            draw(subtree);
+            d3.select("#continent").text(`in ${node.data.id}`);
+        } else {
+            draw(root);
+            d3.select("#continent").text("");
+        }
+    }
+
+    // TOOLTIPS
+    function drawTooltip() {
+        const tooltip = d3.select("svg").append("g")
+            .attr("id", "tooltip")
+            .style("pointer-events", "none")
+            .style("opacity", 0);
+
+        tooltip.append("rect")
+            .style("fill", "#fff")
+            .style("stroke", "#000");
+
+        tooltip.append("text")
+            .style("font-size", "18px")
+            .style("alignment-baseline", "baseline")
+            .style("text-anchor", "middle")
+            .each(function() {
+                d3.select(this).append("tspan").attr("class", "title");
+                d3.select(this).append("tspan").attr("class", "value").attr("dy", "1.2em").attr("x", 0).style("font-size", "14px");
+            });
+    }
+
+    const fmt = d3.format(",.0f");
+
+    function showArea(evt, d) {
+        const tooltip = d3.select("#tooltip").transition();
+        const text = tooltip.attr("transform", `translate(${[(d.x1+d.x0)/2, d.children ? d.y0+25 : (d.y1+d.y0)/2]})`)
+            .style("opacity", 1)
+        text.select("tspan.title")
+            .text(d.data.id)
+            .attr("font-weight", "bold");
+        text.select("tspan.value")
+            .text(`Area: ${fmt(d.value)} km²`);
+        tooltip.select("rect")  // TODO: Use BBox or computed text length to set width
+            .attr("x", -75)
+            .attr("y", -25)
+            .attr("width", 150)
+            .attr("height", 50);
+    }
+</script>
+</body>
+</html>

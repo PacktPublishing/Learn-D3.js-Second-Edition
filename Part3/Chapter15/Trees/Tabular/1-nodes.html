@@ -17,9 +17,12 @@
     const chart = svg.append("g").attr("transform", `translate(${[dim.margin,dim.margin]})`);
 
     // Data
-    const file = "../data/venue.csv";
+    const file = "../../data/venue.csv";
     const tabular = await d3.csv(file, d3.autoType);
     const root = d3.stratify().id(d => d.name).parentId(d => d.location)(tabular);
+
+    const noParentRoot = root.copy().each(d => d.parent = '#link_to_parent#');
+    console.log("Root:\n", JSON.stringify(noParentRoot, null, 3));
 
     // Tree
     d3.tree().size([cht.w, cht.h])(root);

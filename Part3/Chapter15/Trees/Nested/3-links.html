@@ -22,7 +22,8 @@
 
     // Links
     const links = root.links();
-    const width = d3.scaleLinear().range([1,16]).domain(d3.extent(links, k => k.target.height));
+    const width = d3.scaleLinear().range([1,16])
+                                  .domain([d3.min(links, k => k.target.height),d3.max(links, k => k.source.height)]);
 
     drawLinks();
 

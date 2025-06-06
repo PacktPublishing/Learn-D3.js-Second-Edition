@@ -3,16 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Interactive tree: show path between nodes</title>
+    <link rel="stylesheet" href="css/styles.css">
     <style>
-        path {
-            stroke: black;
-            fill: none;
-        }
-        text {
-            font-family: 'Arial Narrow', sans-serif;
-            font-size: 16px;
-            pointer-events: none;
-        }
         path.faded {
             stroke: lightgray;
         }
@@ -29,34 +21,35 @@
         .highlighted text {
             font-weight: bold;
         }
-
     </style>
 </head>
 <body>
 <h1>Interactive tree: show path between nodes</h1>
-<p>Hover a node to highlight its path from the root. Click on any other node to use it as the starting point,
+<p>Hover a node to highlight its path to the root. Click on any other node to use it as the new destination,
    and hover over other nodes to highlight the path between them.</p>
 <script type="module">
     import * as d3 from "https://cdn.skypack.dev/d3@7";
     import {dim, cht, chart, root} from "./js/treedata-json.js";
 
-    root.eachBefore(d => d.number = d.parent ? `${d.parent.number}.${d.parent.children.indexOf(d) + 1}` : 1);
-
     d3.cluster().size([cht.w, cht.h])(root);
 
     const nodes = root.descendants();
     const links = root.links();
-    const colorScale = d3.scaleOrdinal(d3.schemeCategory10).domain(d3.extent(nodes, n => n.depth));
-    const widthScale = d3.scaleLinear().range([2,32]).domain(d3.extent(links, k => k.target.height));
+    const color = d3.scaleOrdinal(d3.schemeCategory10).domain(d3.extent(nodes, n => n.depth));
+    const width = d3.scaleLinear().range([2,32]).domain(d3.extent(links, k => k.target.height));
     const verticalLink = d3.linkVertical().x(d => d.x).y(d => d.y);
 
-    // Paths start at current node and end at the node hovered by the user
-    let currentNode = root;
+    let targetNode = root;
 
-    chart.append("text").text("Starting point: ")
+    chart.append("text").attr("class", "destination").text("Destination: ")
          .attr("x", 0).attr("y", -dim.margin/2)
          .style("font-size", 20)
-         .append("tspan").text(currentNode.number);
+         .append("tspan").text(targetNode.data.id);
+
+    chart.append("text").attr("class", "path").text("Path: ")
+         .attr("x", 0).attr("y", -dim.margin/2 + 20)
+         .style("font-size", 20)
+         .append("tspan").text(targetNode.data.id);
 
     drawLinks();  // draw links under the circles
     drawNodes();
@@ -70,9 +63,9 @@
                   .attr("transform", d => `translate(${[d.x, d.y]})`)
                      .append("circle")
                         .attr("r", d => (d.height + 1) * 10)
-                        .style("fill", d => colorScale(d.depth))
-                        .on("click", changeCurrentNode) // click to change current node to this node
-                        .on("mouseover", highlightPath) // highlight path from current node to this node
+                        .style("fill", d => color(d.depth))
+                        .on("click", changeTargetNode) // click to change target node to this node
+                        .on("mouseover", highlightPath) // highlight path to target node from this node
                         .on("mouseout", reset);
     }
 
@@ -81,14 +74,14 @@
              .data(links)
                .join("path").attr("class", "link")
                  .attr("d", verticalLink)
-                 .style("stroke-width", d => widthScale(d.target.height))
+                 .style("stroke-width", d => width(d.target.height))
                  .style("stroke-opacity", d => d.target.depth *.15 + .4);
     }
 
     function drawLabels() { // relative to node <g>
         chart.selectAll("g.node")
              .append("text")
-                .text(d => d.number) // number generated using eachBefore()
+                .text(d => d.data.id) // number generated using eachBefore()
                 .style("fill", d => d.height !== 0 ? 'white' : 'black')
                 .attr("transform", d => d.height === 0 ? `rotate(-90) translate(-15,5)` : "translate(0,5)")
                 .style("text-anchor", d => d.height !== 0 ? "middle" : "end")
@@ -96,22 +89,24 @@
     }
 
     // Event handlers
-    function changeCurrentNode(event, node) {
-        if(node === currentNode) {
-            currentNode = root;
+    function changeTargetNode(event, node) {
+        if(node === targetNode) {
+            targetNode = root;
         }
-        currentNode = node;
-        d3.select("text").select("tspan").text(currentNode.number);
+        targetNode = node;
+        d3.select("text.destination").select("tspan").text(targetNode.data.id);
     }
 
     function highlightPath(event, node) {
-        const steps = node.path(currentNode);
+        const steps = node.path(targetNode);
 
         d3.selectAll(".node").classed('highlighted', d => steps.indexOf(d) >= 0);
         d3.selectAll(".node").classed('faded', d => steps.indexOf(d) < 0);
 
         d3.selectAll(".link").classed('faded', d => steps.indexOf(d.target) < 0 || steps.indexOf(d.source) < 0)
         d3.selectAll(".link").classed('highlighted', d => steps.indexOf(d.target) >= 0 && steps.indexOf(d.source) >= 0)
+
+        d3.select("text.path").select("tspan").text(steps.map(d => d.data.id).join(" → "));
     }
     function reset() {
         d3.selectAll(".node, .link").classed('faded highlighted', false);

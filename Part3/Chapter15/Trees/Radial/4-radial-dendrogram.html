@@ -19,7 +19,7 @@
     import * as d3 from "https://cdn.skypack.dev/d3@7";
     import {dim, chart, root} from "./js/treedata-json.js";
 
-    const rotation = -180;
+    const rotation = -90;
     chart.attr("transform", `translate(${[dim.width/2, dim.height * .75]}) rotate(${rotation})`);
 
     root.eachBefore(d => d.number = d.parent ? `${d.parent.number}.${d.parent.children.indexOf(d) + 1}` : 1);
@@ -30,8 +30,8 @@
 
     const nodes = root.descendants();
     const links = root.links();
-    const colorScale = d3.scaleOrdinal(d3.schemeCategory10).domain(d3.extent(nodes, n => n.depth));
-    const widthScale = d3.scaleLinear().range([1,16]).domain(d3.extent(links, k => k.target.height));
+    const color = d3.scaleOrdinal(d3.schemeCategory10).domain(d3.extent(nodes, n => n.depth));
+    const width = d3.scaleLinear().range([1,16]).domain(d3.extent(links, k => k.target.height));
 
     drawLinks();
     drawNodes();
@@ -41,32 +41,34 @@
         chart.selectAll("g")
              .data(nodes)
                 .join("g").attr("class", "node")
-                    .attr("transform", d => `rotate(${d.x * 180/Math.PI}) translate(${d.y})`)  // will also rotate text nodes
+                    .attr("transform", d => `rotate(${d.x * 180/Math.PI + rotation}) translate(${d.y})`)  // will also rotate text nodes
                     .append("circle")
                         .attr("r", d => (d.height + 3) * 5)
-                        .style("fill", d => colorScale(d.height));
+                        .style("fill", d => color(d.height));
     }
 
     function drawLinks() {
+        const cartesian = d => d3.pointRadial(d.x, d.y);
         chart.selectAll("line")
              .data(links).join("line")
-                .attr("x1", d => d3.pointRadial(d.source.x + Math.PI/2, d.source.y)[0])
-                .attr("y1", d => d3.pointRadial(d.source.x + Math.PI/2, d.source.y)[1])
-                .attr("x2", d => d3.pointRadial(d.target.x + Math.PI/2, d.target.y)[0])
-                .attr("y2", d => d3.pointRadial(d.target.x + Math.PI/2, d.target.y)[1])
-                .style("stroke-width", d => widthScale(d.target.height))
+                .attr("x1", d => cartesian(d.source)[0])
+                .attr("y1", d => cartesian(d.source)[1])
+                .attr("x2", d => cartesian(d.target)[0])
+                .attr("y2", d => cartesian(d.target)[1])
+                .style("stroke-width", d => width(d.target.height))
                 .style("opacity", d => d.target.depth *.15 + .4);
     }
 
     function drawLabels() {
+        const upsideDown = d => d.x > Math.PI/180 + Math.PI/2;
         chart.selectAll("g.node")
              .append("text")
                 .text(d => d.number) // number was generated using eachBefore()
                 .attr("fill", d => d.height !== 0 ? 'white' : 'black') // compensate rotation for non-leaf nodes, and move other nodes to 12:00 position (0)
                 .attr("transform", d => d.height === 0
-                    ? `rotate(0) translate(20,5)`
-                    : `rotate(${-d.x * 180/Math.PI - rotation}) translate(0,5)`)
-                .style("text-anchor", d => d.height !== 0 ? "middle" : "start")
+                    ? `rotate(${upsideDown(d) ? 0 : 180}) translate(${upsideDown(d) ? 20 : -20},5)`
+                    : `rotate(${-d.x * 180/Math.PI + 180}) translate(0,5)`)
+                .style("text-anchor", d => d.height !== 0 ? "middle" : upsideDown(d) ? "start" : "end")
                 .style("font-size", d => 14 + (d.height*d.height));
     }
 

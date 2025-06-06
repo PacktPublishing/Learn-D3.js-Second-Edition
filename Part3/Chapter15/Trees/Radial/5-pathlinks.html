@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Radial dendrogram using pathlinks</title>
+    <style>
+        path {
+            stroke: black;
+            fill: none;
+        }
+        text {
+            font-family: 'Arial narrow', sans-serif;
+            font-size: 16px;
+        }
+        svg {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+<h1>Radial dendrogram using pathlinks</h1>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {chart, root, cht} from "./js/treedata-json.js";
+
+    const rotation = -90;
+    chart.attr("transform", `translate(${[cht.w * 0.57, cht.h]}) rotate(${rotation})`);
+
+    // Generating numerical labels for nodes and storing them in the node.number property
+    root.eachBefore(d => d.number = d.parent ? `${d.parent.number}.${d.parent.children.indexOf(d) + 1}` : 1);
+
+    d3.cluster().size([200 * Math.PI/180, cht.h * 0.8]) // angle in degrees
+                .separation((a,b) => (a.parent === b.parent ? 1 : 2) / a.depth)
+                (root);
+
+    const nodes = root.descendants();
+    const links = root.links();
+    const color = d3.scaleOrdinal(d3.schemeCategory10).domain(d3.extent(nodes, n => n.depth));
+    const width = d3.scaleLinear().range([1,16]).domain(d3.extent(links, k => k.target.height));
+
+    const radialLink = d3.linkRadial()
+                         .angle(d => d.x)
+                         .radius(d => d.y);
+
+    drawLinks();
+    drawNodes();
+    drawLabels();
+
+    function drawNodes() {
+        const toDeg = x => x * 180/Math.PI + rotation;
+        chart.selectAll("g")
+             .data(nodes)
+                .join("g").attr("class", "node")
+                    .attr("transform", d => `rotate(${toDeg(d.x)}) translate(${d.y})`)  // will also rotate text nodes
+                    .append("circle")
+                        .attr("r", d => (d.height + 3) * 5)
+                        .style("fill", d => color(d.height));
+    }
+
+    function drawLinks() {
+        chart.selectAll("path")
+             .data(links)
+                .join("path")
+                    .attr("d", radialLink)
+                    .style("stroke-width", d => width(d.target.height))
+                    .style("opacity", d => d.target.depth *.15 + .4);
+    }
+
+    function drawLabels() {
+        const upsideDown = d => d.x > Math.PI/180 + Math.PI/2;
+        chart.selectAll("g.node")
+             .append("text")
+                .text(d => d.number)
+                .attr("fill", d => d.height !== 0 ? 'white' : 'black')
+                .attr("transform", d => d.height === 0
+                                        ? `rotate(${upsideDown(d) ? 0 : 180}) translate(${upsideDown(d) ? 20 : -20},5)`
+                                        : `rotate(${-d.x * 180/Math.PI + 180}) translate(0,5)`)
+                .style("text-anchor", d => d.height !== 0 ? "middle" : upsideDown(d) ? "start" : "end")
+                .style("font-size", d => 14 + (d.height*d.height));
+    }
+
+</script>
+</body>
+</html>

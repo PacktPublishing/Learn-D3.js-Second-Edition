@@ -19,7 +19,8 @@
     const cht = {w: dim.width - 2 * dim.margin, h: dim.height - 2 * dim.margin};
     const chart = d3.select("body").append("svg").attr("height", dim.height).attr("width", dim.width)
                     .append("g").attr("transform", `translate(${[dim.margin,dim.margin]})`);
-    const tabular = await d3.csv("../data/venue.csv", d3.autoType);
+
+    const tabular = await d3.csv("../../data/venue.csv", d3.autoType);
     const root = d3.stratify().id(d => d.name).parentId(d => d.location)(tabular);
 
     // Tree

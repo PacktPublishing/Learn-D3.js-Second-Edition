@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Filesystem example</title>
+</head>
+<body>
+<h1>Filesystem example</h1>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {root} from "./js/filesystem.js";
+
+    console.log("D3 hierarchy", root);
+
+    root.sum(d => d.fileSize);
+
+    // Make tidy tree
+    d3.pack().size([500, 500]).padding(5)(root);
+
+    const color = d3.scaleOrdinal(d3.schemePurples[5])
+                    .domain(d3.extent(root.descendants(), d => d.depth));
+
+    // Draw the treemap
+    const chart = d3.select("body").append("svg")
+                    .attr("width", 600)
+                    .attr("height", 600)
+                    .append("g")
+                        .attr("transform", "translate(50, 50)");
+
+    chart.selectAll("circle")
+        .data(root.descendants())
+        .join("circle")
+            .attr("cx", d => d.x)
+            .attr("cy", d => d.y)
+            .attr("r", d => d.r)
+            .attr("fill", d => d.children ? color(d.depth) : "lightblue") // different colors for parent and leaf nodes
+            .style("stroke", "gray");
+
+    chart.selectAll("text")
+        .data(root.descendants())
+        .join("text")
+            .text(d => d.data.substring(d.data.lastIndexOf("/") + 1) + (d.children ? "/" : ""))
+            .attr("x", d => d.x)
+            .attr("y", d => d.y)
+            .style("font-family", "Arial")
+            .style("alignment-baseline", "middle")
+            .style("fill", "black")
+            .style("font-size", 4);
+
+</script>
+
+</body>
+</html>

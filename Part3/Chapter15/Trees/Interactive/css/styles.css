@@ -1,0 +1,9 @@
+path {
+    stroke: black;
+    fill: none;
+}
+text {
+    font-family: 'Arial Narrow', sans-serif;
+    font-size: 16px;
+    pointer-events: none;
+}

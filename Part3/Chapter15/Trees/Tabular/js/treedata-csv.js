@@ -3,7 +3,7 @@
 import * as d3 from "https://cdn.skypack.dev/d3@7";
 
 // CSV file
-const file = "../data/venue.csv";
+const file = "../../data/venue.csv";
 
 // Dimensions
 export const dim = {width: 800, height: 600, margin: 60};

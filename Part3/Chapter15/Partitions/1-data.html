@@ -15,10 +15,10 @@
     root.sort((a,b) => d3.descending(a.height, b.height));
 
     // required to generate value attributes used by partition
-    root.sum(d => d.content ? d.content[0] : 0);
+    root.sum(d => d.weight);    // adding values (alternative is `sum(() => 1)` for counting nodes, or count() for counting leaves)
 
     const partition = d3.partition().size([cht.w, cht.h])  // this will influence the x0, y0, x1 and y1 properties
-        .padding(1); // padding between nodes
+                        .padding(1); // padding between nodes
     partition(root);
 
     console.log("Hierarchical partition data", root);

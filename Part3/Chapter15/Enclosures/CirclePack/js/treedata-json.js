@@ -3,7 +3,7 @@
 import * as d3 from "https://cdn.skypack.dev/d3@7";
 
 // JSON file
-const file = "../../data/sample-hierarchy.json";
+const file = "../../data/sample.json";
 
 // Dimensions
 export const dim = {width: 800, height: 800, margin: 60};

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hierarchy with d3.stratify</title>
+    <link rel="stylesheet" href="../css/table-styles.css">
+</head>
+<body>
+<h1>Hierarchy with d3.hierarchy</h1>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {makeTable, display} from "../js/table-view.js";
+
+    // 1) Raw hierarchical data
+    const nestedFile = "../../data/venue.json";
+    const hierarchy = await d3.json(nestedFile);
+
+    // 2) Generate d3.hierarchy object (generates depth, length, and methods)
+    const root = d3.hierarchy(hierarchy);
+    console.log("D3 hierarchy", root);
+
+    // 3) Calculate the sum of the values for each node (stored in standard value property)
+    root.sum(d => d.capacity);
+    root.descendants().forEach(d => d.capacity = d.value);
+
+    // 4) Draw the table
+    draw(root);
+
+    // Visual presentation as a table
+    function draw(root) {
+        const displayMap = new Map();
+        displayMap.set("capacity", d => display(d.capacity, "Capacity"));
+        makeTable(d3.select("body"), root, displayMap, d => d.data.name);
+    }
+
+
+</script>
+</body>
+</html>

@@ -13,11 +13,10 @@
 
     // Must configure either sum() or count()
     root.sort((a,b) => d3.descending(a.height, b.height) || d3.ascending(a.value, b.value))
-        .sum(d => d.content ? d.content[1] * d.content[1] : 0)
-        .eachBefore(d => d.number = d.parent ? `${d.parent.number}.${d.parent.children.indexOf(d) + 1}` : 1); // number labels
+        .sum(d => d.weight*d.weight);
 
-    const colorScale = d3.scaleOrdinal(d3.schemeObservable10)
-                         .domain(d3.extent(root, n => n.depth));
+    const color = d3.scaleOrdinal(d3.schemeObservable10)
+                    .domain(d3.extent(root, n => n.height));
 
     d3.pack().size([cht.w, cht.h])(root);
 
@@ -32,10 +31,10 @@
                     const cell = d3.select(this);
                     cell.append("circle")
                         .attr("r", d.r)
-                        .style("fill", colorScale(d.depth));
+                        .style("fill", color(d.height));
                     cell.append("text")
-                        .text(d.number)
-                        .attr("y", d.height === 0 ? 3 : -d.r + 14) // places in center if leaf
+                        .text(d.data.id)
+                        .attr("y", d.height === 0 ? 3 : -d.r + 16) // places in center if leaf
                         .style("opacity", d.r > 12 ? 1 : 0); // don't show labels for small circles
                     });
     }

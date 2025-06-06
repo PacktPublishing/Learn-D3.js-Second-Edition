@@ -38,7 +38,7 @@
     drawNodes();
 
     function drawNodes() {
-        const toDeg = x => x * 180/Math.PI - 90;
+        const toDeg = x => x * 180/Math.PI - initialRotation;
         chart.selectAll("g")
              .data(nodes).join("g").attr("class", "node")
              .attr("transform", d => `rotate(${toDeg(d.x)}) translate(${d.y})`)

@@ -1,13 +1,14 @@
 rect {
     stroke: black;
-    stroke-width: .5px;
-    fill-opacity: .5;
+    stroke-width: 1px;
+    fill-opacity: .4;
 }
 text {
     font-family: 'Arial narrow', sans-serif;
     text-anchor: middle;
     fill: white;
     font-weight: 100;
+    font-size: 12px;
 }
 svg {
     border: solid 1px #ccc;

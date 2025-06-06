@@ -17,7 +17,7 @@
     const chart = svg.append("g").attr("transform", `translate(${[dim.margin,dim.margin]})`);
 
     // Data
-    const file = "../data/sample-hierarchy.json";
+    const file = "../../data/sample.json";
     const hierarchy = await d3.json(file);
     const root = d3.hierarchy(hierarchy);
 

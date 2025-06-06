@@ -10,7 +10,6 @@
         }
         text {
             font-family: 'arial narrow', sans-serif;
-            font-size: 16px;
         }
     </style>
 </head>
@@ -22,7 +21,6 @@
 
     // labels and sorting
     root.sort((a,b) => d3.descending(a.height, b.height) );  // taller nodes first
-    root.eachBefore(d => d.number = d.parent ? `${d.parent.number}.${d.parent.children.indexOf(d) + 1}` : 1);
 
     // Generate horizontal tree (size is height first, width second)
     d3.cluster().size([cht.h, cht.w])(root);
@@ -60,11 +58,11 @@
     function drawLabels() { // relative to node <g>
         chart.selectAll("g.node")
              .append("text")
-                .text(d => d.number) // number  generated using eachBefore()
+                .text(d => d.data.id)
                 .style("fill", d => d.height !== 0 ? 'white' : 'black')
                 .attr("transform", d => d.height === 0 ? `translate(15,5)` : "translate(0,5)")
                 .style("text-anchor", d => d.height !== 0 ? "middle" : "start")
-                .style("font-size", d => 10 + (d.height*d.height));
+                .style("font-size", d => 14 + (d.height*d.height));
     }
 
 </script>

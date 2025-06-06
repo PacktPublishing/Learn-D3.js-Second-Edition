@@ -21,7 +21,7 @@
     const data = d3.range(10).map(() => d3.randomInt(2, 100)());
 
     // A scale for the color of the circles
-    const colorScale = d3.scaleOrdinal(d3.schemeCategory10).domain(d3.extent(data));
+    const color = d3.scaleOrdinal(d3.schemeCategory10).domain(d3.extent(data));
 
     // An array of objects with a single property "r"
     const circles = data.map(d => ({r: d}));
@@ -41,7 +41,7 @@
                   .attr("cx", d => d.x)
                   .attr("cy", d => d.y)
                   .attr("r", d => d.r)
-                  .style("fill", d => colorScale(d));
+                  .style("fill", d => color(d));
 
         chart.append("circle")
             .attr("cx", outerCircle.x)

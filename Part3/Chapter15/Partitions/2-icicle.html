@@ -20,13 +20,13 @@
     root.sort((a,b) => d3.ascending(a.height, b.height));
 
     // required to generate value attributes used by partition
-    root.sum(d => d.content ? d.content[0]+1 : 1);  // 1 added to create icicle layout
+    root.sum(() => 1);  // counting nodes
 
     // Generate partition properties (x0, y0, x1, y1) for each node in root
     d3.partition().size([cht.w, cht.h])(root);
 
     const nodes = root.descendants();
-    const colorScale = d3.scaleOrdinal(d3.schemeGnBu[6].slice(1).reverse());
+    const color = d3.scaleOrdinal(d3.schemeGnBu[6].slice(1).reverse());
 
     chart.selectAll("rect")
         .data(nodes)
@@ -35,7 +35,7 @@
             .attr("y", d => d.y0)
             .attr("width", d => d.x1 - d.x0)
             .attr("height", d => d.y1 - d.y0)
-            .style("fill", d => colorScale(d.depth));
+            .style("fill", d => color(d.depth));
 
 </script>
 </body>
