@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Tutorial - Chapter 4</title>
+    <meta name="generator" content="BBEdit HTML Export">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+<style>
+    @font-face {
+        font-family: 'NK57 Monospace Cd Lt';
+        font-style: normal;
+        font-weight: 300;
+        src: local('NK57 Monospace Cd Lt'), url('https://fonts.cdnfonts.com/s/16188/nk57-monospace-cd-lt.woff') format('woff');
+</style>
+
+<style>
+    * {
+        color: black !important;
+    }
+    body {
+        font-family: 'Source Serif 4', sans-serif;
+        line-height: 1.6;
+        background-color: white;
+        margin: 20px;
+        width: 800px;
+    }
+    h1, h2, h3 {
+        color: #333;
+    }
+    code {
+        font-family: 'NK57 Monospace Cd Lt', serif;
+        background-color: #f4f4f4;
+        padding: 2px 4px;
+        border-radius: 4px;
+    }
+    pre {
+        background-color: #f4f4f4;
+        padding: 10px;
+        border-radius: 4px;
+        overflow-x: auto;
+    }
+</style>
+</head>
+<body>
+
+<h3 id="_learn-d3-js-second-edition_-chapter-4"><em>Learn D3.js Second Edition</em> * Chapter 4</h3>
+<h1 id="creating-a-world-map-with-d3-and-svg-polygons">Creating a World Map with D3 and SVG Polygons</h1>
+<p>This tutorial is part of <em>Learn D3.js Second Edition&quot;, Chapter 4</em>. It shows how to read a standard public-domain JSON data source containing geographic coordinates to draw a world map using D3. You will learn how to draw the shapes of all countries using scaled latitude and longitude coordinates from a data file as vertices of SVG polygons, and color the shapes using random colors.</p>
+<p>The <a href="https://geojson.org/,{target=&quot;_blank&quot;}">GeoJSON</a> file was previously used in the Canvas map example from <em>Chapter 2</em> (see <a href="../Chapter02/Canvas/2-canvas-map.html">Chapter02/Canvas/2-canvas-map.html</a>), but this time we draw the map with D3 and SVG.</p>
+<p><strong>NOTE:</strong> In this tutorial, we won’t use any methods from the <em>d3-geo</em> module (covered in <em>Chapters 19</em> and <em>20</em>). The goal is to use only familiar D3 and SVG features.</p>
+<!-- TOC -->
+<h2 id="table-of-contents">Table of Contents</h2>
+<ul>
+    <li><a href="#step-1-inspecting-the-data">Step 1: Inspecting the data</a></li>
+    <li><a href="#step-2-listing-the-countries">Step 2: Listing the countries</a></li>
+    <li><a href="#step-3-drawing-the-map">Step 3: Drawing the map</a></li>
+    <li><a href="#step-4-adjusting-the-viewport">Step 4: Adjusting the viewport</a></li>
+    <li><a href="#step-5-flipping-the-coordinates">Step 5: Flipping the coordinates</a></li>
+    <li><a href="#step-6-adding-colors">Step 6: Adding colors</a><!-- TOC -->
+    </li>
+</ul>
+<p>The data visualization developed in this tutorial is also available as an <a href="https://observablehq.com/d/4733ef9186e84229,{target=&quot;_blank&quot;}">Observable notebook</a> and as <a href="https://codepen.io/collection/VvYqOJ,{target=&quot;_blank&quot;}">CodePen examples</a> for each step.</p>
+<h2 id="step-1-inspecting-the-data">Step 1: Inspecting the data</h2>
+<p>The data file is <a href="../data/world-lowres.geojson">data/world-lowres.geojson</a>, available from the repository for this chapter. It is in standard <a href="https://geojson.org/,{target=&quot;_blank&quot;}">GeoJSON</a> format with the following general structure:</p>
+<pre><code class="lang-json">{
+ <span class="hljs-string">"features"</span>: [
+  {
+    <span class="hljs-string">"id"</span>:<span class="hljs-string">"COD"</span>,
+    <span class="hljs-string">"properties"</span>:{<span class="hljs-string">"name"</span>:<span class="hljs-string">"Country name"</span>},
+    <span class="hljs-string">"geometry"</span>: {
+      <span class="hljs-string">"type"</span>: <span class="hljs-string">"Polygon"</span>,
+      <span class="hljs-string">"coordinates"</span>: [
+        [[lon, lat], [lon, lat]], /* ... */
+      ]
+  },{
+    <span class="hljs-string">"id"</span>:<span class="hljs-string">"COD"</span>,
+    <span class="hljs-string">"properties"</span>:{<span class="hljs-string">"name"</span>:<span class="hljs-string">"Country name"</span>},
+    <span class="hljs-string">"geometry"</span>:{
+    <span class="hljs-string">"type"</span>:<span class="hljs-string">"MultiPolygon"</span>,
+    <span class="hljs-string">"coordinates"</span>:[[[[lon,lat], [lon,lat]]], [[[lon,lat], [lon,lat]]]]
+  },{ /* ... */ },
+ /* ... */
+}
+</code></pre>
+<p>The file contains a single object with a <code>features</code> property, which is an array of objects containing data for individual countries. That means that if you load and parse the file, and store it in a variable called <code>data</code>, you can access this array using <code>data.features</code> or <code>data[&#39;features&#39;]</code>. You can inspect the parsed array after loading this file in <a href="../WorldMap/1-load-data.html">WorldMap/1-load-data.html</a>.</p>
+<p>Each individual <code>feature</code> object in this file contains the following properties:</p>
+<ul>
+    <li><code>type</code>, which is always <code>Feature</code> in this case.</li>
+    <li><code>id</code>, an optional property which, in this file, contains a unique three-letter code for a country.</li>
+    <li><code>properties</code>, an object containing properties for the object. In this file it contains a single property <code>name</code> which includes the name of the country in English.</li>
+    <li><code>geometry</code>, an object containing two properties: <code>type</code> and <code>coordinates</code>. The <code>type</code> property (in this file) can either be <code>Polygon</code> (a single closed shape) or <code>MultiPolygon</code> (an array of closed shapes – e.g. a country with islands). The coordinates are arrays of 2-element arrays containing the longitude and latitude (in this order) of each point. If the shape is a <code>MultiPolygon</code>, it’s coordinates are nested one array level deeper.</li>
+</ul>
+<p>Knowing the structure of the file, we can extract data from it and use it to draw a map in a cylindrical projection, using the latitudes as vertical coordinates, and the longitudes as horizontal coordinates. But first, let’s list some of its data.</p>
+<h2 id="step-2-listing-the-countries">Step 2: Listing the countries</h2>
+<p>A good way to explore a data file is loading it and listing some of its properties. In this step, we will list the countries and their codes, using properties.name and id. First, copy the data file to the same directory as your code (you can find it in <a href="../data/world-lowres.geojson">/data/world-lowres.geojson</a> and assign its URL to a constant in your code:</p>
+<pre><code><span class="hljs-attribute">const url</span> = <span class="hljs-string">"world-lowres.geojson"</span>;
+</code></pre><p>Load the file and create a new <code>countries</code> array with the data. Extract <code>properties.name</code> and <code>id</code> from each <code>feature</code> object to get the names and three-letter codes of the countries. The following code creates a new <code>countries</code> array with objects containing <code>name</code> and <code>id</code> properties, and then calls a <code>draw()</code> function:</p>
+<pre><code class="lang-javascript">d3.json(url)
+  .<span class="hljs-keyword">then</span>(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span> {
+    const countries = <span class="hljs-keyword">data</span>.features.map(obj =&gt; {
+    <span class="hljs-keyword">return</span> {
+        <span class="hljs-keyword">name</span>: obj.properties.<span class="hljs-keyword">name</span>,
+        id: obj.id
+    };
+  });
+  draw(countries);
+});
+</code></pre>
+<p>The <code>draw()</code> function selects the page’s <code>&lt;body&gt;</code>, adds an <code>&lt;ol&gt;</code> ordered list block, and appends an <code>&lt;li&gt;</code> list item containing each country’s name and ID:</p>
+<pre><code class="lang-javascript"><span class="hljs-selector-tag">function</span> <span class="hljs-selector-tag">draw</span>(countries) {
+    <span class="hljs-selector-tag">d3</span><span class="hljs-selector-class">.select</span>(<span class="hljs-string">"body"</span>)<span class="hljs-selector-class">.append</span>(<span class="hljs-string">"ol"</span>)
+      <span class="hljs-selector-class">.selectAll</span>(<span class="hljs-string">"li"</span>)
+        <span class="hljs-selector-class">.data</span>(countries)
+        <span class="hljs-selector-class">.join</span>(<span class="hljs-string">"li"</span>)
+        <span class="hljs-selector-class">.text</span>(d =&gt; d.name + <span class="hljs-string">" ("</span> + d.id + <span class="hljs-string">")"</span>);
+}
+</code></pre>
+<p>The result is a numbered list of all the countries in the file. Inspect the source code to view the generated HTML. You can also run the code from <a href="../WorldMap/2-map-list-data.html">WorldMap/2-map-list-data.html</a>. Note, however, that it loads the file using the following relative URL:</p>
+<pre><code class="lang-javascript"><span class="hljs-attribute">const url</span> = <span class="hljs-string">"../data/world-lowres.geojson"</span>;
+</code></pre>
+<p>With the data successfully loaded and some information retrieved, let&#39;s learn to get geographic coordinates and draw the map.</p>
+<h2 id="step-3-drawing-the-map">Step 3: Drawing the map</h2>
+<p>The map will be rendered as an SVG, so place an <code>&lt;svg&gt;</code> element in your page’s <code>&lt;body&gt;</code>:</p>
+<pre><code class="lang-html">&lt;svg id=<span class="hljs-string">"world-map"</span> <span class="hljs-built_in">width</span>=<span class="hljs-string">"800"</span> <span class="hljs-built_in">height</span>=<span class="hljs-string">"400"</span>&gt;&lt;/svg&gt;
+</code></pre>
+<p>One way to draw the map is using SVG polygons (see <em>Chapter 3</em>). Let’s set some styles for the map and for all polygons (a light blue background for the oceans and a white border for each country):</p>
+<pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-name">style</span>&gt;</span><span class="css">
+    <span class="hljs-selector-tag">svg</span> {
+        <span class="hljs-attribute">background-color</span>: <span class="hljs-number">#cceaff</span>;
+    }
+    <span class="hljs-selector-tag">polygon</span> {
+        <span class="hljs-attribute">stroke</span>: white;
+        <span class="hljs-attribute">stroke-width</span>: .<span class="hljs-number">2px</span>;
+    }
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">style</span>&gt;</span>
+</code></pre>
+<p>To draw the map, get the geographic coordinates for each country (or feature). Let’s do this in a <code>drawMap()</code> function that receives the array of countries from the features array:</p>
+<pre><code class="lang-javascript">d3.json(url)
+  .<span class="hljs-keyword">then</span>(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span> {
+     drawMap(<span class="hljs-keyword">data</span>.features);
+});
+</code></pre>
+<p>In <em>Chapter 3</em> you learned that the vertices of an SVG <code>&lt;polygon&gt;</code> are defined by a sequence of (<em>x</em>, <em>y</em>) pairs in the points attribute. These pairs can be separated by spaces or commas.</p>
+<p>Each object from the <code>data.features</code> array has a <code>geometry.coordinates</code> property that contains latitudes and longitudes, but they are nested in a complex array structure. This array, however, can be easily flattened by converting it to <em>String</em> format. For example, if you have an array like:</p>
+<pre><code class="lang-javascript">[[[<span class="hljs-number">1</span>,<span class="hljs-number">2</span>],[<span class="hljs-number">3</span>,<span class="hljs-number">4</span>]],[<span class="hljs-number">5</span>,<span class="hljs-number">6</span>]]
+</code></pre>
+<p>Converting it to <em>String</em> will result in:</p>
+<pre><code class="lang-javascript"><span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>,<span class="hljs-number">6</span>
+</code></pre>
+<p>The result is compatible with the data expected by the <code>points</code> attribute in <code>&lt;polygon&gt;</code>. This conversion occurs automatically when you assign the array to an attribute using <code>.attr()</code>.</p>
+<p>But first we need to create a data binding for a selection of countries. We will bind data to <code>&lt;g&gt;</code> elements, so each <code>&lt;g&gt;</code> will be a feature, that is, a country. Recall that the <code>drawMap()</code> function takes an array of <em>GeoJSON</em> features:</p>
+<pre><code class="lang-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">drawMap</span><span class="hljs-params">(countries)</span> </span>{
+    <span class="hljs-keyword">const</span> shapes = d3.select(<span class="hljs-string">"#world-map"</span>)
+                     .selectAll(<span class="hljs-string">".country"</span>)
+                     .data(countries)
+                     .join(<span class="hljs-string">"g"</span>)
+                     .attr(<span class="hljs-string">"class"</span>, <span class="hljs-string">"country"</span>);
+ <span class="hljs-comment">/* ... */</span>
+}
+</code></pre>
+<p>This code will generate a <code>&lt;g&gt;</code> object for each country and save the selection in the <code>shapes</code> constant. The data context for each shape is now a feature object (yes, do inspect it in your browser!).</p>
+<p>In this context, <code>data()</code> receives the <code>geometry.coordinates</code> property of each feature, which is an array of points, and binds it to <code>&lt;polygon&gt;</code> objects. After joining, the <code>points</code> attribute of each <code>&lt;polygon&gt;</code> receives the longitude/latitude pairs, automatically flattened as a string:</p>
+<pre><code class="lang-javascript"> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">drawMap</span>(<span class="hljs-params">countries</span>) </span>{
+    <span class="hljs-comment">/* ... */</span>
+    shapes.selectAll(<span class="hljs-string">"polygon"</span>)
+          .data(<span class="hljs-function"><span class="hljs-params">f</span> =&gt;</span> f.geometry.coordinates)
+          .join(<span class="hljs-string">"polygon"</span>)
+          .attr(<span class="hljs-string">"points"</span>, d =&gt; d);
+ }
+</code></pre>
+<p>The code above performs all the magic. Running it will display part of the world on your screen, as shown in <em>Figure 1</em>. We must now adjust our coordinate system to display it correctly.</p>
+<p><img src="../../../../../Documents/Packt/PART-1/Chapter4_Quick_DONE/LATEST/Tutorial/images/figure-1.png" alt="A first attempt in rendering a world map with GeoJSON data"></p>
+<p><em>Figure 1 – A first attempt in rendering a world map with GeoJSON data. Code: <a href="../WorldMap/3-polygon-map.html">WorldMap/3-polygon-map.html</a></em></p>
+<p>Besides displaying a small map, the SVG viewport shows just one quarter of the globe, flipped horizontally and upside-down (according to the standard). Most of the map is generated offscreen due to incompatibilities between different coordinate systems, since we are treating longitudes as <em>x</em> coordinates, and latitudes as <em>y</em> coordinates without any configuration. We can fix this with two SVG attributes.</p>
+<h2 id="step-4-adjusting-the-viewport">Step 4: Adjusting the viewport</h2>
+<p>SVG coordinates begin at the top-left, grow right and down, and only use positive values. Geographic coordinates include negative values and expand in all directions. To align SVG with geographic standards, adjust the viewport using the SVG <code>viewBox</code> attribute, as explained in <em>Chapter 3</em>. The default <code>viewBox</code> matches the chart&#39;s height and width, starting at 0,0:</p>
+<pre><code class="lang-html">&lt;svg id=<span class="hljs-string">"world-map"</span> <span class="hljs-built_in">width</span>=<span class="hljs-string">"800"</span> <span class="hljs-built_in">height</span>=<span class="hljs-string">"400"</span> viewBox=<span class="hljs-string">"0 0 800 400"</span>\&gt;\&lt;/svg\&gt;
+</code></pre>
+<p>Change it to <code>0 0 400 200</code> to make each pixel count as 2 pixels. This scales the map, making it occupy twice the space, but still hides quadrants with negative values. Using <code>-200 100 400 200</code> applies the same scale, but shifts the origin to the center, rendering the result in <em>Figure 2</em>:</p>
+<p><img src="../../../../../Documents/Packt/PART-1/Chapter4_Quick_DONE/LATEST/Tutorial/images/figure-2.png" alt="Adjusting the viewport to fit the entire map"></p>
+<p><em>Figure 2 – Adjusting the viewport to fit the entire map. Code: <a href="../WorldMap/4-polygon-map-viewbox.html">WorldMap/4-polygon-map-viewbox.html</a></em></p>
+<p>The map is now completely visible, but the continents are inverted. We need to flip it horizontally (and vertically, if you wish to display it in a standard position.)</p>
+<h2 id="step-5-flipping-the-coordinates">Step 5: Flipping the coordinates</h2>
+<p>You can flip the map horizontally and vertically with a transform SVG attribute. The following transform will invert latitudes and longitudes while keeping the scale:</p>
+<pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-name">svg</span> <span class="hljs-attr">...</span> <span class="hljs-attr">viewBox</span>=<span class="hljs-string">"-200 -100 400 200"</span> <span class="hljs-attr">transform</span>=<span class="hljs-string">"scale(1,-1)"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span>
+</code></pre>
+<p>Reload your page now and see the results.</p>
+<h2 id="step-6-adding-colors">Step 6: Adding colors</h2>
+<p>Let’s add random colors for each country. A simple uniform random function can be created with the <code>d3.randomUniform()</code> generator (more about this in <em>Chapter 7</em>). The following code creates a function that generates random numbers from 0 to 255:</p>
+<pre><code class="lang-javascript"><span class="hljs-attribute">const rand</span> = d3.randomUniform(256);
+</code></pre>
+<p>You can use it to generate colors with the CSS <code>rgb()</code> function, as follows:</p>
+<pre><code class="lang-javascript">shapes.style(<span class="hljs-string">"fill"</span>, <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> `<span class="javascript">rgb(${rand()},${rand()},${rand()})</span>`);
+</code></pre>
+<p>The result is shown in <em>Figure 3</em>. The colors may vary, as they are generated randomly:</p>
+<p><img src="../../../../../Documents/Packt/PART-1/Chapter4_Quick_DONE/LATEST/Tutorial/images/figure-3.png" alt="A world map rendered with SVG polygons and public domain GeoJSON data"></p>
+<p><em>Figure 3 – A world map rendered with SVG polygons and public domain GeoJSON data. Code: <a href="../WorldMap/6-polygon-map-colors.html">WorldMap/6-polygon-map-colors.html</a></em></p>
+<p>Another way to adjust the viewport to fit geographical coordinates is using two <code>d3.scaleLinear()</code> functions and a simple SVG tag (without any <code>viewBox</code> configuration). You will learn this in <em>Chapter 9</em> but can also try it as an exercise.</p>
+<p>Geographical maps are a very important topic in data visualization, and D3 provides specific tools to create and interact efficiently with maps using different projections and spherical geometry in the <em>d3-geo</em> modules. This will be covered in detail in <em>Chapters 19</em> and <em>20</em>.</p>
+<h2 id="exercise">Exercise</h2>
+<p>Templates and solutions to all exercises can be found in the <a href="../Exercises">Exercises/</a> folder.</p>
+<ul>
+    <li>4.7: Use a simple <code>&lt;svg&gt;</code> without <code>viewBox</code> or <code>transform</code> and adjust the map using <code>d3.scaleLinear()</code> functions so that it looks the same as the example from this section.</li>
+</ul>
+</body>

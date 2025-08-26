@@ -1,0 +1,9 @@
+rect {
+    stroke: black;
+}
+text {
+    text-anchor: middle;
+}
+text.target {
+    text-anchor: end;
+}

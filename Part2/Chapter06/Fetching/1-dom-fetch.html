@@ -11,9 +11,8 @@
     const dataFile = "../data/Paris2024-Top10.csv";
 
     fetch(dataFile)
-        .then(response =>
-            console.log(response.text())
-        );
+        .then(response => response.text()) // obtains the text (also a promise)
+        .then(text => console.log(text));  // logs the text to the console
 
     // You may prefer to use await (when in a module or async function)
     // See 2-dom-fetch-async.html.

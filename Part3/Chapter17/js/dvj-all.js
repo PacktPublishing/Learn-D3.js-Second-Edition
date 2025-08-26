@@ -161,14 +161,10 @@ dvj.arcDiagram = function() {
             points.push(node);
         });
 
-        console.log('nodes', nodes)
-
         const groups = d3.nest()
             .key(d => d.node)
             .rollup(d => d[0])
             .map(nodes);
-
-        console.log('groups', groups)
 
         edges.forEach(function(edge, j) {
             if(isNaN(edge.source)) {

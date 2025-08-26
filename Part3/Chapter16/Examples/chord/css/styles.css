@@ -1,0 +1,30 @@
+text {
+    font-family: 'Arial Narrow', sans-serif;
+    font-weight: bold;
+    font-size: 18px;
+    text-anchor: middle;
+    alignment-baseline: central;
+    fill: white;
+    pointer-events: none;
+}
+
+path.ribbon {
+    opacity: .7;
+}
+
+.faded {
+    opacity: .2 !important;
+}
+.tooltip {
+    pointer-events: none;
+}
+.tooltip text {
+    font-weight: normal;
+    text-anchor: start;
+    font-size: 18px;
+    alignment-baseline: baseline;
+    fill: black;
+}
+.tooltip text tspan {
+    font-size: 70%
+}

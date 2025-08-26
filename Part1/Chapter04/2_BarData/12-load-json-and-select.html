@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Step 12: Selecting data from an external data file</title>
+    <style>
+        #bar-chart {
+            border: solid 1px gray;
+        }
+        .category {
+            text-anchor: end;
+        }
+        text {
+            font-size: 10pt;
+            alignment-baseline: central;
+        }
+    </style>
+</head>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    const dim = {width: 600, height: 300};
+
+    /* Use as reference to create local array from imported data:
+    const planets = [
+        {name: "Mercury", distance: 0.387},
+        {name: "Venus", distance: 0.723},
+        {name: "Earth", distance: 1},
+        {name: "Mars", distance: 1.52},
+        {name: "Jupiter", distance: 5.2},
+        {name: "Saturn", distance: 9.54},
+        {name: "Uranus", distance: 19.2},
+        {name: "Neptune", distance: 30.1},
+        {name: "Ceres", distance: 2.765},
+        {name: "Pluto", distance: 39.481},
+        {name: "Eris", distance: 67.67},
+        {name: "Haumea", distance: 43},
+        {name: "Makemake", distance: 45.346}
+    ];
+    */
+
+    const url = "../data/sol_2019.json"; // contains a 'planets' array with data for rocky, gaseous and dwarf planets
+
+    d3.json(url)
+        .then(data => {
+            // return a new array of planets keeping only two selected properties for
+            // each element from the 'planets' array: 'name' and 'semiMajorAxisAU'
+            const distances = data.planets.map(object =>
+                ({
+                    name: object.name,
+                    distance: object.semiMajorAxisAU
+                })
+            );
+            drawChart(distances);
+            //debugger;  // uncomment to access the module in the console
+        });
+
+    
+    function drawChart(dataset) {
+        // configure data
+        dataset.sort((a,b) => d3.ascending(a.distance, b.distance));
+
+        // define functions
+        const xscale = d3.scaleLinear()
+                         .domain([0, d3.max(dataset, d => d.distance)])
+                         .range([0, dim.width-140]);
+
+        const yscale = d3.scaleBand()
+                         .range([0, dim.height])
+                         .domain(dataset)
+                         .padding(0.1);
+
+        const barHeight = yscale.bandwidth();
+
+        const color = d3.scaleOrdinal(d3.schemeTableau10)
+                        .domain(yscale.domain());
+
+        const fmt = d3.format(".2f");
+
+        // render chart
+        const body = d3.select("body");
+        body.append("h1")
+            .text("Average distance from the Sun");
+
+        const svg = body.append("svg")
+                        .attr("id", "bar-chart")
+                        .attr("width", dim.width)
+                        .attr("height", dim.height);
+
+        const entries = svg.selectAll(".entry")
+                           .data(dataset)
+                              .join("g")
+                                 .attr("class", "entry")
+                                 .attr("transform", d => `translate(70, ${yscale(d)})`);
+
+        entries.append("rect")
+                .attr("class", "bar")
+                .attr("height", barHeight)
+                .attr("width", d => xscale(d.distance))
+                .style("fill", (d,i) => color(i));
+
+        entries.append("text")
+                .attr("class", "category")
+                .attr("x", -5)
+                .attr("y", barHeight/2)
+                .text(d => d.name);
+
+        entries.append("text")
+                .attr("class", "value")
+                .attr("x", d => xscale(d.distance) + 5)
+                .attr("y", barHeight/2)
+                .text(d => `${fmt(d.distance)} AU`);
+    }
+
+    // DEBUGGING
+    // Uncomment the following lines to pause the execution and be able to access
+    // any function or variable from this module using the browser's console
+    // debugger;
+</script>
+
+</body>
+</html>

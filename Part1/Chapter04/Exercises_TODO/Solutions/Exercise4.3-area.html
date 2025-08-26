@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exercise 4.1</title>
+    <style>
+      h1 {
+        font-family: sans-serif;
+        font-size: 18px;
+      }
+      text {
+        font-family: sans-serif;
+        font-size: 12px;
+        alignment-baseline: central;
+      }
+      .category {
+        text-anchor: end;
+        font-weight: bold;
+      }
+      svg {
+        border: solid 1px lightseagreen;
+      }
+    </style>
+</head>
+<body>
+<h1>Area in millions of km<sup>2</sup> per continent</h1>
+<script type="module">
+  import * as d3 from 'https://cdn.skypack.dev/d3@7';
+  /*
+  4.1.	Create a bar chart using the following JSON file: data/continents.json.
+  Open the file, look at its contents and discover a way to adapt your code to
+  display its data as a bar chart.
+   */
+  const dim = {
+        width: 800,
+        height: 300,
+        margin: {left: 100, right: 150, top: 10, bottom: 10}
+  };
+  const data = await d3.json('../../data/continents.json');
+  console.log(data);
+
+  const svg = d3.select('body')
+                .append('svg')
+                .attr('width', dim.width)
+                .attr('height', dim.height);
+
+  const xScale = d3.scaleLinear()
+                   .domain([0, d3.max(data, d => d.areakm2)])
+                   .range([0, dim.width - (dim.margin.right + dim.margin.left)]);
+  const yScale = d3.scaleBand()
+                   .domain(data)
+                   .range([dim.margin.top, dim.height - dim.margin.bottom])
+                   .padding(0.1);
+  const barHeight = yScale.bandwidth();
+  const fmt = d3.format(",.3f");
+  const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+  data.sort((a, b) => d3.descending(a.areakm2, b.areakm2));
+
+  const entries = svg.selectAll('g.entry')
+                     .data(data)
+                       .join('g')
+                         .attr("class", "entry")
+                         .attr('transform', d => `translate(0, ${yScale(d)})`);
+
+  entries.append("rect")
+         .attr('x', dim.margin.left)
+         .attr('width', d => xScale(d.areakm2))
+         .attr('height', barHeight)
+         .attr('fill', (_,i) => color(i));
+
+  entries.append("text")
+         .attr("y", barHeight/2)
+         .attr('x', dim.margin.left - 10)
+         .attr('class', "category")
+         .text(d => d.continent);
+
+  entries.append("text")
+         .attr("y", barHeight/2)
+         .attr('class', "value")
+         .attr('x', d => xScale(d.areakm2) + dim.margin.left + 10)
+         .text(d => fmt(d.areakm2/1000000));
+
+</script>
+
+</body>
+</html>

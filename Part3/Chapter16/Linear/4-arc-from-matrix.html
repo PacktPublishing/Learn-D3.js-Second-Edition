@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Linear network: arc diagram from a matrix</title>
+    <style>
+        text {
+            font-family: 'Arial Narrow', sans-serif;
+            font-size: 16px;
+            alignment-baseline: central;
+            text-anchor: middle;
+            fill: white;
+            font-weight: bold;
+        }
+        .faded {
+            opacity: .3;
+        }
+        .active {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+<h1>Linear network: arc diagram from a matrix</h1>
+<p>This chart uses a custom layout generator available in the <code>js/network-utils.js</code> module.</p>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as nwu from "../js/network-utils.js";
+
+    const dim = {width: 800, height: 600, margin: 100};
+    const chart = d3.select("body").append("svg").attr("width", dim.width).attr("height", dim.height)
+                    .append("g").attr("transform", `translate(${[dim.margin/2, dim.margin/2 + dim.height/2]})`);
+
+    const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+    const matrix = [
+        [0,3,3,3,0,0,0,2,4],
+        [3,0,5,0,0,0,0,0,0],
+        [8,5,0,6,0,0,4,0,0],
+        [9,0,8,0,9,0,0,0,0],
+        [0,0,0,9,0,8,0,0,0],
+        [0,0,0,0,9,0,7,8,0],
+        [0,0,9,0,0,7,0,7,0],
+        [3,0,0,0,0,8,6,0,7],
+        [4,0,0,0,0,0,0,9,0]
+    ];
+
+    const nodes = ['A','B','C','D','E','F','G','H','I'];
+
+    // Create an arc diagram layout generator
+    const arcDiagLayout = nwu.arcDiagram()
+                             .width(dim.width - dim.margin);
+
+    // Convert the matrix to a list of nodes and edges
+    const edges = nwu.matrixToLinks(nodes, matrix);
+
+    // Generate the data containing properties to draw the arc diagram
+    const data = arcDiagLayout(nodes, edges);
+
+    console.log(data.nodes(), data.links())
+
+    color.domain([0, nodes.length]);
+
+    // Create a curve generator for the arcs
+    const curve = nwu.curve()
+                     .size([dim.width - dim.margin, dim.height - dim.margin]);
+
+    const widthScale = d3.scaleLinear()
+                         .range([2,10])
+                         .domain([0, d3.max(edges, d => d.value)]);
+
+    // Draw the arcs
+    chart.selectAll("path")
+         .data(data.links())
+            .join("path")
+                .attr("d", curve)
+                .style("stroke-width", d => widthScale(d.value))
+                .style("stroke", d => color(d.source.i))
+                .style("stroke-opacity", .3)
+                .style("fill", 'none');
+
+    chart.selectAll("circle")
+         .data(data.nodes())
+            .join("circle")
+                .attr("cx", d => d.x)
+                .style("fill", (d,i) => color(i))
+                .attr("r", 15);
+
+    chart.selectAll("text")
+         .data(data.nodes())
+            .join("text")
+            .attr("x", d => d.x)
+            .text((d,i) => nodes[i])
+            .style("pointer-events",'none');
+
+    // Add mouseover events to highlight arcs and nodes
+    d3.selectAll("circle")
+        .on("mouseover", highlight)
+        .on("mouseout", () => d3.selectAll("path, circle").classed('faded', false));
+
+    // Highlight function to fade out non-related arcs and nodes
+    function highlight(evt, d) {
+        d3.selectAll("path")
+            .classed('faded', s => !(s.source === d || s.target === d));
+        d3.selectAll("circle")
+            .classed('faded',
+                n => !(n === d || n.sources.filter(s => s.target === d).length > 0
+                               || n.targets.filter(s => s.source === d).length > 0));
+    }
+</script>
+</body>
+</html>

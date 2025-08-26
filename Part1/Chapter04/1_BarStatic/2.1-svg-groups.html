@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Step 2: Improving the SVG prototype with groups</title>
+    <style>
+        #bar-chart {
+            border: solid 1px gray;
+        }
+        .bar {
+            height: 20px;
+            fill: orange;
+        }
+        .category {
+            text-anchor: end;
+        }
+        text {
+            font-size: 10pt;
+            alignment-baseline: central;
+        }
+    </style>
+</head>
+<body>
+<h1>Bar chart</h1>
+
+<svg id="bar-chart" width="600" height="300">
+    <svg id="bar-chart" width="600" height="300">
+        <g class="entry">
+            <rect class="bar" y="0" x="50" width="225"/>
+            <text class="category" y="10" x="45">One</text>
+            <text class="value" y="10" x="280">225</text>
+        </g>
+        <g class="entry">
+            <rect class="bar" y="21" x="50" width="425"/>
+            <text class="category" y="31" x="45">Two</text>
+            <text class="value" y="31" x="480">425</text>
+        </g>
+        <g class="entry">
+            <rect class="bar" y="42" x="50" width="125"/>
+            <text class="category" y="52" x="45">Three</text>
+            <text class="value" y="52" x="180">125</text>
+        </g>
+    </svg>
+
+</svg>
+
+</body>
+</html>

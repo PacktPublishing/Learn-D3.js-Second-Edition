@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Linear network: arc diagram</title>
+    <style>
+        text {
+            font-family: 'Arial Narrow', sans-serif;
+            font-size: 20px;
+            alignment-baseline: central;
+            text-anchor: middle;
+            fill: white;
+            font-weight: bold;
+        }
+        path {
+            stroke-opacity: .3;
+            fill: none;
+        }
+        svg {border: solid 1px #ccc;}
+    </style>
+</head>
+<body>
+    <h1>Linear network: arc diagram</h1>
+    <p>This chart uses a custom layout generator available in the <code>js/network-utils.js</code> module.</p>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as nwu from "../js/network-utils.js";
+
+    const dim = {width: 800, height: 400, margin: 100};
+    const chart = d3.select("body").append("svg").attr("width", dim.width).attr("height", dim.height)
+                    .append("g").attr("transform", `translate(${[dim.margin, dim.height/2]})`);
+
+    const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+    const nodes = [{node: 'A'},{node: 'B'},{node: 'C'},{node: 'D'},{node: 'E'}];
+
+    const edges = [
+        {source: 'A', target: 'B', value: 16},
+        {source: 'A', target: 'C', value: 2},
+        {source: 'B', target: 'A', value: 8},
+        {source: 'B', target: 'C', value: 4},
+        {source: 'C', target: 'B', value: 1},
+        {source: 'D', target: 'B', value: 1},
+        {source: 'D', target: 'E', value: 1}
+    ];
+
+    // Create an arc diagram layout generator
+    const arcDiagLayout = nwu.arcDiagram()
+                             .width(dim.width - dim.margin);
+
+    // Generate the data containing properties to draw the arc diagram
+    const data = arcDiagLayout(nodes, edges);
+
+    color.domain([0, nodes.length]);
+
+    const widthScale = d3.scaleLinear()
+            .range([2,10])
+            .domain([0, d3.max(edges, d => d.value)]);
+
+    chart.selectAll("path")
+         .data(data.links())
+            .join("path")
+                .attr("d", nwu.curve()) // generates a curve for each link
+                .style("stroke-width", d => widthScale(d.value))
+                .style("stroke", d => color(d.source.i));
+
+    chart.selectAll("circle")
+         .data(data.nodes())
+            .join("circle")
+                .attr("cx", d => d.x)
+                .attr("r", 15)
+                .style("fill", (d,i) => color(i));
+
+    chart.selectAll("text")
+         .data(data.nodes())
+            .join("text")
+                .attr("x", d => d.x)
+                .text(d => d.node);
+
+</script>
+</body>
+</html>

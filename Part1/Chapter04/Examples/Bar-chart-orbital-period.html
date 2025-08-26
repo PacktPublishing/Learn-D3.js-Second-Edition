@@ -11,7 +11,7 @@
         }
         text {
             font-size: 10pt;
-            alignment-baseline: hanging;
+            alignment-baseline: central;
         }
     </style>
 </head>
@@ -27,7 +27,7 @@
     d3.json(url)
         .then(data => {
             const temp = data.planets
-                             .filter(d => d.category == 'rocky' || d.category == 'gaseous')
+                             .filter(d => d.category === 'rocky' || d.category === 'gaseous')
                              .map(obj => ({name: obj.name, year: obj.orbitalPeriodD}));
             drawChart(temp);
         });
@@ -37,19 +37,20 @@
         // configure data
         dataset.sort((a,b) => d3.ascending(a.year, b.year));
 
-        const bar_height = height / dataset.length - 2;
-
         // define functions
         const xscale = d3.scaleLinear()
-            .domain([0, d3.max(dataset, d => d.year)])
-            .range([0, width-150]);
+                        .domain([0, d3.max(dataset, d => d.year)])
+                        .range([0, width-150]);
 
-        const yscale = d3.scaleLinear()
-            .domain([0, dataset.length])
-            .range([1, height]);
+        const yscale = d3.scaleBand()
+                        .domain(dataset)
+                        .range([0, height])
+                        .padding(0.1);
+
+        const bar_height = yscale.bandwidth();
 
         const color = d3.scaleOrdinal(d3.schemeTableau10)
-            .domain(yscale.domain());
+                        .domain(yscale.domain());
 
         const fmt = d3.format(",.0d");
 
@@ -67,7 +68,7 @@
             .data(dataset)
             .join("g")
             .attr("class", "entry")
-            .attr("transform", (d,i) => `translate(70, ${yscale(i)})`);
+            .attr("transform", d => `translate(70, ${yscale(d)})`);
 
         entries.append("rect")
             .attr("class", "bar")
@@ -78,12 +79,12 @@
         entries.append("text")
             .attr("class", "category")
             .attr("x", -5)
-            .attr("y", (bar_height/2) - 5)
+            .attr("y", bar_height/2)
             .text(d => d.name);
 
         entries.append("text")
             .attr("x", d => xscale(d.year) + 5)
-            .attr("y", (bar_height/2) - 5)
+            .attr("y", bar_height/2)
             .text(d => `${fmt(d.year)} days`);
     }
 

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Migrations (UN data, 2024)</title>
+    <style>
+        text {
+            font-family: 'Arial Narrow', sans-serif;
+            font-size: 12px;
+            alignment-baseline: middle;
+            text-anchor: middle;
+        }
+        .faded {
+            opacity: .3;
+        }
+        .highlight {
+            font-weight: bold;
+            font-size: 150%;
+        }
+        .highlight rect {
+            stroke-width: 1px;
+        }
+        text.node {
+            pointer-events: none;
+        }
+        .tooltip text {
+            font-size: 110%;
+        }
+    </style>
+</head>
+<body>
+<h1>Migrations (25 largest populations, in millions)</h1>
+<p>Move mouse over a cell for details. Source: United Nations Data (2024)</p>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as nwu from "../../js/network-utils.js";
+    import {draw} from "./js/adjacency-countries.js";
+
+    const dim = {width: 900, height: 900, margin: 250};
+
+    const svg = d3.select("body").append("svg").attr("width", dim.width).attr("height", dim.height);
+    export const chart = svg.append("g").attr("transform", `translate(${[dim.margin/2, dim.margin/2]})`);
+
+    const maxNodes = 25; // Limit to 25 nodes
+
+    const migrationsFile = "../../data/migrations_2024.csv";
+
+    // Load migration data and filter by continent
+   const edges = await d3.csv(migrationsFile, function(row) {
+        const link = {          // link format = {source, target, value}
+            value: +row.Immigrants,
+            target: row.Destination,
+            source: row.Origin,
+        }
+        return link;
+    });
+
+    // Create the nodes array from edges {node: country, totalIn: total_immigrants, totalOut: total_emigrants}
+    const nodes = [... new Set(edges.map(edge => edge.target))]
+                  .map(n => ({node: n,
+                              totalIn: edges.filter(e => e.target === n)
+                                            .reduce((sum, e) => sum + e.value, 0),
+                              totalOut: edges.filter(e => e.source === n)
+                                             .reduce((sum, e) => sum + e.value, 0)}));
+
+    // Limit to maxNodes total based on total immigrants or emigrants
+    const filteredNodes  = nodes.sort((a,b) => d3.descending(Math.max(a.totalIn, a.totalOut), Math.max(b.totalIn, b.totalOut)))
+                                .filter((d,i) => i < maxNodes);
+
+    // Keep only edges that connect to filtered nodes
+    const filteredEdges = edges.filter(edge => filteredNodes.find(n => n.node === edge.target))
+                               .filter(edge => filteredNodes.find(n => n.node === edge.source));
+
+    // Create adjacency matrix
+    const matrixLayout = nwu.adjacencyMatrix().size([dim.width-dim.margin, dim.height-dim.margin]);
+
+    // Prepare matrix data
+    // Alternative 1) Replace node names with their indices
+    /*
+    filteredEdges.forEach(edge => {
+        edge.source = filteredNodes.map(n => n.node).indexOf(edge.source);
+        edge.target = filteredNodes.map(n => n.node).indexOf(edge.target);
+    });
+    const matrix = nwu.linksToMatrix(filteredNodes, filteredEdges); // uses indices (default: objectIds = false)
+    */
+
+    // Alternative 2) Replace node names with node objects (using objects as IDs)
+    filteredEdges.forEach(edge => {
+        edge.source = filteredNodes[filteredNodes.map(n => n.node).indexOf(edge.source)];
+        edge.target = filteredNodes[filteredNodes.map(n => n.node).indexOf(edge.target)];
+    });
+    const matrix = nwu.linksToMatrix(filteredNodes, filteredEdges, true); // Alternative: using objects as IDs (true)
+
+    // Generate the matrix layout
+    const result = matrixLayout(filteredNodes, matrix);
+
+    // Coloring
+    const color = d3.scaleSqrt().range(['lightyellow','red'])
+                    .domain([0,d3.max(result, d => d.value)]);
+
+    // Paint nodes with colors based on their values or white if no value
+    result.forEach(item => item.color = item.value ? color(item.value) : 'white');
+
+    draw(dim, chart, filteredNodes, result);
+
+</script>
+</body>
+</html>

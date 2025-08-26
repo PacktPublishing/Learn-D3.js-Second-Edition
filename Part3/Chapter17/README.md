@@ -1,6 +1,6 @@
-# Chapter17
+# Chapter18
 
-Files and exercises for chapter 17.
+Files and exercises for chapter 18.
 
 ## 1) Description of each subfolder in this folder
 

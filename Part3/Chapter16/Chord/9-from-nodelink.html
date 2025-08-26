@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chord layout - using data in node-link format</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .faded {
+            opacity: .2 !important;
+        }
+        .tooltip {
+            pointer-events: none;
+        }
+        .tooltip text {
+            font-weight: normal;
+            text-anchor: start;
+            alignment-baseline: baseline;
+            fill: black;
+        }
+        text tspan {
+            font-size: 80%
+        }
+    </style>
+</head>
+<body>
+<h1>Chord layout - using data in node-link format</h1>
+<p>This example uses data in a node-link format (<code>{source, target, value}</code>) instead of a matrix.
+    The data is converted to a matrix using a custom function from the <code>js/network-utils.js</code> module.</p>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as nwu from "../js/network-utils.js";
+    import {dim, draw, color} from "./js/chord-example.js"; // code to draw the chart, dimensions, color scale, etc.
+
+    const headers = ['A', 'B', 'C', 'D', 'E'];
+
+    // Node-links should be bidirectional (e.g. if there is a link from A to E, there should explicitly be
+    // a link from E to A, otherwise there will be chords that end in zero.
+    const edges = [
+        {source: 'A', target: 'B', value: 3},
+        {source: 'A', target: 'C', value: 2},
+        {source: 'B', target: 'A', value: 3},
+        {source: 'B', target: 'C', value: 4},
+        {source: 'C', target: 'B', value: 1},
+        {source: 'D', target: 'B', value: 1},
+        {source: 'D', target: 'E', value: 1},
+        {source: 'E', target: 'C', value: 1}
+    ];
+
+    // Generate a matrix from the node-link data (using a custom function from network-utils.js)
+    // 3rd argument: true = uses objects as IDs instead of indices
+    // 4th argument: true = will duplicate the links in both directions in one side is missing
+    const matrix = nwu.linksToMatrix(headers, edges, true, true);
+    color.domain([0, matrix.length]);
+
+    console.log('matrix', matrix); // inspect the generated matrix in the console
+
+    const chord = d3.chord().padAngle(.4);
+
+    // Create the chords from the matrix data
+    const chords = chord(matrix);
+
+    // Create the ribbon generator
+    const radius = dim.height / 2 - dim.margin;
+    const ribbon = d3.ribbon().radius(radius);
+
+    draw(chords, headers, true); // true = will use interactive highlighting (see js/chord-example.js)
+
+</script>
+
+</body>
+</html>

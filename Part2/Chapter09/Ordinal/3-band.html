@@ -80,7 +80,7 @@
         .data(data)
           .join("rect")
             .attr("y",22)
-            .attr("height", d => Math.random() * 200)
+            .attr("height", () => Math.random() * 200)
             .attr("fill", (d,i,n) => colorScale(d3.select(n[i]).attr("height")));
 
     d3.select("svg").append("g").attr("id", "x-axis").attr("transform", "translate(10,20)")
@@ -92,7 +92,7 @@
     function update() {
         d3.select("svg").selectAll("rect")
             .attr("x", scale)
-            .attr("width", d => scale.bandwidth());
+            .attr("width", scale.bandwidth());
 
         d3.select("#x-axis").call(xAxis);
     }

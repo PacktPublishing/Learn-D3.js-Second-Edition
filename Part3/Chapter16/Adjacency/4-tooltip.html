@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Adjacency Matrix with tooltip</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .faded {
+            opacity: .3;
+        }
+        .highlight {
+            font-weight: bold;
+            font-size: 120%;
+        }
+        rect.highlight {
+            stroke-width: 3px;
+        }
+        .tooltip {
+            font-size: 300%
+        }
+    </style>
+</head>
+<body>
+<h1>Adjacency Matrix with tooltips</h1>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as nwu from "../js/network-utils.js";
+
+    // Dimensions and chart setup
+    const dim = {width: 700, height: 700, margin: 100};
+    const chart = d3.select("body").append("svg").attr("width", dim.width).attr("height", dim.height)
+                    .append("g").attr("transform", `translate(${[dim.margin/2, dim.margin/2]})`);
+    const color = d3.scaleSequential(d3.interpolateBuGn);
+
+    // DATA
+    const nodes = [
+        {node: 'A', value: 123}, // value not used in this example
+        {node: 'B', value: 456},
+        {node: 'C', value: 995},
+        {node: 'D', value: 65},
+        {node: 'E', value: 79},
+    ];
+    const edges = [
+        {source: 0, target: 1, value: 6},
+        {source: 0, target: 2, value: 2},
+        {source: 1, target: 0, value: 8},
+        {source: 1, target: 2, value: 5},
+        {source: 2, target: 1, value: 1},
+        {source: 3, target: 1, value: 1},
+        {source: 3, target: 4, value: 1}
+    ];
+
+    // Create the adjacency matrix layout function
+    const matrixLayout = nwu.adjacencyMatrix()
+                            .size([dim.width - dim.margin, dim.height - dim.margin]);
+
+    // Convert links to matrix format
+    const matrix = nwu.linksToMatrix(nodes, edges);
+
+    // Call the matrix layout function to generate placement data
+    const data = matrixLayout(nodes, matrix);
+
+    color.domain([0, d3.max(edges, d => d.value)]);
+
+    const cell =
+        chart.selectAll('g.cell')
+             .data(data)
+                .join("g").attr("class", 'cell')
+                    .attr("transform", d => `translate(${[d.x, d.y]})`); // using d.x and d.y
+
+    // draw cells
+    cell.append("rect")
+        .attr("height", d => d.h*.95)                  // using d.h
+        .attr("width", d => d.w*.95)                   // using d.w
+        .attr("rx",d => d.w/4)                         // using d.w
+        .attr("ry", d => d.h/4)                        // using d.h
+        .style("fill", d => d.value ? color(d.value) : 'white');
+
+    // Add axis coordinates
+    chart.selectAll('text.source')
+         .data(data.filter(d => d.x === 0))
+            .join("text").attr("class",'source')
+                .attr("y", d => d.y + d.h/2 + 7)      // using d.y and d.h
+                .attr("x", -15)
+                .text((d,i) => nodes[i].node)
+
+    chart.selectAll('text.target')
+         .data(data.filter(d => d.y === 0))
+            .join("text").attr("class",'target')
+                .attr("x", d => d.x + d.w/2)          // using d.x and d.w
+                .attr("y", -10)
+                .text((d,i) => nodes[i].node);
+
+    // Add axis labels
+    const h = dim.height/2 - dim.margin/2;
+    const w = dim.width/2 - dim.margin/2;
+    chart.append("text")
+         .attr("transform",`rotate(-90,${[0, h]}) translate(${[0, h - 30]})`)
+         .text("FROM");
+    chart.append("text")
+         .attr("transform",`translate(${[w, -35]})`)
+         .text("TO");
+
+    // Create tooltip
+    const tooltip =
+        chart.append("g")
+             .attr("class",'tooltip')
+             .style("opacity", 0)
+             .style("pointer-events", 'none');
+    tooltip.append("rect")
+            .style("fill", 'white')
+            .style("stroke", 'black');
+    tooltip.append("text")
+            .style("alignment-baseline", 'middle')
+            .style("text-anchor", 'middle');
+
+    // Add interactivity
+    // Attach interactive events
+    chart.selectAll('text.target, text.source, g.cell')
+         .on("mouseover", highlight)
+         .on("mouseout", fade);
+
+    // Interactive functions
+    function highlight(evt, d) {
+        d3.selectAll(".cell").classed('faded', k => !(k.x === d.x || k.y === d.y));
+        d3.selectAll(".cell").classed('highlight', k => k.x === d.x || k.y === d.y);
+        d3.selectAll("text.source").classed('highlight', k => k.x === d.x);
+        d3.selectAll("text.target").classed('highlight', k => k.y === d.y);
+
+        d3.select('.tooltip').select("text")
+            .attr("x", d.w * .625)
+            .attr("y", d.h * .625)
+            .text(d.value ? d.value : 0);
+
+        d3.select('.tooltip')
+            .attr("transform", `translate(${[d.x -d.w/8, d.y -d.h/8]})`)
+            .style("opacity", 1)
+            .select("rect")
+                .style("stroke-width", 3)
+                .attr("rx", d.w/8)
+                .attr("ry", d.h/8)
+                .style("fill", d.value ? color(d.value) : 'white')
+                .attr("width", 1.25 * d.w)
+                .attr("height", 1.25 * d.w)
+    }
+
+    function fade() {
+        d3.selectAll("rect, text").classed('faded highlight', false);
+        d3.select('.tooltip').style("opacity", 0);
+    }
+</script>
+</body>
+</html>

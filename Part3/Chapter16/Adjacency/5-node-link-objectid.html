@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Adjacency Matrix from node-link dataset</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<h1>Adjacency Matrix from node-link dataset</h1>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as nwu from "../js/network-utils.js";
+
+    // Set up the dimensions and chart
+    const dim = {width: 700, height: 700, margin: 100};
+    const chart = d3.select("body").append("svg").attr("width", dim.width).attr("height", dim.height)
+                    .append("g").attr("transform", `translate(${[dim.margin/2, dim.margin/2]})`);
+    const color = d3.scaleSequential(d3.interpolateBuGn);
+
+    // DATA
+    const labels = ['A', 'B', 'C', 'D', 'E'];
+    const edges = [
+        {source: 'A', target: 'B', value: 6},
+        {source: 'A', target: 'C', value: 2},
+        {source: 'B', target: 'A', value: 8},
+        {source: 'B', target: 'C', value: 5},
+        {source: 'C', target: 'B', value: 1},
+        {source: 'D', target: 'B', value: 1},
+        {source: 'D', target: 'E', value: 1}
+    ];
+
+    // Using the adjacencyMatrix() function from network-utils.js (will add x and y properties)
+    // Create the adjacency matrix layout function
+    const matrixLayout = nwu.adjacencyMatrix()
+                            .size([dim.width - dim.margin, dim.height - dim.margin]);
+
+    // Using the linksToMatrix() function to convert the node-link data format to a matrix format
+    // Convert the node-link data to a matrix
+    const matrix = nwu.linksToMatrix(labels, edges, true); // true = object/string IDs identify nodes instead of indices
+
+    // Use the matrix layout function to generate placement data for the chart (x, y, w, h)
+    const data = matrixLayout(labels, matrix);
+
+    console.log(data); // inspect
+
+    color.domain([0, d3.max(edges, d => d.value)]);
+
+    // Drawing the cells and using the generated x, y, w, h properties
+    chart.selectAll("rect")
+         .data(data)
+            .join("rect")
+                .attr("x", d => d.x)                           // using d.x
+                .attr("y", d => d.y)                           // using d.y
+                .attr("height", d => d.h*.95)                  // using d.h
+                .attr("width", d => d.w*.95)                   // using d.w
+                .attr("rx",d => d.w/4)                         // using d.w
+                .attr("ry", d => d.h/4)                        // using d.h
+                .style("fill", d => d.value ? color(d.value) : 'white');
+
+    // Add axis coordinates
+    chart.selectAll('text.source')
+         .data(data.filter(d => d.x === 0))
+            .join("text").attr("class",'source')
+                .attr("y", d => d.y + d.h/2 + 7)      // using d.y and d.h
+                .attr("x", -15)
+                .text((d,i) => labels[i]);
+
+    chart.selectAll('text.target')
+         .data(data.filter(d => d.y === 0))
+            .join("text").attr("class",'target')
+                .attr("x", d => d.x + d.w/2)          // using d.x and d.w
+                .attr("y", -10)
+                .text((d,i) => labels[i]);
+
+    // Add axis labels
+    const h = dim.height/2 - dim.margin/2;
+    const w = dim.width/2 - dim.margin/2;
+    chart.append("text")
+         .attr("transform",`rotate(-90,${[0, h]}) translate(${[0, h - 30]})`)
+         .text("FROM");
+    chart.append("text")
+         .attr("transform",`translate(${[w, -35]})`)
+         .text("TO");
+</script>
+</body>
+</html>

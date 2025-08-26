@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Step 1: An SVG prototype</title>
+    <style>
+        #bar-chart {
+            border: solid 1px gray;
+        }
+        .bar {
+            height: 20px;
+            fill: orange;
+        }
+        text {
+            font-size: 10pt;
+            alignment-baseline: central;
+        }
+        .category {
+            text-anchor: end;
+        }
+    </style>
+</head>
+<body>
+<h1>Bar chart</h1>
+<svg id="bar-chart" width="600" height="300">
+    <rect class="bar" y="0" x="50" width="225"/>
+    <rect class="bar" y="21" x="50" width="425"/>
+    <rect class="bar" y="42" x="50" width="125"/>
+
+    <text class="category" y="10" x="45">One</text>
+    <text class="category" y="31" x="45">Two</text>
+    <text class="category" y="52" x="45">Three</text>
+
+    <text class="value" y="10" x="280">225</text>
+    <text class="value" y="31" x="480">425</text>
+    <text class="value" y="52" x="180">125</text>
+</svg>
+</body>
+</html>

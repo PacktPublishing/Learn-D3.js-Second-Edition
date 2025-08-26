@@ -1,65 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Exercise 4.5</title>
-    <style>
-        svg {
-            background-color: #cceaff;
-        }
-        polygon {
-            stroke: white;
-            stroke-width: .2px;
-        }
-    </style>
+    <title>Exercise 4.3</title>
+    <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-<svg id="world-map"
-     width="800" height="400"></svg>
-
+<!--
+4.3. Create a static horizontal bar chart with three bars displaying all the data
+     in a single chart. Choose separate colors for average, minimum and maximum distances.
+-->
 <script type="module">
     import * as d3 from 'https://cdn.skypack.dev/d3@7';
 
-    const url = "../../data/world-lowres.geojson";
-    const rand = d3.randomUniform(256);
+    // dimensions used in the chart
+    const dim = {
+        width: 600,
+        height: 600,
+        padding: {bar: 8, text: 5},
+        margin: {top: 20, right: 140, bottom: 20, left: 70}
+    };
 
-    // Scales to place the 0,0 coordinates in the center
-    const lonScale = d3.scaleLinear().domain([-180,180]).range([0,800]);
-    const latScale = d3.scaleLinear().domain([-90,90]).range([400,0]);   // inverted directions
+    // Functions and objects used by the app
+    const app = {
+        datasets: ['min','avg','max'],     // datasets per planet
+        data: [],
+        xscale: d3.scaleLinear().range([0, dim.width - dim.margin.right]),
+        yscale: d3.scaleBand().range([dim.padding.bar/2, dim.height + dim.padding.bar/2]).padding(0.1),
+        fmt: d3.format(".2f"),
+        color: {min: "blue", avg: "green", max: "red"}
+    }
+
+    const body = d3.select("body");
+    const url = "../../data/sol_2019.json";
 
     d3.json(url)
-      .then(function(data) {
-          console.log(data.features)
-          drawMap(data.features);
-      });
+        .then(data => {
+            makeDataset(data, 'planets');
+            renderChart();
+            drawLegend();
+            //debugger;  // uncomment to access the module in the console
+        });
 
-    // A function to scale the data points (it needs to check if it's a MultiPolygon
-    // and flatten the array if it is). This is not necessary if you don't need to scale
-    // the values because when it is assigned to the polygon's points attribute it will
-    // ignore the brackets when converting to string.
-    function getPoints(d) {
-        const points = d.geometry.type === 'MultiPolygon'
-            ? d.geometry.coordinates.flat()
-            : d.geometry.coordinates;
-
-        return points.map(pts =>
-            pts.map( ([a,b]) => [lonScale(a), latScale(b)] )
-        )
+    function makeDataset(data, section) {
+        data[section].forEach(object => {
+            app.data.push(
+                {
+                    name: object.name,
+                    avg: +object.semiMajorAxisAU,
+                    min: +object.periheliumAU,
+                    max: +object.apheliumAU,
+                }
+            );
+        });
     }
 
-    function drawMap(countries) {
-        const shapes = d3.select("#world-map")
-                         .selectAll(".country")
-                             .data(countries) // many countries
-                                .join("g")
-                                .attr("class", "country");
+    function renderChart() {
+        app.data.sort((a, b) => d3.ascending(a.avg, b.avg));
 
-        shapes.selectAll("polygon")
-              .data(s => getPoints(s)) // many points
-                  .join("polygon")
-                      .attr("points", d => d)
-                      .style("fill", () => `rgb(${rand()},${rand()},${rand()})`);
+        // computations and scales
+        app.barHeight = (dim.height/app.data.length - dim.padding.bar) / app.datasets.length;
+        app.yscale.domain(app.data)
+        app.xscale.domain([0, d3.max(app.data, d => d.max)]);
+
+        // draw the chart
+        body.append("h1")
+            .text("Distance from the Sun");
+
+        const svg = body.append("svg")
+                        .attr("id", "bar-chart")
+                        .attr("width", dim.width)
+                        .attr("height", dim.height);
+
+        const entries = svg.selectAll(".entry")
+                           .data(app.data)
+                              .join("g")
+                                 .attr("class", "entry")
+                                 .attr("transform", d => `translate(${dim.margin.left}, ${app.yscale(d)})`);
+
+        // for each of the three datasets, draw a bar and value label
+        app.datasets.forEach((d, i) => drawBars(entries, d, i));
+
+        // Draws the category label for each entry (three bars)
+        entries.append("text")
+            .attr("class", "category")
+            .attr("x", -dim.padding.text)
+            .attr("y", (app.barHeight * 3/2))
+            .text(d => d.name);
     }
+
+    /* Draws a bar and value label for a dataset */
+    function drawBars(entries, dataset, position) {
+        entries.append("rect")
+            .attr("class", `bar ${dataset}`)
+            .attr("y", app.barHeight * position)
+            .attr("height", app.barHeight - 1)
+            .attr("width", d => app.xscale(d[dataset]))
+            .style("fill", app.color[dataset]);
+        entries.append("text")
+            .attr("class", `value ${dataset}`)
+            .attr("y", app.barHeight/2 + (app.barHeight * position))
+            .attr("x", d => app.xscale(d[dataset]) + dim.padding.text)
+            .text(d => `${app.fmt(d[dataset])} AU`);
+    }
+
+    function drawLegend() {
+        const sets =
+            body.select("svg")
+                .selectAll(".legend")
+                  .data(app.datasets)
+                    .join("g")
+                      .attr("class", "legend")
+                      .attr("transform", (d,i) => `translate(${dim.width - dim.margin.right + 10}, ${i*20 + 100})`);
+
+        sets.append("rect")
+            .attr("width", 10)
+            .attr("height", 10)
+            .style("fill", d => app.color[d]);
+
+        sets.append("text")
+            .attr("x", 15)
+            .attr("y", 5)
+            .text(d => d);
+    }
+
 </script>
 
 </body>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Step 6: Scaling to accomodate more data</title>
+    <style>
+        #bar-chart {
+            border: solid 1px gray;
+        }
+        .bar {
+            height: 20px;
+            fill: orange;
+        }
+        .category {
+            text-anchor: end;
+        }
+        text {
+            font-size: 10pt;
+            alignment-baseline: central;
+        }
+    </style>
+</head>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    const dim = {width: 600, height: 300};
+    const dataset = [225, 425, 125, 50, 450, 75, 325];
+
+    const xscale = d3.scaleLinear()
+                     .range([0, dim.width-100])
+                     .domain([0, d3.max(dataset)]);
+
+    // Using xscale()
+    console.log('xscale(50)', xscale(50));
+    console.log('xscale(100)', xscale(100));
+    console.log('xscale(450)', xscale(450));
+
+    const body = d3.select("body");
+
+    body.append("h1")
+        .text("Bar chart");
+
+    const svg = body.append("svg")
+                    .attr("id", "bar-chart")
+                    .attr("width", dim.width)
+                    .attr("height", dim.height);
+
+    const entries = svg.selectAll(".entry")
+                       .data(dataset)
+                          .join("g")
+                             .attr("class", "entry")
+                             .attr("transform", (d,i) => `translate(50, ${i * 21})`);
+
+    entries.append("rect")
+            .attr("class", "bar")
+            .attr("width", d => xscale(d));
+
+    entries.append("text")
+            .attr("class", "category")
+            .attr("x", -5)
+            .attr("y", 10)
+            .text((d,i) => `Item ${1 + i}`);
+
+    entries.append("text")
+            .attr("class", "value")
+            .attr("x", d => xscale(d) + 5)
+            .attr("y", 10)
+            .text(d => d);
+
+    // DEBUGGING
+    // Uncomment the following lines to be able to call d3 tools and xscale() from the console
+    window.d3 = d3;
+    window.xscale = xscale;
+</script>
+
+</body>
+</html>

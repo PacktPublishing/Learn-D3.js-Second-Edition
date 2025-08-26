@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Radial network: circle diagram</title>
+    <style>
+        text {
+            font-family: 'Arial Narrow', sans-serif;
+            font-size: 20px;
+            alignment-baseline: central;
+            text-anchor: middle;
+            fill: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<h1>Radial network: circle diagram</h1>
+<p>This chart uses a custom layout generator available in the <code>js/network-utils.js</code> module.</p>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as nwu from "../js/network-utils.js";
+
+    const dim = {width: 800, height: 600, margin: 100};
+    const chart = d3.select("body").append("svg").attr("width", dim.width).attr("height", dim.height)
+                    .append("g").attr("transform", `translate(${[dim.margin/2 + dim.width/2, dim.margin/2 + dim.height/2]})`);
+
+    const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+    const nodes = [
+        {node: 'A', value: 123},
+        {node: 'B', value: 456},
+        {node: 'C', value: 995},
+        {node: 'D', value: 65},
+        {node: 'E', value: 79},
+    ];
+
+    const edges = [
+        {source: 'A', target: 'B', value: 32},
+        {source: 'A', target: 'C', value: 2},
+        {source: 'B', target: 'A', value: 8},
+        {source: 'B', target: 'C', value: 4},
+        {source: 'C', target: 'B', value: 1},
+        {source: 'D', target: 'B', value: 1},
+        {source: 'D', target: 'E', value: 1}
+    ];
+
+    const circleLayout = nwu.circleDiagram()
+                            .size([dim.width - dim.margin, dim.height - dim.margin]);
+
+    const data = circleLayout(nodes, edges);
+
+    color.domain([0, d3.max(edges, d => d.value)]);
+
+    const widthScale = d3.scaleLinear()
+                         .range([2,10])
+                         .domain([0, d3.max(edges, d => d.value)]);
+
+    chart.selectAll('line')
+         .data(data.links())
+            .join('line')
+                .attr("x1", d => d3.pointRadial(d.source.angle, d.source.radius)[0])
+                .attr("y1", d => d3.pointRadial(d.source.angle, d.source.radius)[1])
+                .attr("x2", d => d3.pointRadial(d.target.angle, d.target.radius)[0])
+                .attr("y2", d => d3.pointRadial(d.target.angle, d.target.radius)[1])
+                .style("stroke-width", d => widthScale(d.value))
+                .style("stroke", d => color(d.target.i))
+                .style("stroke-opacity", .3)
+                .style("fill", 'none');
+
+    chart.selectAll("circle")
+         .data(data.nodes())
+            .join("circle")
+                .attr("cx", d => d3.pointRadial(d.angle, d.radius)[0])
+                .attr("cy", d => d3.pointRadial(d.angle, d.radius)[1])
+                .style("fill", (d,i) => color(i))
+                .attr("r", 15);
+
+    chart.selectAll("text")
+         .data(data.nodes())
+            .join("text")
+                .attr("x", d => d3.pointRadial(d.angle, d.radius)[0])
+                .attr("y", d => d3.pointRadial(d.angle, d.radius)[1])
+                .text(d => d.node);
+
+</script>
+</body>
+</html>

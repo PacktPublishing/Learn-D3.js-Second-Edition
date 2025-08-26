@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chord layout - sorting groups (nodes)</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<h1>Chord layout - sorting groups (nodes)</h1>
+<p>See commented source code and JavaScript console for details.</p>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    const dim = {width: 800, height: 800, margin: 100};
+    const chart = d3.select("body").append("svg").attr("width", dim.width).attr("height", dim.height)
+                    .append("g").attr("transform", `translate(${[dim.margin/2 + dim.width/2, dim.margin/2 + dim.height/2]})`);
+
+    // DATA
+    const matrix = [
+        [0,3,3,3,0,0,0,2,4],
+        [3,0,5,0,0,0,0,0,0], // smallest group (B)
+        [8,5,0,6,0,0,4,0,0],
+        [9,0,8,0,9,0,0,0,0], // largest group (D)
+        [0,0,0,9,0,8,0,0,0],
+        [0,0,0,0,9,0,7,8,0],
+        [0,0,9,0,0,7,0,7,0],
+        [3,0,0,0,0,8,6,0,7],
+        [4,0,0,0,0,0,0,9,0]
+    ];
+    const headers = ['A','B','C','D','E','F','G','H','I'];
+
+    // Configure chords function to sort groups in descending order
+    // (starting at 12'o clock position, going clockwise, D (9+8+9) will be first, B (3+5) will be last)
+    const chord = d3.chord()
+                     .padAngle(.3)
+                     .sortGroups((a,b) => d3.descending(a,b)); // sort groups (nodes) in descending order
+    const chords = chord(matrix);
+
+    const radius = dim.height/2 - dim.margin;
+    const ribbon = d3.ribbon().radius(radius);
+    const color = d3.scaleSequential(d3.interpolateRainbow).domain([0,matrix.length]);
+
+    chart.selectAll('path.ribbon')
+         .data(chords)
+            .join("path").attr("class",'ribbon')
+                .attr("d", ribbon)
+                .style("opacity", .3)
+                .style("fill", d => color(d.source.index));
+
+    const arc = d3.arc().innerRadius(radius+2).outerRadius(radius+30);
+    chart.selectAll('path.arc')
+         .data(chords.groups)
+            .join("path").attr("class",'arc')
+                .attr("d", arc)
+                .style("fill", d => color(d.index));
+
+    const textAngle = d => (arc.endAngle()(d) + arc.startAngle()(d)) * 90/Math.PI;
+    chart.selectAll("text")
+         .data(chords.groups).join("text")
+            .attr("x", d => arc.centroid(d)[0])
+            .attr("y", d => arc.centroid(d)[1])
+            .text(d => headers[d.index])
+            .attr("transform", d => `rotate(${textAngle(d)},${arc.centroid(d)})`);
+
+</script>
+
+</body>
+</html>

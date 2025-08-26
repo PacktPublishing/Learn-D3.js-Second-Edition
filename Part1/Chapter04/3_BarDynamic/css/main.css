@@ -1,0 +1,10 @@
+#bar-chart {
+    border: solid 1px gray;
+}
+.category {
+    text-anchor: end;
+}
+text {
+    font-size: 10pt;
+    alignment-baseline: central;
+}
