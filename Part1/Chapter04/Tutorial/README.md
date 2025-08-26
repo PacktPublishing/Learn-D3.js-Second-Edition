@@ -1,40 +1,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
-
-<style>
-    @font-face {
-        font-family: 'NK57 Monospace Cd Lt';
-        font-style: normal;
-        font-weight: 300;
-        src: local('NK57 Monospace Cd Lt'), url('https://fonts.cdnfonts.com/s/16188/nk57-monospace-cd-lt.woff') format('woff');
-</style>
-
-<style>
-    * {
-        color: black !important;
-    }
-    body {
-        font-family: 'Source Serif 4', sans-serif;
-        line-height: 1.6;
-        background-color: white;
-        margin: 20px;
-        width: 800px;
-    }
-    h1, h2, h3 {
-        color: #333;
-    }
-    code {
-        font-family: 'NK57 Monospace Cd Lt', serif;
-        background-color: #f4f4f4;
-        padding: 2px 4px;
-        border-radius: 4px;
-    }
-    pre {
-        background-color: #f4f4f4;
-        padding: 10px;
-        border-radius: 4px;
-        overflow-x: auto;
-    }
-</style>
+<link href="./css/fonts.css" rel="stylesheet">
+<link href="./css/styles.css" rel="stylesheet">
 
 ### _Learn D3.js Second Edition_ * Chapter 4
 # Creating a World Map with D3 and SVG Polygons
