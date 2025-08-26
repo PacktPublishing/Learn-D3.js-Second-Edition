@@ -2,37 +2,43 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Exercise 4.3</title>
+    <title>Exercise 4.1</title>
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
 <h1>Population per continent (in millions of inhabitants)</h1>
 <script type="module">
   import * as d3 from 'https://cdn.skypack.dev/d3@7';
+  /*
+  4.1.	Create a bar chart using the following dataset.
+  */
+  const allData = [
+      {continent: "North America", population: 579024000, areakm2: 24490000},
+      {continent: "Asia", population: 4436224000,  areakm2: 3820000},
+      {continent: "Europe", population: 738849000, areakm2: 10180000},
+      {continent: "Africa", population: 1216130000, areakm2: 30370000},
+      {continent: "South America", population: 422535000, areakm2: 17840000},
+      {continent: "Oceania", population: 39901000, areakm2: 9008500},
+      {continent: "Antarctica", population: 1106, areakm2: 13720000}
+  ];
+  // Exclude Antarctica from the visualization since it has almost no population
+  const data = allData.filter(d => d.continent !== "Antarctica");
 
+    // Use these dimensions.
   const dim = {
         width: 800,
         height: 300,
         margin: {left: 100, right: 150, top: 10, bottom: 10}
   };
 
-  /*
-  4.3.	Create a bar chart using the following JSON file: data/continents.json.
-  Open the file, look at its contents and discover a way to adapt your code to
-  display its data as a bar chart. You just need to load the file and parse the data.
-  The result should be identical to Exercise 4.1.
-   */
-  const allData = await d3.json('../../data/continents.json');
-  console.log(allData);
-
-  // Exclude Antarctica from the visualization since it has almost no population
-  const data = allData.filter(d => d.continent !== "Antarctica");
-
+    // Create the SVG container.
   const svg = d3.select('body')
                 .append('svg')
                 .attr('width', dim.width)
                 .attr('height', dim.height);
 
+  // This solution uses the population property of the data
+  // Set up the scales
   const xScale = d3.scaleLinear()
                    .domain([0, d3.max(data, d => d.population)])
                    .range([0, dim.width - (dim.margin.right + dim.margin.left)]);
@@ -40,30 +46,41 @@
                    .domain(data)
                    .range([dim.margin.top, dim.height - dim.margin.bottom])
                    .padding(0.1);
+    // Define the bar height
   const barHeight = yScale.bandwidth();
+    // Define a formatter to display the population values in millions
   const fmt = d3.format(",.0f");
+    // Define a color scale
   const color = d3.scaleOrdinal(d3.schemeCategory10);
-
+    // Sort the data in descending order based on population
   data.sort((a, b) => d3.descending(a.population, b.population));
 
+  // Create a selection for each entry and bind the data, then join to g.entry elements
+  // Use a transform to position each group vertically
   const entries = svg.selectAll('g.entry')
                      .data(data)
                        .join('g')
                          .attr("class", "entry")
                          .attr('transform', d => `translate(0, ${yScale(d)})`);
 
+  // Append a rectangle for each entry, starting at the left margin
+  // The width is determined by the population value scaled to the xScale
+  // The height is the barHeight
+  // The fill color is determined by the color scale and the index
   entries.append("rect")
          .attr('x', dim.margin.left)
          .attr('width', d => xScale(d.population))
          .attr('height', barHeight)
          .attr('fill', (_,i) => color(i));
 
+  // Append text elements for the continent names and population values
   entries.append("text")
          .attr("y", barHeight/2)
          .attr('x', dim.margin.left - 10)
          .attr('class', "category")
          .text(d => d.continent);
 
+  // Append text elements for population values, positioned to the right of the bars
   entries.append("text")
          .attr("y", barHeight/2)
          .attr('class', "value")

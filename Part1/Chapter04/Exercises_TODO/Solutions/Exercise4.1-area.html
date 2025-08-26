@@ -2,34 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Exercise 4.3</title>
+    <title>Exercise 4.1</title>
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
 <h1>Area in millions of km<sup>2</sup> per continent</h1>
 <script type="module">
   import * as d3 from 'https://cdn.skypack.dev/d3@7';
+  /*
+  4.1.	Create a bar chart using the following dataset.
+  */
+  const data = [
+      {continent: "North America", population: 579024000, areakm2: 24490000},
+      {continent: "Asia", population: 4436224000,  areakm2: 3820000},
+      {continent: "Europe", population: 738849000, areakm2: 10180000},
+      {continent: "Africa", population: 1216130000, areakm2: 30370000},
+      {continent: "South America", population: 422535000, areakm2: 17840000},
+      {continent: "Oceania", population: 39901000, areakm2: 9008500},
+      {continent: "Antarctica", population: 1106, areakm2: 13720000}
+  ];
 
+  // Use these dimensions.
   const dim = {
         width: 800,
         height: 300,
         margin: {left: 100, right: 150, top: 10, bottom: 10}
   };
 
-  /*
-  4.3.	Create a bar chart using the following JSON file: data/continents.json.
-  Open the file, look at its contents and discover a way to adapt your code to
-  display its data as a bar chart. You just need to load the file and parse the data.
-  The result should be identical to Exercise 4.1.
-   */
-  const data = await d3.json('../../data/continents.json');
-  console.log(data);
-
+  // Create the SVG container.
   const svg = d3.select('body')
                 .append('svg')
                 .attr('width', dim.width)
                 .attr('height', dim.height);
 
+  // Set up the scales
+  // This solution uses the area (areakm2) property of the data (see other solution for population)
   const xScale = d3.scaleLinear()
                    .domain([0, d3.max(data, d => d.areakm2)])
                    .range([0, dim.width - (dim.margin.right + dim.margin.left)]);
@@ -37,30 +44,47 @@
                    .domain(data)
                    .range([dim.margin.top, dim.height - dim.margin.bottom])
                    .padding(0.1);
+
+  // Define the bar height
   const barHeight = yScale.bandwidth();
+
+  // Define a formatter
   const fmt = d3.format(",.3f");
+
+  // Define a color scale
   const color = d3.scaleOrdinal(d3.schemeCategory10);
 
+  // Sort the data by area in descending order
   data.sort((a, b) => d3.descending(a.areakm2, b.areakm2));
 
+  // Create a selection for each entry and bind the data, then join to g.entry elements
+  // Use a transform to position each group vertically
   const entries = svg.selectAll('g.entry')
                      .data(data)
                        .join('g')
                          .attr("class", "entry")
                          .attr('transform', d => `translate(0, ${yScale(d)})`);
 
+  // Append a rectangle for each entry, starting at the left margin
+  // The width is determined by the area value scaled to the xScale
+  // The height is the barHeight
+  // The fill color is determined by the color scale and the index
   entries.append("rect")
          .attr('x', dim.margin.left)
          .attr('width', d => xScale(d.areakm2))
          .attr('height', barHeight)
          .attr('fill', (_,i) => color(i));
 
+  // Append text elements for continent names
+  // Position them vertically centered in the bar and to the left of the bar
   entries.append("text")
          .attr("y", barHeight/2)
          .attr('x', dim.margin.left - 10)
          .attr('class', "category")
          .text(d => d.continent);
 
+  // Append text elements for area values
+  // Position them vertically centered in the bar and to the right of the bar
   entries.append("text")
          .attr("y", barHeight/2)
          .attr('class', "value")

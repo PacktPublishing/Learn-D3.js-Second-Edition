@@ -1,11 +1,16 @@
-#bar-chart {
-    border: solid 1px gray;
-}
-.category {
-    text-anchor: end;
-}
 text {
     font-family: sans-serif;
     font-size: 12px;
     alignment-baseline: central;
+}
+h1 {
+    font-family: sans-serif;
+    font-size: 18px;
+}
+.category {
+    text-anchor: end;
+    font-weight: bold;
+}
+svg {
+    border: solid 1px lightseagreen;
 }

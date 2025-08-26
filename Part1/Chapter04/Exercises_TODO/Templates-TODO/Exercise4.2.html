@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exercise 4.2</title>
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+      .value, .category {
+        text-anchor: middle;
+      }
+    </style>
+</head>
+<body>
+<h1>Area in millions of km<sup>2</sup> per continent</h1>
+<script type="module">
+  import * as d3 from 'https://cdn.skypack.dev/d3@7';
+  /*
+  4.2.	Make this a vertical bar chart instead of a horizontal one.
+  Hint: you need to swap the x and y axes, and also the width and height
+  attributes of the rectangles.
+  You also need to adjust the position of the text labels.
+  */
+  const data = [
+      {continent: "North America", population: 579024000, areakm2: 24490000},
+      {continent: "Asia", population: 4436224000,  areakm2: 3820000},
+      {continent: "Europe", population: 738849000, areakm2: 10180000},
+      {continent: "Africa", population: 1216130000, areakm2: 30370000},
+      {continent: "South America", population: 422535000, areakm2: 17840000},
+      {continent: "Oceania", population: 39901000, areakm2: 9008500},
+      {continent: "Antarctica", population: 1106, areakm2: 13720000}
+  ];
+
+  const dim = {
+        width: 800,
+        height: 500,
+        margin: {left: 10, right: 10, top: 50, bottom: 50}
+  };
+
+  const svg = d3.select('body')
+                .append('svg')
+                .attr('width', dim.width)
+                .attr('height', dim.height);
+
+  // Set up the scales. Hint: swap x and y compared to the horizontal version in the range!
+  const yScale = d3.scaleLinear()
+                   .domain([0, d3.max(data, d => d.areakm2)])
+                   // CODE: set up the range;
+  const xScale = d3.scaleBand()
+                   .domain(data)
+                   // CODE: set up the range
+                   .padding(0.1);
+
+  // Define the bar width
+  // const barWidth = /* CODE */;
+  const fmt = d3.format(",.3f");
+  const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+  data.sort((a, b) => d3.descending(a.areakm2, b.areakm2));
+
+  // The transform now translates in the x direction!
+  const entries = svg.selectAll('g.entry')
+                     .data(data)
+                       .join('g')
+                         .attr("class", "entry")
+                         .attr('transform', d => `translate(${/*CODE*/}, 0)`);
+
+  // You can make the bars grow downwards or upwards.
+  // The y position of the rectangles is now fixed at the top or bottom margin
+  // The height is calculated using the yScale
+  entries.append("rect")
+         .attr('y', /*CODE*/)
+         .attr('height', d => /*CODE*/)
+         .attr('width', /*CODE*/)
+         .attr('fill', (_,i) => color(i));
+
+  // The category labels are now positioned above (or below) the bars
+  entries.append("text")
+         .attr("x", /*CODE*/)
+         .attr('y', /*CODE*/)
+         .attr('class', "category")
+         .text(d => d.continent);
+
+  // The value labels are now positioned below (or above) the bars
+  entries.append("text")
+         .attr("x", /*CODE*/)
+         .attr('class', "value")
+         .attr('y', d => /*CODE*/)
+         .text(d => fmt(d.areakm2/1000000));
+
+</script>
+
+</body>
+</html>
