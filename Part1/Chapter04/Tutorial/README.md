@@ -5,9 +5,9 @@
 ### _Learn D3.js Second Edition_ * Chapter 4
 # Creating a World Map with D3 and SVG Polygons
 
-This tutorial is part of _Learn D3.js Second Edition", Chapter 4_. It shows how to read a standard public-domain JSON data source containing geographic coordinates to draw a world map using D3. You will learn how to draw the shapes of all countries using scaled latitude and longitude coordinates from a data file as vertices of SVG polygons, and color the shapes using random colors.
+This tutorial is part of _Learn D3.js Second Edition, Chapter 4_. It shows how to read a standard public-domain JSON data source containing geographic coordinates to draw a world map using D3. You will learn how to draw the shapes of all countries using scaled latitude and longitude coordinates from a data file as vertices of SVG polygons, and color the shapes using random colors.
 
-The [GeoJSON](https://geojson.org/,{target="_blank"}) file was previously used in the Canvas map example from *Chapter 2* (see [Chapter02/Canvas/2-canvas-map.html](../../Chapter02/Canvas/2-canvas-map.html)), but this time we draw the map with D3 and SVG.
+The [GeoJSON](https://geojson.org/) file was previously used in the Canvas map example from *Chapter 2* (see [Chapter02/Canvas/2-canvas-map.html](../../Chapter02/Canvas/2-canvas-map.html)), but this time we draw the map with D3 and SVG.
 
 **NOTE:** In this tutorial, we won’t use any methods from the *d3-geo* module (covered in *Chapters 19* and *20*). The goal is to use only familiar D3 and SVG features.
 
@@ -21,11 +21,11 @@ The [GeoJSON](https://geojson.org/,{target="_blank"}) file was previously used i
 * [Step 6: Adding colors](#step-6-adding-colors)
 <!-- TOC -->
 
-The data visualization developed in this tutorial is also available as an [Observable notebook](https://observablehq.com/d/4733ef9186e84229,{target="_blank"}) and as [CodePen examples](https://codepen.io/collection/VvYqOJ,{target="_blank"}) for each step.
+The data visualization developed in this tutorial is also available as an [Observable notebook](https://observablehq.com/d/4733ef9186e84229) and as [CodePen examples](https://codepen.io/collection/VvYqOJ,{target="_blank"}) for each step.
 
 ## Step 1: Inspecting the data
 
-The data file is [data/world-lowres.geojson](../data/world-lowres.geojson), available from the repository for this chapter. It is in standard [GeoJSON](https://geojson.org/,{target="_blank"}) format with the following general structure:
+The data file is [data/world-lowres.geojson](../data/world-lowres.geojson), available from the repository for this chapter. It is in standard [GeoJSON](https://geojson.org/) format with the following general structure:
 ```json
 {  
  "features": [  
