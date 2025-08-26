@@ -7,7 +7,7 @@
 
 This tutorial is part of _Learn D3.js Second Edition", Chapter 4_. It shows how to read a standard public-domain JSON data source containing geographic coordinates to draw a world map using D3. You will learn how to draw the shapes of all countries using scaled latitude and longitude coordinates from a data file as vertices of SVG polygons, and color the shapes using random colors.
 
-The [GeoJSON](https://geojson.org/,{target="_blank"}) file was previously used in the Canvas map example from *Chapter 2* (see [Chapter02/Canvas/2-canvas-map.html](../Chapter02/Canvas/2-canvas-map.html)), but this time we draw the map with D3 and SVG.
+The [GeoJSON](https://geojson.org/,{target="_blank"}) file was previously used in the Canvas map example from *Chapter 2* (see [Chapter02/Canvas/2-canvas-map.html](../../Chapter02/Canvas/2-canvas-map.html)), but this time we draw the map with D3 and SVG.
 
 **NOTE:** In this tutorial, we won’t use any methods from the *d3-geo* module (covered in *Chapters 19* and *20*). The goal is to use only familiar D3 and SVG features.
 
