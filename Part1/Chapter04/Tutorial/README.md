@@ -2,7 +2,6 @@
 <link href="./css/fonts.css" rel="stylesheet">
 <link href="./css/styles.css" rel="stylesheet">
 
-### _Learn D3.js Second Edition_ * Chapter 4
 # Creating a World Map with D3 and SVG Polygons
 
 This tutorial is part of _Learn D3.js Second Edition, Chapter 4_. It shows how to read a standard public-domain JSON data source containing geographic coordinates to draw a world map using D3. You will learn how to draw the shapes of all countries using scaled latitude and longitude coordinates from a data file as vertices of SVG polygons, and color the shapes using random colors.
@@ -13,6 +12,9 @@ The [GeoJSON](https://geojson.org/) file was previously used in the Canvas map e
 
 <!-- TOC -->
 ## Table of Contents
+
+The following sections are included in this tutorial:
+
 * [Step 1: Inspecting the data](#step-1-inspecting-the-data)
 * [Step 2: Listing the countries](#step-2-listing-the-countries)
 * [Step 3: Drawing the map](#step-3-drawing-the-map)
