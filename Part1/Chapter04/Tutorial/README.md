@@ -28,7 +28,7 @@ The data visualization developed in this tutorial is also available as an [Obser
 ## Step 1: Inspecting the data
 
 The data file is [data/world-lowres.geojson](../data/world-lowres.geojson), available from the repository for this chapter. It is in standard [GeoJSON](https://geojson.org/) format with the following general structure:
-```json
+```js
 {  
  "features": [  
   {  
@@ -37,7 +37,7 @@ The data file is [data/world-lowres.geojson](../data/world-lowres.geojson), avai
     "geometry": {
       "type": "Polygon",
       "coordinates": [
-        [[lon, lat], [lon, lat]], /* ... */
+        [[lon,lat], [lon,lat]], /* ... */
       ]
   },{  
     "id":"COD",  
