@@ -43,5 +43,5 @@ export async function load() {
  * @returns {string}
  */
 function imageFile(planet, moon) {
-    return `${dataFolder}/images/${moon.name}.png`;
+    return `${dataFolder}/images/${planet.name}/${moon.name}.png`;
 }

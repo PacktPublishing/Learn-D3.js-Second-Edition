@@ -178,7 +178,7 @@ Each element in the `satellites` array is an object, and it also contains a larg
 
 With this information, you can load the file, parse it and filter the `planets` array so that it only includes the objects that are going to be used. It should then be stored in the `app.planets` array.
 
-Start creating a new script file: `js/load.js`. It requires the _d3-fetch_ module (since we will use `d3.json()`) and the `js/constants.js` (since we will populate the `app.planets` array). To keep things simple, at this stage, we will import the entire D3 library, since we might use other functions later. Add the following two lines to `js/load.js`:
+Start creating a new script file: `js/data.js`. It requires the _d3-fetch_ module (since we will use `d3.json()`) and the `js/constants.js` (since we will populate the `app.planets` array). To keep things simple, at this stage, we will import the entire D3 library, since we might use other functions later. Add the following two lines to `js/data.js`:
 
 ```js
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
@@ -259,9 +259,9 @@ The dataset contains many properties that won’t be used in this project. You m
 
 Templates (based on `StepByStep/2-load-data`) with tips (comments), as well as the complete solutions for these exercises can be found in the [`Exercises/`](../Exercises) folder.
 
-* 6.3. Remove unnecessary properties so that the resulting dataset (`app.planets`) only contains the data that will effectively be used in the app: each planet should contain just the `id`, `name`, `diameterKm` and `satellites` properties. The relevant code is in `js/load.js`. _Hint_: Use the JavaScript `map()` function to replace each object from the `app.planets` array with a new one containing just the required properties.
+* 6.3. Remove unnecessary properties so that the resulting dataset (`app.planets`) only contains the data that will effectively be used in the app: each planet should contain just the `id`, `name`, `diameterKm` and `satellites` properties. The relevant code is in `js/data.js`. _Hint_: Use the JavaScript `map()` function to replace each object from the `app.planets` array with a new one containing just the required properties.
 
-* 6.4. Add a filter for the satellites array of each planet so that each satellite contains only the data that will be used in the app: each satellite should contain just `name` and `diameterKm` of each satellite. The relevant code is in `js/load.js`. _Hint_: use the JavaScript `map()` function to replace each object from the `satellites` array with a new one containing just the required properties.
+* 6.4. Add a filter for the satellites array of each planet so that each satellite contains only the data that will be used in the app: each satellite should contain just `name` and `diameterKm` of each satellite. The relevant code is in `js/data.js`. _Hint_: use the JavaScript `map()` function to replace each object from the `satellites` array with a new one containing just the required properties.
 
 Our next step is to configure the view and fit the data we loaded in the space we have available.
 
@@ -353,7 +353,7 @@ Since we have now calculated all the necessary values, we can start rendering th
 
 ## Step 4 - drawing the planet
 
-Let’s create a new module `js/render.js` for the code that renders the shapes. It will contain a `draw()` function to draw the circles for planet and moons. We will need the `dim` constants to place the objects, the `app` constant to obtain the data, and tools from the D3 library, so `js/render.js` should include the following imports:
+Let’s create a new module `js/view.js` for the code that renders the shapes. It will contain a `draw()` function to draw the circles for planet and moons. We will need the `dim` constants to place the objects, the `app` constant to obtain the data, and tools from the D3 library, so `js/view.js` should include the following imports:
 
 ```js
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
@@ -362,10 +362,10 @@ import {app, dim} from "./constants.js";
 The `draw()` function will be called from the main page after `configure()`, so it needs to be imported in `index.html`:
 
 ```js
-import { draw } from "./js/render.js";
+import { draw } from "./js/view.js";
 ```
 
-According to the sketch in _Figure 2_, circles are placed on their orbital plane, which appears in the chart as a horizontal guideline dividing the chart in half. The `plane` object (a `<g>` element) is already defined in `index.html`, but we need to pass its reference to `js/render.js`, which can be done when calling `draw()`:
+According to the sketch in _Figure 2_, circles are placed on their orbital plane, which appears in the chart as a horizontal guideline dividing the chart in half. The `plane` object (a `<g>` element) is already defined in `index.html`, but we need to pass its reference to `js/view.js`, which can be done when calling `draw()`:
 
 ```js
 load().then(() => {
@@ -373,7 +373,7 @@ load().then(() => {
     draw(plane);
 });
 ```
-The `draw()` function (in `js/render.js`) is a good place to display the guideline, so we can be sure it is in the right place (we will remove it later):
+The `draw()` function (in `js/view.js`) is a good place to display the guideline, so we can be sure it is in the right place (we will remove it later):
 
 ```js
 export function draw(plane) {
@@ -390,7 +390,7 @@ Now let’s draw the planet.
 
 The scale was calculated so that all the circles that represent moons could be placed side-by-side and fit in the viewport, but the planet was not included in that calculation. Its scaled radius won’t fit in the viewport, however, the visible curvature should still be displayed in the same scale as the moons. Using a scaled negative radius as `cx`, the planet will be mostly drawn offscreen, but a small part of it should still be visible on the left side of the chart since the center is offset by `dim.margin.planet`.
 
-Let’s create a function in `js/render.js` to draw the circle on the plane representing the planet:
+Let’s create a function in `js/view.js` to draw the circle on the plane representing the planet:
 
 ```js
 function drawPlanet(plane) {
@@ -489,7 +489,7 @@ Now we have enough information to bind to SVG circles and finally draw the moons
 
 An SVG `<circle>` requires a radius (the `r` attribute) and center coordinates (the `cx` and `cy` attributes) to determine its position, if not at `(0,0)`.  The `r` attribute for each circle is obtained scaling the moon’s `diameterKm` property and dividing it by two. Since `cy` is zero, it’s the default and doesn’t need to be set. The `cx` attribute uses the property we calculated in the previous section, which is already scaled.
 
-Since no circles of class `'moon'` yet exist in the plane, the initial selection will create the same number of circles as the length of the `app.current.moons` array. The code should be placed in a function in the js/render.js module:
+Since no circles of class `'moon'` yet exist in the plane, the initial selection will create the same number of circles as the length of the `app.current.moons` array. The code should be placed in a function in the js/view.js module:
 
 ```js
 function drawMoons(plane) {
@@ -553,7 +553,7 @@ Now let’s add some labels so the user knows what the circles represent.
 
 A user interested in the largest moons of Jupiter will probably be curious to know which circles correspond to each moon. This information is available in the dataset, but it needs to be placed near each circle so that the user can relate it to the corresponding moon.
 
-In SVG you can’t append text to a circle, but you can append a circle and a text element to a `<g>` container. Before adding text labels we need to refactor our `drawMoons()` code (in `js/render.js`) so that each moon is bound to an SVG `<g>` container, instead of a `<circle>`. This will also make it easier to later replace circles for images of the satellites.
+In SVG you can’t append text to a circle, but you can append a circle and a text element to a `<g>` container. Before adding text labels we need to refactor our `drawMoons()` code (in `js/view.js`) so that each moon is bound to an SVG `<g>` container, instead of a `<circle>`. This will also make it easier to later replace circles for images of the satellites.
 
 The refactored code is shown below. The computed `cx` property (from the current datum) is now used to translate the `<g>` container and the circle is placed at the origin of the container (since `cx` and `cy` were not set and are zero by default). Only the `r` attribute needs to be set:
 
@@ -652,17 +652,17 @@ app.planets.forEach(planet => {
 return Promise.all(promises);
 ```
 
-The `imageFile()` function (also in `js/load.js`) constructs the path to each image file, appending the path to the `data/images` folder, the name of the moon, followed by the `.png` extension:
+The `imageFile()` function (also in `js/data.js`) constructs the path to each image file, appending the path to the `data/images` folder, the name of the planet, the name of the moon, followed by the `.png` extension:
 
 ```js
 function imageFile(planet, moon) {
-    return `${dataFolder}/images/${moon.name}.png`;
+    return `${dataFolder}/images/${planet.name}/${moon.name}.png`;
 }
 ```
 
 The code will attempt to load an image for each moon of each planet. If the image is found, its URL is stored in a new property called `image` of the corresponding moon object. If the image is not found, the promise is rejected, but the error is ignored (the second argument to `then()` is an empty function). This way, if an image is not available, the corresponding `moon` object will simply not have an `image` property.
 
-Now we update the `js/view-1.3.js` module to use images instead of circles if the image exists. In the `appendObjects()` function, if an image exists, make the radius of the circle zero, otherwise, draw the circle as before. We also changed the color, so that it contrasts with the dark background:
+Now we update the `js/view-1.4.js` module to use images instead of circles if the image exists. In the `appendObjects()` function, if an image exists, make the radius of the circle zero, otherwise, draw the circle as before. We also changed the color, so that it contrasts with the dark background:
 
 ```js
 moon.append("circle")
