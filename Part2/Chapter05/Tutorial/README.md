@@ -489,7 +489,7 @@ Now we have enough information to bind to SVG circles and finally draw the moons
 
 An SVG `<circle>` requires a radius (the `r` attribute) and center coordinates (the `cx` and `cy` attributes) to determine its position, if not at `(0,0)`.  The `r` attribute for each circle is obtained scaling the moon’s `diameterKm` property and dividing it by two. Since `cy` is zero, it’s the default and doesn’t need to be set. The `cx` attribute uses the property we calculated in the previous section, which is already scaled.
 
-Since no circles of class `'moon'` yet exist in the plane, the initial selection will create the same number of circles as the length of the `app.current.moons` array. The code should be placed in a function in the js/view.js module:
+Since no circles of class `'moon'` yet exist in the plane, the initial selection will create the same number of circles as the length of the `app.current.moons` array. The code should be placed in a function in the `js/view.js` module:
 
 ```js
 function drawMoons(plane) {
