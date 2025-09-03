@@ -37,7 +37,7 @@ Although static, you will be able to choose which planet to display by changing 
 
 We will use data from the [`data/sol_2019.json`](../data/sol_2019.json) file -– a compilation of planetary data obtained from open databases (mostly from the [NASA Open Data portal](https://data.nasa.gov/)). This same file was used in _Chapter 4_ to create a bar chart comparing average orbit distances. This time we will extract data from other parts of this file.
 
-`Figure 2` shows a sketch of the visualization we plan to create. It contains all the coordinates, spacing and margins we will have to consider when drawing the shapes.
+_Figure 2_ shows a sketch of the visualization we plan to create. It contains all the coordinates, spacing and margins we will have to consider when drawing the shapes.
 
 Sizes and margins will be stored in a globally accessible dimensions object called `dim`. To place and scale SVG circles in each view, we will need to compute their radii (`r`) and horizontal coordinates (`cx`), as well as determine margins and spaces so that the objects fit nicely in the chart.
 
@@ -221,9 +221,7 @@ Now let’s add a bit more code to the `load()` function so that it populates th
 
 ```js
 export async function load() {
-const data = await d3.json(dataFile);
-
-    // only include planets with moons (p3 to p8)
+    const data = await d3.json(dataFile);
     app.planets = data.planets
        .filter(p => +p.id.substring(1) >= 3
                  && +p.id.substring(1) <= 8);
@@ -246,8 +244,8 @@ load().then(() => {
 
 As before, the app still displays only the title and an empty SVG graphics context, but since we logged `app.planets` to the console, you can open it to inspect its structure (which lists the six planets), as shown in _Figure 3_.
 
-![Printing the loaded data in the JavaScript console](./images/figure-3.png)
-_Figure 3 — Printing the loaded data in the JavaScript console. Code: [`StepByStep/2-load-data`](../StepByStep/2-load-data)._
+![Printing the loaded data in the console](./images/figure-3.png)
+_Figure 3 — Printing the loaded data in the console. Code: [`StepByStep/2-load-data`](../StepByStep/2-load-data)._
 
 Expand the array and its contents to inspect all the properties of each planet and its satellites. Try retrieving selected information for some planets and natural satellites. For example, you can use the following object path to obtain the diameter of Saturn, which is the fourth element in the array:
 
@@ -279,16 +277,16 @@ After the data is loaded and every time a view is selected, the application shou
 Although the application is not interactive yet, we will implement these features now, since they can be triggered by simply changing the value of `app.current.id`. This is done in the `js/config.js` file. It requires the following imports:
 
 ```js
-      import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
-      import {app, dim} from "./constants.js";
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+import {app, dim} from "./constants.js";
 ```
       
 The object that contains the data for the current planet is selected from the `app.planets` array using its `id` property (e.g. `"p5"`), which should match `app.current.id`. Let’s create a function to set the current planet:
       
 ```js
-      function setPlanet() {
-          app.current.planet = app.planets.filter(p => p.id === app.current.id)[0];
-      }
+function setPlanet() {
+    app.current.planet = app.planets.filter(p => p.id === app.current.id)[0];
+}
 ```
       
 To select which moons to show for the current planet, get the object in its `satellites` array that contains the largest value for `diameterKm`, then use this value to store an array in `app.current.moons` containing just the moons that have a diameter of at least 1/50 of this value. We will also implement this in a function:
@@ -516,7 +514,7 @@ export function draw(plane) {
 If you comment out or remove the code that draws the red guideline in `draw()`, you should finally see a representation of the planet and its largest moons in scale, as shown in _Figure 5_.
 
 ![The moons of Jupiter in scale, sorted by relative position](./images/figure-5.png)
-_Figure 5 — The moons of Jupiter in scale, sorted by relative position. Code: [`StepByStep/6-draw-moons.`](../StepByStep/6-draw-moons)_
+_Figure 5 — The moons of Jupiter in scale, sorted by relative position. Code: [`StepByStep/6-draw-moons.`](../StepByStep/6-draw-moons)_.
 
 These circles were ordered according to their data array indexes, which were sorted by the ascending average distance of each satellite to its planet. Since the goal of our chart is to compare sizes of the planet’s largest natural satellites, we aren’t interested in that distance. So, let’s follow the sketch (_Figure 2_) and order the moons by their size.
 
@@ -545,7 +543,7 @@ export function configure() {
 Load the page and you should now see the circles displayed from largest to smallest, as in _Figure 6_. 
 
 ![The moons of Jupiter in scale, sorted by relative position](./images/figure-6.png)
-_Figure 6 — The moons in scale, sorted by diameter. Code: [`StepByStep/5-sort-moons.`](../StepByStep/7-sort-moons)_.
+_Figure 6 — The moons in scale, sorted by diameter. Code: [`StepByStep/5-sort-moons`](../StepByStep/7-sort-moons)_.
 
 The full code for this step is in [`StepByStep/7-sort-moons`](../StepByStep/7-sort-moons).
 
