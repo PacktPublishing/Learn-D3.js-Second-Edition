@@ -33,9 +33,7 @@ We will code a visualization that shows and compares the diameters of the larges
 ![The visualization we will generate in Part 1 of this tutorial](./images/figure-1.png)
 _Figure 1 — The visualization we will generate in Part 1 of this tutorial._
 
-Although static, you will be able to choose which planet to display by changing the value of a single constant in the code.
-
-In the second part of the tutorial, a control panel will be added so the user can switch views and display different planets and moons.
+Although static, you will be able to choose which planet to display by changing the value of a single constant in the code. In the second part of the tutorial, a control panel will be added so the user can switch views and display different planets and moons.
 
 We will use data from the [`data/sol_2019.json`](../data/sol_2019.json) file -– a compilation of planetary data obtained from open databases (mostly from the [NASA Open Data portal](https://data.nasa.gov/)). This same file was used in _Chapter 4_ to create a bar chart comparing average orbit distances. This time we will extract data from other parts of this file.
 
@@ -46,14 +44,14 @@ Sizes and margins will be stored in a globally accessible dimensions object call
 ![Sketch of the visualization that will be created](./images/figure-2.png)
 _Figure 2 — Sketch of the visualization that will be created._
 
-The chart is a view that shows the relative sizes of the largest moons compared to their planet. The view is driven by data, so it can be used to compare the moons of any planet. For _Part 1_, you can choose any planet, such as Jupiter or Saturn. In _Part 2_, we will stack multiple views in a single app and the user can choose which planet to display.
+The chart is a view that shows the relative sizes of the largest moons compared to their planet. The view is driven by data, so it can be used to compare the moons of any planet. For _Part 1_, you can edit the code to choose a planet, such as Jupiter or Saturn, for display. In _Part 2_, we will stack multiple views in a single app so the user can interactively select which planet to display.
 
-Each step in this tutorial is a folder that contains all the code necessary to run the application in that step, except for the data file, which is kept in `Chapter05/data`, and the `d3.js` library, which is loaded via CDN. Unlike the short examples in this book, where all the code is in a single HTML file, here it will consist of a folder containing the main page, `index.html`, and two subfolders `js/` and `css/`, where scripts (modules) and stylesheets will be stored. Script files that are modified in different steps will have a version number that is incremented every time the file changes.
+Each step in this tutorial is a folder that contains all the code necessary to run the application in that step, except for the data file, which is stored in `Chapter05/data`, and the `d3.js` library, which is loaded via CDN. Unlike the short examples in this book, where all the code is in a single HTML file, here it is organized like a typical web application, consisting of a root folder containing the main page, `index.html`, and two subfolders `js/` and `css/`, where scripts (modules) and stylesheets will be stored. Script files that are modified in different steps will have a version number postfixed to the file name, incremented every time the file changes.
 
 Let’s begin.
 
 ## Step 1 - setting up the page, scripts, stylesheet
-If you want to code along, start with the contents of the [`StepByStep/1-page-setup`](../StepByStep/1-page-setup) folder. It contains a simple page with some boilerplate code ([`index.html`](../StepByStep/1-page-setup/index.html)), a minimal CSS style sheet ([`css/main.css`](../StepByStep/1-page-setup/css/main.css)), and a script file ([`js/constants.js`](../StepByStep/1-page-setup/js/constants.js)) where we will declare the global objects used in the application. This section will describe all of them.
+If you want to code along, start with the contents of the [`StepByStep/1-page-setup`](../StepByStep/1-page-setup) folder. It contains a simple page with some boilerplate code ([`index.html`](../StepByStep/1-page-setup/index.html)), a minimal CSS style sheet ([`css/main-1.0.css`](../StepByStep/1-page-setup/css/main-1.0.css)), and a script file ([`js/constants.js`](../StepByStep/1-page-setup/js/constants.js)) where we will declare the global objects used in the application. This section will describe all of them.
 
 This is the `index.html` file:
 
@@ -62,7 +60,7 @@ This is the `index.html` file:
 <html lang="en">
 <head>
     <title>Moons: Step 1 - Page setup</title>
-    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/main-1.0.css">
 </head>
 <body>
 
@@ -78,7 +76,7 @@ This is the `index.html` file:
 </html>
 ```
 
-The HTML body also includes static elements that will be referenced from the code, for example, the contents of the `<h1>` block that will change depending on the view, and the `<form>` block that will later contain a control panel (buttons) that the user can use to switch between different views (in _Part 2_). All the graphics will be rendered as SVG inside the `<svg>` block.
+The HTML body also includes static elements that will be referenced from the code, for example, the contents of the `<h1>` block that will change depending on the view, and the `<form>` block that will later contain a control panel (buttons) so the user can switch between views (in _Part 2_). All the graphics will be rendered as SVG inside the `<svg>` block.
 
 Some minimal code will be kept in the `index.html` file. This includes imports, two view-related constants, and functions that will start the application. This code will be placed in the `<script type="module">` block. 
 
@@ -99,7 +97,7 @@ dim.margin.moon = 10;    // horizontal space between moons
 dim.margin.planet = 100; // horizontal space reserved for the planet
 ```
 
-The `app` object contains the data and functions used by the application. The `app.planets` array contains all the data used by the application. It will be populated after the data is loaded from the file. The `app.colors` array contains a six-color palette we will use to color the planets, and the `app.scale` function is a reference to the scale function used in all views. Every time the user selects a new view, the scale’s domain and range, and the `app.current` object will be updated. 
+The `app` object contains properties used by the application. The `app.planets` array will contain the data used by the application (extracted from the external source after it is loaded, parsed and filtered). The `app.colors` array contains a six-color palette to color the planets, and the `app.scale` function points to the scale function used in all views. The `app.current` object represents the currently displayed planet. When displaying different planets it will be updated. 
 
 ```js
 export const app = {
@@ -127,7 +125,7 @@ The planet's color can also be set at this stage, setting it from the `app.color
 app.current.color = app.colors[(+app.current.id.substring(1) - 3)];
 ```
 
-The script block in `index.html` imports the modular D3 library and the `js/constants.js` module. It also configures the SVG container with a viewBox so that it will scale when the user resizes the browser window. The `plane` object is the line where the center coordinates for all circles will be placed. It is configured with a `translate()` transform that places it horizontally in the middle of the viewport and starting 100 pixels from the left:
+The `<script>` block in `index.html` imports the modular D3 library and the `js/constants.js` module. It also configures the SVG container with a `viewBox` so that it will scale when the user resizes the browser window. The `plane` object is the guideline where the center coordinates for all circles will be placed. It is configured with a `translate()` transform that places it horizontally in the middle of the viewport and starting 100 pixels from the left:
 
 ```js
 <script type="module">
@@ -145,7 +143,7 @@ The script block in `index.html` imports the modular D3 library and the `js/cons
 
 If you load the page in your browser, you should see the header “The largest moons” followed by the SVG viewport (which has a border, added in CSS). This is where the chart will be rendered.
 
-This was the first step. Use the full code in [`StepByStep/1-page-setup`](../StepByStep/1-page-setup) as a starting point if you wish to code as you read.
+This was the initial step. Use the full code in [`StepByStep/1-page-setup`](../StepByStep/1-page-setup) as a starting point if you wish to code as you read.
 
 Now let’s load some data.
 
@@ -166,19 +164,19 @@ The data file for this example ([`data/sol_2019.json`](../data/sol_2019.json)) i
 }
 ```
 
-After parsing this JSON file, a JavaScript object with the same structure will be generated. Understanding the file structure will allow you to navigate the parsed object via object properties and array indexes to extract the data you need.
+After parsing this JSON file, a JavaScript object with the same structure will be generated. Understanding the file structure will allow you to navigate the parsed object via its object properties and array indexes to extract the data you need.
 
-For this project, we are only interested in the objects inside the planets array that have an id property with one of the following values: `p3`, `p4`, `p5`, `p6`, `p7`, `p8`. We will also filter out dwarf planets and planets that don’t have any moons. Each object (planet) from the array has several properties, but we only need four of them:
+For this project, we are only interested in the objects inside the planets array that have an `id` property with one of the following values: `p3`, `p4`, `p5`, `p6`, `p7`, `p8`. We will also filter out dwarf planets and planets that don’t have any moons. Each object (`planet`) from the array has several properties, but we only need four of them:
 *	**`id`**: a code that identifies the planet (e.g. `"p5"`)
 *	**`name`**: the common name of the planet (e.g. `"Jupiter"`)
 *	**`diameterKm`**: the diameter of the planet in kilometers.
-*	**`satellites`**: an array that contains an array of objects, which are the planet’s moons.
+*	**`satellites`**: an array that contains an array of objects, which are the planet’s natural satellites, or "moons".
 
 Each element in the `satellites` array is an object, and it also contains a large list of properties. We only need two:
 *	**`name`**: the name (or code) of the satellite.
 *	**`diameterKm`**: the diameter of the satellite in kilometers.
 
-With this information, you can load the file, parse it and filter the planets array so that it only includes the objects that are going to be used. It should then be stored in the `app.planets` array.
+With this information, you can load the file, parse it and filter the `planets` array so that it only includes the objects that are going to be used. It should then be stored in the `app.planets` array.
 
 Start creating a new script file: `js/load.js`. It requires the _d3-fetch_ module (since we will use `d3.json()`) and the `js/constants.js` (since we will populate the `app.planets` array). To keep things simple, at this stage, we will import the entire D3 library, since we might use other functions later. Add the following two lines to `js/load.js`:
 
@@ -217,9 +215,9 @@ load().then(data => {
 });
 ```
 
-Loading the page in your browser should list the file’s contents in the browser's console (you will see the top-level properties: `asteroids`, `comets`, `planets`, etc.). If instead you receive an error, first make sure you are accessing the file via a Web server, and then check if the path is correct (you will get a _404 Not Found_ error if the path is incorrect). You might need to move the file or edit the path so that your page will find the file. You may also have authorization or data issues if you are using an external URL. Make sure you fix these issues before proceeding.
+Loading the page in your browser should list the file’s contents in the console (you will see the top-level properties: `asteroids`, `comets`, `planets`, etc.). If instead you receive an error, first make sure you are accessing the file via a Web server, and then check if the path is correct (you will get a _404 Not Found_ error if the path is incorrect). You might need to move the file or edit the path so that your page will find the file. You may also have authorization or data issues if you are using an external URL. Make sure you fix these issues before proceeding.
 
-Now let’s add a bit more code to the `load()` function so that it populates the `app.planets` object with the data we need, which is stored in `data.planets`. There are only six planets with moons, so before copying the array, filter it so only these six are included. This should be done in the `load()` function:
+Now let’s add a bit more code to the `load()` function so that it populates the `app.planets` object with the data we need, which is stored in `data.planets`. There are only six planets with moons, so before copying the array, filter it so only these six are included. This should be done in the `load()` function, as follows:
 
 ```js
 export async function load() {
@@ -246,12 +244,13 @@ load().then(() => {
 });
 ```
 
-As before, the app still displays only the title and an empty SVG graphics context, but since we logged `app.planets` to the console, you can open it to inspect its structure, as shown in _Figure 3_.
+As before, the app still displays only the title and an empty SVG graphics context, but since we logged `app.planets` to the console, you can open it to inspect its structure (which lists the six planets), as shown in _Figure 3_.
 
 ![Printing the loaded data in the JavaScript console](./images/figure-3.png)
 _Figure 3 — Printing the loaded data in the JavaScript console. Code: [`StepByStep/2-load-data`](../StepByStep/2-load-data)._
 
-You can expand the array and its contents, as to inspect all the properties of each planet and its satellites. Try retrieving selected information for some planets and natural satellites. For example, you can use the following object path to obtain the diameter of Saturn, which is the fourth element in the array:
+Expand the array and its contents to inspect all the properties of each planet and its satellites. Try retrieving selected information for some planets and natural satellites. For example, you can use the following object path to obtain the diameter of Saturn, which is the fourth element in the array:
+
 ```js
 app.planets[3].diameterKm
 ```
@@ -277,7 +276,7 @@ After the data is loaded and every time a view is selected, the application shou
 2)	Select the moons of the current planet that will be displayed, limiting them by diameter, and store their data in the `app.current.moons` object.
 3)	Recompute the chart’s margins, and use that data to reconfigure the scale (via `app.scale`), updating its range and domain.
 
-Although the application is not interactive yet, we will implement these features now,in the `js/config.js`. It requires the following imports:
+Although the application is not interactive yet, we will implement these features now, since they can be triggered by simply changing the value of `app.current.id`. This is done in the `js/config.js` file. It requires the following imports:
 
 ```js
       import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
@@ -323,7 +322,7 @@ function configScale() {
 }
 ```
 
-Finally, call these functions in a `configure()` function that is exported by the module. Since we didn’t render anything yet, print the data in the console so it can be inspected:
+Finally, call these functions in a `configure()` function that is exported by the module. Since we didn’t render anything yet, let's print the data in the console so it can be inspected:
 
 ```js
 export function configure() {
@@ -351,6 +350,7 @@ load().then(() => {
 ```
 
 Open the console and check if the `app.current` object was configured correctly. You will find the full code for this step in [`StepByStep/3-config-scales`](../StepByStep/3-config-scales).
+
 Since we have now calculated all the necessary values, we can start rendering the chart.
 
 ## Step 4 - drawing the planet
