@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Multifetching images</title>
+</head>
+<body>
+<h1>Fetching multiple image files</h1>
+<p>View source and open JavaScript console to see the results.</p>
+
+<svg height="200" width="1000"></svg>
+<script type="module">
+    import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+    const entries = [
+        {name: "Moon"},
+     //   {name: "Phobos"},
+     //   {name: "Deimos"},
+        {name: "Europa"},
+        {name: "Ganymede"},
+        {name: "Io"},
+        {name: "Callisto"},
+        {name: "Titan"},
+     //   {name: "Callisto"},
+     //   {name: "Rhea"},
+     //   {name: "Iapetus"},
+     //   {name: "Dione"},
+     //   {name: "Tethys"},
+    ];
+
+    const promises = entries.map(entry =>
+        d3.image(`../data/images/${entry.name}.png`)
+            .then(img => entry.image = img.src)    // preload image if URL exists
+            .catch(() => {})                       // do nothing if file not found
+    );
+
+    await Promise.all(promises); // continue after all image files are loaded
+
+    d3.select("svg")
+        .selectAll("image")
+        .data(entries.filter(d => d.image))
+        .join("image")
+          .attr("href",d => d.image)
+          .attr("x", (d,i) => 10 + i*90).attr("y", 10)
+          .attr("height", 80).attr("width", 80);
+
+</script>
+
+</body>
+</html>

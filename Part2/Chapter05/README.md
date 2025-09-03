@@ -1,40 +1,33 @@
-# Chapter05
+# Chapter06
 
 Files and exercises for chapter 5.
 
 ## 1) Description of each subfolder in this folder
 
-__`Selecting/`__
+__`Fetching/`__
 
-Description.
+Examples using fetching and parsing functions from the d3-fetch module and native Javascript fetch().
 
-__`Joining/`__
+__`Multifetch/`__
 
-Description.
+Examples loading multiple files using functions from the d3-fetch module.
 
-__`Modifying/`__
+__`Parsing/`__
 
-Description.
+Examples using tabular data (DSV, CVS, TSV) parsers from the d3-dsv module.
 
-__`Functions/`__
+__`Formatting/`__
 
-Description.
+An example using text formatting functions from the d3-dsv module.
 
-__`Events/`__
+__`StepByStep/`__
 
-Description.
-
-__`MultiSelect/`__
-
-Description.
-
-__`LegacyJoin/`__
-
-Description.
+A step-by-step tutorial. Each step is a folder containing an index.html file, a css folder and a js folder.
 
 __`Exercises/`__
 
-Description.
+Exercises. Use files from the Templates folder as starting points (follow the comments). 
+The solutions are in the Solutions folder.
 
 __`data/`__
 

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Getting data from fetching functions</title>
+    <style>
+        #imported-svg {
+            height: 200px;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+<h3>Getting data from fetching functions</h3>
+<p>Open JavaScript console to see results</p>
+<div id="imported-svg"></div>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    // List of data items
+    const dataPromises = [
+        {function: "d3.text", promise: d3.text("../data/Paris2024.csv")},
+
+        {function: "d3.csv", promise: d3.csv("../data/Paris2024.csv")},
+        {function: "d3.tsv", promise: d3.tsv("../data/vehicles.tsv")},
+        {function: "d3.dsv", promise: d3.dsv(";", "../data/cities15000.csv")},
+
+        {function: "d3.html", promise: d3.html("./1-dom-fetch.html")},
+        {function: "d3.xml", promise: d3.xml("../data/knight.svg")},
+        {function: "d3.svg", promise: d3.svg("../data/knight.svg")},
+
+        {function: "d3.json", promise: d3.json("../data/world-lowres.geojson")},
+
+        {function: "d3.blob", promise: d3.blob("../data/images/Moon.png")},
+        {function: "d3.buffer", promise: d3.buffer("../data/images/Moon.png")},
+        {function: "d3.image", promise: d3.image("../data/images/Moon.png")}
+    ];
+
+    // Print the DOM interface of the object returned by each promise
+    await Promise.all(dataPromises);
+    dataPromises.forEach(item => {
+        item.promise.then(data => console.log(item.function+": "+data.constructor.name));
+    });
+
+    // Example of using the fetched SVG XML document
+    const svg = await d3.xml("../data/knight.svg");  // or d3.svg(...)
+
+    console.log(svg.getElementById("knight")); // Access an element in the SVG
+
+    console.log(svg.documentElement);
+    d3.select("#imported-svg").append(() => svg.documentElement);
+</script>
+</body>
+</html>

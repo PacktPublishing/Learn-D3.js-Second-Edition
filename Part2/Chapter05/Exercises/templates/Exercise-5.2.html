@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Exercise 5.2 - Fetching multiple documents</title>
+</head>
+<body>
+<h1>Exercise 5.2 - Fetching multiple documents</h1>
+<p>See comments with hints in the source code.</p>
+
+<svg height="200" width="1000"></svg>
+<script type="module">
+    import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+    // EXERCISE 5.2 - Fetching multiple documents
+
+    // The URL for the data file where the satellite diameters are stored
+    // (adjust to your file's location if necessary)
+    const datafile = "../../data/satellites.json";
+
+    const entries = [
+        {name: "Moon"},
+        //  {name: "Phobos"},
+        //   {name: "Deimos"},
+        {name: "Europa"},
+        {name: "Ganymede"},
+        {name: "Io"},
+        {name: "Callisto"},
+        {name: "Titan"},
+        //   {name: "Rhea"},
+        //   {name: "Iapetus"},
+        //   {name: "Dione"},
+        //   {name: "Tethys"},
+    ];
+
+    const promises = [];
+
+    entries.forEach( entry => {
+        promises.push(
+            d3.image(`../../data/images/${entry.name}.png`)
+              .then(img => entry.image = img.src) // preload image if URL exists
+              .catch(() => {}) // do nothing if file not found
+        )
+    });
+
+    // EXERCISE 5.2 - Fetching multiple documents
+    // 1) Create a promise that loads the data file, then finds satellites with the same name as the entries,
+    //    and adds a diameter property to each entry containing the satellites diameter
+    // 2) Add the data promise to the promises array
+    // 3) Use Promise.all to wait for all promises to resolve
+    // 4) Then create a scale to map the diameter to the size of the image (use 100 as the maximum range size)
+    // 5) Filter out entries without an image property and sort by diameter
+    // 6) Use the scale to set the image size (total diameter) and y position (50 - diameter/2)
+
+</script>
+
+
+</body>
+</html>

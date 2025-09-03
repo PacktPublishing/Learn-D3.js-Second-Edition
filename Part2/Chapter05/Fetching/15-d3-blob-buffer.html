@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fetching an array buffer or blob</title>
+    <style>
+        img, svg, canvas {
+            border: 1px solid black;
+            display: inline-block;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+<h3>Loading and using image data as a blob or array buffer</h3>
+<p>Open JavaScript console to see results</p>
+<div>
+    <div id="html-div"></div>
+</div>
+<script type="module">
+    import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+    // Load an image and creates a new HTMLImageElement
+    const data1 = await d3.blob("../data/images/Moon.png");
+
+    // This is a Blob
+    console.log("What object is data1? It's " + data1.constructor.name);
+    console.log(data1)
+
+    // Display the blob as an image in HTML
+    const url = URL.createObjectURL(data1);
+    console.log("Blob URL: " + url);
+    const img = new Image();
+    img.src = url;
+    img.onload = () => {
+        img.width = img.width/4;
+        img.height = img.height/4;
+        console.log("Width: " + img.width + " pixels (resized)");
+        console.log("Height: " + img.height + " pixels (resized)");
+
+        // Show it
+        document.querySelector("#html-div").appendChild(img);
+    }
+
+    // You can also load as an ArrayBuffer (then convert to a Blob)
+    const data2 = await d3.buffer("../data/images/Moon.png");
+    console.log("What object is data2? It's " + data2.constructor.name);
+    console.log(data2)
+
+
+</script>
+</body>
+</html>

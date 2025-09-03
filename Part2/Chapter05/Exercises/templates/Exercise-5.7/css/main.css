@@ -1,0 +1,11 @@
+svg {
+    border: solid 1px;
+    background: black;
+}
+* {
+    font-family: sans-serif;
+}
+text {
+    font-size: 10px;
+    fill: white;
+}

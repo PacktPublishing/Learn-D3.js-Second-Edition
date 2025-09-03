@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Exercise 6.2b - Fetching multiple documents</title>
+</head>
+<body>
+<h1>Exercise 6.2b - Fetching multiple documents - using different file</h1>
+<p>See comments with hints in the source code.</p>
+
+<svg height="200" width="1000"></svg>
+<script type="module">
+    import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+    // EXERCISE 6.2 - Extra
+    // This is an advanced version on exercise 6.2 that uses the sol_2019.json file to get the satellite diameters
+    // You need to navigate the JSON file and locate the data you need
+
+    // The URL for the data file where the satellite diameters are stored
+    // (adjust to your file's location if necessary)
+    const datafile = "../../data/sol_2019.json";
+
+    const entries = [
+        {name: "Moon"},
+        //  {name: "Phobos"},
+        //   {name: "Deimos"},
+        {name: "Europa"},
+        {name: "Ganymede"},
+        {name: "Io"},
+        {name: "Callisto"},
+        {name: "Titan"},
+        //   {name: "Rhea"},
+        //   {name: "Iapetus"},
+        //   {name: "Dione"},
+        //   {name: "Tethys"},
+    ];
+
+    const promises = [];
+
+    entries.forEach( entry => {
+        promises.push(
+            d3.image(`../../data/images/${entry.name}.png`)
+              .then(img => entry.image = img.src) // preload image if URL exists
+              .catch(() => {}) // do nothing if file not found
+        )
+    });
+
+    // EXERCISE 6.2 - Extra
+    // 1) Create a promise that loads the data file, then finds satellites with the same name as the entries,
+    //    and adds a diameter property to each entry containing the satellites diameter.
+    //    This version uses the sol_2019.json file to get the satellite diameters, which requires you
+    //    navigate the JSON file and find the data you need
+    const dataPromise = d3.json(datafile)
+        .then(data => {
+
+            // 2) Get all satellites in planets that have the "satellites" property,
+            //    flatten the array and replace each satellite with an object
+            //    containing just the name and diameter
+            const satellites = data.planets
+                                   .filter(d => d.satellites)
+                                       .map(p => p.satellites)
+                                          .flat()
+                                             .map(s => ({name: s.name, diameter: s.diameterKm}));
+
+            // The satellites constant now contains the same data as the satellites.json file
+
+            // 3) Match the name and add the diameter to the matching entry
+            entries.map(e => e.diameter = satellites.find(s => s.name === e.name).diameter);
+        });
+
+    // 4) Add the data promise to the promises array
+    promises.push(dataPromise);
+
+    Promise.all(promises)
+        .then(() => {
+
+            // 5) Create a scale to map the diameter to the size of the image (use 100 as the maximum range size)
+            const scale = d3.scaleLinear()
+                            .domain([0, d3.max(entries, d => d.diameter)])
+                            .range([0, 100]);
+
+            // 6) Filter out entries without an image property and sort by diameter
+            const data = entries.filter(d => d.image)
+                                .sort((a,b) => d3.ascending(a.diameter, b.diameter))
+
+            // 7) Use the scale to set the image size (total diameter) and y position (50 - diameter/2)
+            d3.select("svg")
+              .selectAll("image")
+                .data(data)
+                  .join("image")
+                     .attr("href",d => d.image)
+                     .attr("x", (d,i) => 50 + i*scale(d.diameter))
+                     .attr("y", d => 50 - scale(d.diameter)/2) // center by diameter
+                     .attr("height", d => scale(d.diameter))   // scale by diameter
+                     .attr("width", d => scale(d.diameter));   // scale by diameter
+        });
+
+</script>
+
+
+</body>
+</html>

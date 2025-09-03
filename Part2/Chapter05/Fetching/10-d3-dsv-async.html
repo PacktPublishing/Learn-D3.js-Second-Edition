@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CSV fetching and parsing</title>
+</head>
+<body>
+
+<h1>Open JavaScript console to see results</h1>
+<script type="module">
+    import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+    const cities = "../data/cities15000.csv";
+
+    const data = await d3.dsv(";", cities);
+    console.log(data);
+
+    // You can also use the then() method to obtain the response in a callback function
+    // See 9-d3-dsv.html
+
+</script>
+</body>
+</html>

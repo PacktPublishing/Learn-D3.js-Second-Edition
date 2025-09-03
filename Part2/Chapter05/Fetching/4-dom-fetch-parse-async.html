@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HTML fetching</title>
+</head>
+<body>
+<h1>Using standard JavaScript to fetch and D3 to parse a CSV file</h1>
+<p>Open JavaScript console to see results</p>
+<script type="module">
+    import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+    const dataFile = "../data/Paris2024-Top10.csv";
+
+    const response = await fetch(dataFile);
+    const data = d3.csvParse(await response.text()); // Obtains an array of objects
+
+    console.log(data); // inspect the contents!
+
+    // You can also use the then() method to obtain the response in a callback function
+    // See 3-dom-fetch-parse.html.
+
+</script>
+</body>
+</html>
