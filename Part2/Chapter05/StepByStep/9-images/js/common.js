@@ -24,7 +24,7 @@ export const app = {
         moons: []           // the moons to be displayed
     }
 }
-app.current.id = "p5"; // starting with Jupiter id = "p5"
+app.current.id = "p7"; // starting with Jupiter id = "p5"
 app.current.color  = app.colors[(+app.current.id.substring(1) - 3)]; // Set the initial color for the planet
 
 /**

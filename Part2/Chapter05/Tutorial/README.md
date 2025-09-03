@@ -2,8 +2,7 @@
 <link href="./css/fonts.css" rel="stylesheet">
 <link href="./css/styles.css" rel="stylesheet">
 
-### _Learn D3.js Second Edition_ * Chapter 5
-# A static data-driven visualization in 9 steps
+# Creating an interactive data-driven visualization - Part 1
 
 This tutorial is part of _Learn D3.js Second Edition, Chapter 5_. The goal is to guide you through the process of designing and developing a complete interactive data visualization with D3 using other shapes and images. With D3 you can create visualizations with all the resources you have available in HTML and SVG, so we don’t have to stick to conventional bar, line and pie charts. 
 
@@ -29,22 +28,27 @@ This tutorial includes the following sections:
 - [Step 9 - adding images](#step-9---adding-images)
 
 ## What are we going to create?
-We will code a visualization that shows and compares the diameters of the largest natural satellites (moons) of planets in the Solar System using circles and images. In each view, the circumference of the planet will be partially visible, and its largest moons will be lined up and sorted by their diameters. In the first part of the tutorial, we will create the static visualization shown in _Figure 6_.
+We will code a visualization that shows and compares the diameters of the largest natural satellites (moons) of planets in the Solar System using circles and images. In each view, the circumference of the planet will be partially visible, and its largest moons will be lined up and sorted by their diameters. In the first part of the tutorial, we will create the static visualization shown in _Figure 1_.
+
+![The visualization we will generate in Part 1 of this tutorial](./images/figure-1.png)
+_Figure 1 — The visualization we will generate in Part 1 of this tutorial._
+
+Although static, you will be able to choose which planet to display by changing the value of a single constant in the code.
 
 In the second part of the tutorial, a control panel will be added so the user can switch views and display different planets and moons.
 
 We will use data from the [`data/sol_2019.json`](../data/sol_2019.json) file -– a compilation of planetary data obtained from open databases (mostly from the [NASA Open Data portal](https://data.nasa.gov/)). This same file was used in _Chapter 4_ to create a bar chart comparing average orbit distances. This time we will extract data from other parts of this file.
 
-`Figure 1` shows a sketch of the visualization we plan to create. It contains all the coordinates, spacing and margins we will have to consider when drawing the shapes.
+`Figure 2` shows a sketch of the visualization we plan to create. It contains all the coordinates, spacing and margins we will have to consider when drawing the shapes.
 
 Sizes and margins will be stored in a globally accessible dimensions object called `dim`. To place and scale SVG circles in each view, we will need to compute their radii (`r`) and horizontal coordinates (`cx`), as well as determine margins and spaces so that the objects fit nicely in the chart.
 
-![Sketch of the visualization that will be created](./images/figure-1.png)
-_Figure 1 — Sketch of the visualization that will be created._
+![Sketch of the visualization that will be created](./images/figure-2.png)
+_Figure 2 — Sketch of the visualization that will be created._
 
-The chart is a view that shows the relative sizes of the largest moons compared to their planet. The view is driven by data, so it can be used to compare the moons of any planet. For Part 1, you can choose any planet, such as Jupiter or Saturn. In _Part 2_, we will stack multiple views in a single app and the user can choose which planet to display.
+The chart is a view that shows the relative sizes of the largest moons compared to their planet. The view is driven by data, so it can be used to compare the moons of any planet. For _Part 1_, you can choose any planet, such as Jupiter or Saturn. In _Part 2_, we will stack multiple views in a single app and the user can choose which planet to display.
 
-Each step in this tutorial is a folder that contains all the code necessary to run the application in that step, except for the data file, which is kept in `Chapter06/data`, and the `d3.js` library, which is loaded via CDN. Unlike the short examples in this book, where all the code is in a single HTML file, here it will consist of a folder containing the main page, `index.html`, and two subfolders `js/` and `css/`, where scripts (modules) and stylesheets will be stored. Script files that are modified in different steps will have a version number that is incremented every time the file changes.
+Each step in this tutorial is a folder that contains all the code necessary to run the application in that step, except for the data file, which is kept in `Chapter05/data`, and the `d3.js` library, which is loaded via CDN. Unlike the short examples in this book, where all the code is in a single HTML file, here it will consist of a folder containing the main page, `index.html`, and two subfolders `js/` and `css/`, where scripts (modules) and stylesheets will be stored. Script files that are modified in different steps will have a version number that is incremented every time the file changes.
 
 Let’s begin.
 
@@ -78,7 +82,7 @@ The HTML body also includes static elements that will be referenced from the cod
 
 Some minimal code will be kept in the `index.html` file. This includes imports, two view-related constants, and functions that will start the application. This code will be placed in the `<script type="module">` block. 
 
-The `js/constants.js` file stores objects and functions we will use in the application. The `dim` object contains dimensions and margins. Its values are based on the sketch from _Figure 1_:
+The `js/constants.js` file stores objects and functions we will use in the application. The `dim` object contains dimensions and margins. Its values are based on the sketch from _Figure 2_:
 
 ```js
 export const dim = {
@@ -242,10 +246,10 @@ load().then(() => {
 });
 ```
 
-As before, the app still displays only the title and an empty SVG graphics context, but since we logged `app.planets` to the console, you can open it to inspect its structure, as shown in _Figure 2_.
+As before, the app still displays only the title and an empty SVG graphics context, but since we logged `app.planets` to the console, you can open it to inspect its structure, as shown in _Figure 3_.
 
-![Printing the loaded data in the JavaScript console](./images/figure-2.png)
-_Figure 2 — Printing the loaded data in the JavaScript console. Code: [`StepByStep/2-load-data`](../StepByStep/2-load-data)._
+![Printing the loaded data in the JavaScript console](./images/figure-3.png)
+_Figure 3 — Printing the loaded data in the JavaScript console. Code: [`StepByStep/2-load-data`](../StepByStep/2-load-data)._
 
 You can expand the array and its contents, as to inspect all the properties of each planet and its satellites. Try retrieving selected information for some planets and natural satellites. For example, you can use the following object path to obtain the diameter of Saturn, which is the fourth element in the array:
 ```js
@@ -363,7 +367,7 @@ The `draw()` function will be called from the main page after `configure()`, so 
 import { draw } from "./js/render.js";
 ```
 
-According to the sketch in _Figure 1_, circles are placed on their orbital plane, which appears in the chart as a horizontal guideline dividing the chart in half. The `plane` object (a `<g>` element) is already defined in `index.html`, but we need to pass its reference to `js/render.js`, which can be done when calling `draw()`:
+According to the sketch in _Figure 2_, circles are placed on their orbital plane, which appears in the chart as a horizontal guideline dividing the chart in half. The `plane` object (a `<g>` element) is already defined in `index.html`, but we need to pass its reference to `js/render.js`, which can be done when calling `draw()`:
 
 ```js
 load().then(() => {
@@ -427,10 +431,10 @@ export function configure() {
 }
 ```
 
-This will produce the result shown in _Figure 3_. You can check the full code so far in [`StepByStep/4-draw-planet`](../StepByStep/4-draw-planet). 
+This will produce the result shown in _Figure 4_. You can check the full code so far in [`StepByStep/4-draw-planet`](../StepByStep/4-draw-planet). 
 
-![Positioning the planet and the guideline for the orbital plane where the moons will be placed](./images/figure-3.png)
-_Figure 3 — Positioning the planet and the guideline for the orbital plane where the moons will be placed.
+![Positioning the planet and the guideline for the orbital plane where the moons will be placed](./images/figure-4.png)
+_Figure 4 — Positioning the planet and the guideline for the orbital plane where the moons will be placed.
 Code: [`StepByStep/4-draw-planet`](../StepByStep/4-draw-planet)._
 
 The next step is to draw the moons, but first we must compute their positions.
@@ -509,12 +513,12 @@ export function draw(plane) {
 }
 ```
 
-If you comment out or remove the code that draws the red guideline in `draw()`, you should finally see a representation of the planet and its largest moons in scale, as shown in _Figure 4_.
+If you comment out or remove the code that draws the red guideline in `draw()`, you should finally see a representation of the planet and its largest moons in scale, as shown in _Figure 5_.
 
-![The moons of Jupiter in scale, sorted by relative position](./images/figure-4.png)
-_Figure 4 — The moons of Jupiter in scale, sorted by relative position. Code: [`StepByStep/6-draw-moons.`](../StepByStep/6-draw-moons)_
+![The moons of Jupiter in scale, sorted by relative position](./images/figure-5.png)
+_Figure 5 — The moons of Jupiter in scale, sorted by relative position. Code: [`StepByStep/6-draw-moons.`](../StepByStep/6-draw-moons)_
 
-These circles were ordered according to their data array indexes, which were sorted by the ascending average distance of each satellite to its planet. Since the goal of our chart is to compare sizes of the planet’s largest natural satellites, we aren’t interested in that distance. So, let’s follow the sketch (_Figure 1_) and order the moons by their size.
+These circles were ordered according to their data array indexes, which were sorted by the ascending average distance of each satellite to its planet. Since the goal of our chart is to compare sizes of the planet’s largest natural satellites, we aren’t interested in that distance. So, let’s follow the sketch (_Figure 2_) and order the moons by their size.
 
 ## Step 7 - sorting the moons by size
 
@@ -538,7 +542,12 @@ export function configure() {
 }
 ```
 
-Load the page and you should now see the circles displayed from largest to smallest. The full code including the line above is in [`StepByStep/7-sort-moons`](../StepByStep/7-sort-moons).
+Load the page and you should now see the circles displayed from largest to smallest, as in _Figure 6_. 
+
+![The moons of Jupiter in scale, sorted by relative position](./images/figure-6.png)
+_Figure 6 — The moons in scale, sorted by diameter. Code: [`StepByStep/5-sort-moons.`](../StepByStep/7-sort-moons)_.
+
+The full code for this step is in [`StepByStep/7-sort-moons`](../StepByStep/7-sort-moons).
 
 Now let’s add some labels so the user knows what the circles represent.
 
@@ -585,10 +594,10 @@ If you load the page now, you will notice that the visual result is the same, bu
 
 Note that the `<text>` element’s position is determined solely by its `transform` attribute, which is relative to the `<g>` container’s coordinate system. The `alignment-baseline` style is important so that the label is centered vertically to the circle.
 
-The result is shown in _Figure 5_.
+The result is shown in _Figure 7_.
 
-![Moons sorted by size and labeled](./images/figure-5.png)
-_Figure 5 — Moons sorted by size and labeled. Code: [`StepByStep/8-text-labels`](../StepByStep/8-text-labels)._
+![Moons sorted by size and labeled](./images/figure-7.png)
+_Figure 7 — Moons sorted by size and labeled. Code: [`StepByStep/8-text-labels`](../StepByStep/8-text-labels)._
 
 Before ending this step, let’s move the code from the `each()` method in `drawMoons()` to a separate function we will call `appendObjects()`. This will make it easier to refactor the code later:
 
@@ -609,7 +618,7 @@ function appendObjects(moon) {
 
 You can see the full code in [`StepByStep/8-text-labels`](../StepByStep/8-text-labels).
 
-## Step 9 – using images - TODO
+## Step 9 – using images
 
 We already have a good visualization that will display any planet and its largest moons. In _Part 2_ we will create a control panel to switch planets automatically. For now, you can see the result with different planets changing the value of `app.current.id` (in `js/common.js`). For example, to display the moons for Saturn, just change it to:
 
@@ -676,10 +685,10 @@ moon.filter(d => d.image)
         .attr("width", d => app.scale(d.diameterKm));
 ```
 
-Now your chart should look like _Figure 6_. Try changing the planet to see which moons have images available.
+Try changing the planet to see which moons have images available. If you choose `'p7'` as `app.current.planet` your chart should look like _Figure 8_.
 
-![Using images instead of circles for the larger moons](./images/figure-6.png)
-_Figure 6 — Using images instead of circles for the larger moons.
+![Using images instead of circles for the larger moons](./images/figure-8.png)
+_Figure 8 — Using images instead of circles for the larger moons.
 Code: [`StepByStep/9-images`](../StepByStep/9-images)._
 
 The final code for this step can be found in [`StepByStep/9-images`](../StepByStep/9-images).
