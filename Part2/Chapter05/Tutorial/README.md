@@ -51,7 +51,7 @@ Each step in this tutorial is a folder that contains all the code necessary to r
 Let’s begin.
 
 ## Step 1 - setting up the page, scripts, stylesheet
-If you want to code along, start with the contents of the [`StepByStep/1-page-setup`](../StepByStep/1-page-setup) folder. It contains a simple page with some boilerplate code ([`index.html`](../StepByStep/1-page-setup/index.html)), a minimal CSS style sheet ([`css/main-1.0.css`](../StepByStep/1-page-setup/css/main-1.0.css)), and a script file ([`js/constants.js`](../StepByStep/1-page-setup/js/constants.js)) where we will declare the global objects used in the application. This section will describe all of them.
+If you want to code along, start with the contents of the [`StepByStep/1-page-setup`](../StepByStep/1-page-setup) folder. It contains a simple page with some boilerplate code ([`index.html`](../StepByStep/1-page-setup/index.html)), a minimal CSS style sheet ([`css/main-1.0.css`](../StepByStep/1-page-setup/css/main-1.0.css)), and a script file ([`js/common.js`](../StepByStep/1-page-setup/js/common.js)) where we will declare the global objects used in the application. This section will describe all of them.
 
 This is the `index.html` file:
 
@@ -80,7 +80,7 @@ The HTML body also includes static elements that will be referenced from the cod
 
 Some minimal code will be kept in the `index.html` file. This includes imports, two view-related constants, and functions that will start the application. This code will be placed in the `<script type="module">` block. 
 
-The `js/constants.js` file stores objects and functions we will use in the application. The `dim` object contains dimensions and margins. Its values are based on the sketch from _Figure 2_:
+The `js/common.js` file stores objects and functions we will use in the application. The `dim` object contains dimensions and margins. Its values are based on the sketch from _Figure 2_:
 
 ```js
 export const dim = {
@@ -125,12 +125,12 @@ The planet's color can also be set at this stage, setting it from the `app.color
 app.current.color = app.colors[(+app.current.id.substring(1) - 3)];
 ```
 
-The `<script>` block in `index.html` imports the modular D3 library and the `js/constants.js` module. It also configures the SVG container with a `viewBox` so that it will scale when the user resizes the browser window. The `plane` object is the guideline where the center coordinates for all circles will be placed. It is configured with a `translate()` transform that places it horizontally in the middle of the viewport and starting 100 pixels from the left:
+The `<script>` block in `index.html` imports the modular D3 library and the `js/common.js` module. It also configures the SVG container with a `viewBox` so that it will scale when the user resizes the browser window. The `plane` object is the guideline where the center coordinates for all circles will be placed. It is configured with a `translate()` transform that places it horizontally in the middle of the viewport and starting 100 pixels from the left:
 
 ```js
 <script type="module">
   import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
-  import { dim } from "./js/constants.js";
+  import { dim } from "./js/common.js";
 
   const svg = d3.select("#moons")
                 .attr("viewBox", `0 0 ${dim.width} ${dim.height}`);
@@ -178,11 +178,11 @@ Each element in the `satellites` array is an object, and it also contains a larg
 
 With this information, you can load the file, parse it and filter the `planets` array so that it only includes the objects that are going to be used. It should then be stored in the `app.planets` array.
 
-Start creating a new script file: `js/data.js`. It requires the _d3-fetch_ module (since we will use `d3.json()`) and the `js/constants.js` (since we will populate the `app.planets` array). To keep things simple, at this stage, we will import the entire D3 library, since we might use other functions later. Add the following two lines to `js/data.js`:
+Start creating a new script file: `js/data.js`. It requires the _d3-fetch_ module (since we will use `d3.json()`) and the `js/common.js` (since we will populate the `app.planets` array). To keep things simple, at this stage, we will import the entire D3 library, since we might use other functions later. Add the following two lines to `js/data.js`:
 
 ```js
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
-import {app} from "./constants.js";
+import {app} from "./common.js";
 ```
 
 We also need a path to the data file, which is stored in the [`data/`](../data) folder, located at the root folder for this chapter. You can copy the file into the app’s folder or use a relative path. The path used in the following code assumes you are coding in a folder inside `StepByStep/` and did not move the data file:
@@ -228,10 +228,10 @@ export async function load() {
 }
 ```
 
-Now we can print the `app.planets` object to the console and inspect it. First add the `app` object to the `js/constants.js` import in `index.html`:
+Now we can print the `app.planets` object to the console and inspect it. First add the `app` object to the `js/common.js` import in `index.html`:
 
 ```js
-import { app, dim } from "./js/constants.js";
+import { app, dim } from "./js/common.js";
 ```
 
 Then print the object to the console after loading the file:
@@ -278,7 +278,7 @@ Although the application is not interactive yet, we will implement these feature
 
 ```js
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
-import {app, dim} from "./constants.js";
+import {app, dim} from "./common.js";
 ```
       
 The object that contains the data for the current planet is selected from the `app.planets` array using its `id` property (e.g. `"p5"`), which should match `app.current.id`. Let’s create a function to set the current planet:
@@ -357,7 +357,7 @@ Let’s create a new module `js/view.js` for the code that renders the shapes. I
 
 ```js
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
-import {app, dim} from "./constants.js";
+import {app, dim} from "./common.js";
 ```
 The `draw()` function will be called from the main page after `configure()`, so it needs to be imported in `index.html`:
 
