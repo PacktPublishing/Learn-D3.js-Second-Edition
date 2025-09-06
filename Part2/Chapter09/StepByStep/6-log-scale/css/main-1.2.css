@@ -1,0 +1,20 @@
+svg {
+    border: solid 1px;
+}
+
+text {
+    font-family: 'Arial Narrow', sans-serif;
+    font-size: 7pt;
+}
+.label {
+    font-size: 8pt;
+    text-anchor: middle;
+}
+
+.domain {
+    opacity: 0;
+}
+.y-axis line, .x-axis line {
+    stroke-width: .25;
+    stroke: rgba(114, 138, 74, 0.5);
+}

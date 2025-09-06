@@ -27,7 +27,7 @@ function drawAxes() {
         .append("g")
         .attr("class", "x-axis")
         // .attr("transform", `translate(${[0, dim.h - dim.margin.h]})`)    // original
-        .attr("transform", `translate(${[0, dim.margin.h]})`)               // modified - moves ticks to the top
+        .attr("transform", `translate(${[0, dim.margin.h]})`)            // modified - moves ticks to the top
         .call(app.axis.x);
 
     d3.select("svg")

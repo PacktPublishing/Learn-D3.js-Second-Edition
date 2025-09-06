@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Scatter Chart: Step 6 - using a logarithmic scale</title>
+    <link rel="stylesheet" href="css/main-1.2.css">
+</head>
+<body>
+<div id="chart"></div>
+<script type="module">
+    import * as d3 from 'https://cdn.skypack.dev/d3@7';
+    import {load} from './js/data-1.2.js';
+    import {draw} from './js/view-1.3.js';
+
+    const app = await load();
+    console.log(app.data);  // inspect app.data.countries
+    draw();
+
+    // For testing purposes (remove in production)
+    window.d3 = d3;
+    window.app = app;
+</script>
+</body>
+</html>
