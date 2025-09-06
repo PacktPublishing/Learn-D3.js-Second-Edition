@@ -99,6 +99,7 @@ See the full code for this step in `StepByStep/1-load-data/`. Now let’s set up
 In this step we set up dimensions, scales and the SVG viewport, where the chart will be rendered. _Figure 1_ contains a sketch of the chart’s layout.
 
 ![A sketch of the layout for the scatterplot](./images/figure-1.png)
+
 _Figure 1 – A sketch of the layout for the scatterplot. The data will be displayed in the inner rectangle. Axes (yellow rectangles) and labels will be placed in the margins._
 
 Create a `js/common.js` module to be shared by other modules. It will contain a dimensions object (`dim`) and an application object (`app`). The dimension object will define width, height, and margins:
@@ -199,6 +200,7 @@ To generate the SVG code, import the `draw()` function from the `js/view.js` mod
 This will make the SVG occupy all the space available. If you resize the browser, it should always fit in the window. Use your browser’s element inspector to view the generated SVG code.
 
 ![Generated SVG code after step 2](./images/figure-2.png)
+
 _Figure 2 – Generated SVG code after step 2_
 
 The full code for this step is in `StepByStep/2-setup-page/`. In the next step we set the scale’s domains and use them to finally plot the dots on the screen.
@@ -259,6 +261,7 @@ export function draw() {
 Reload the page and you should now have something like _Figure 3_ on your screen:
 
 ![A simple scatterplot comparing GDP per capita with HDI](./images/figure-3.png)
+
 _Figure 3 – A simple scatterplot comparing GDP per capita (y-axis) with HDI (x-axis) among 194 countries in 2017. Code: `StepByStep/3-scatter-dots/`._
 
 The chart shows an exponential relationship between HDI and GDP, but we don’t know which countries are represented, which axis is HDI, which is GDP nor any values. Context is necessary. We will provide it with axes and labels in the next step.
@@ -332,6 +335,7 @@ text {
 After making all these changes, preview the `index.html` file. Your chart should look like _Figure 4_.
 
 ![Adding a simple Cartesian grid and labels](./images/figure-4.png)
+
 _Figure 4 – Adding a simple Cartesian grid and labels. Code: `StepByStep/4-axes-labels/`._
 
 Now we have some context and can see that high GDP values are somewhat related to high HDI values, that the growth is exponential, and that it seems that most countries have a GDP per capita below 10 thousand international dollars. There is still a lot we can do to improve it. In the next section, we will explore some other ways to style your axes.
@@ -370,6 +374,7 @@ Here we extended the horizontal axis tick line to fill the chart's vertical spac
 Reload the file in your browser. What do you see? It seems that the tick lines indeed grew longer, but they moved offscreen. In _Figure 5_ we extended the viewport to show all four quadrants, and you can see that they grew down and to the left. The lines need to be moved in the other direction.
 
 ![First attempt at extending the tick lines](./images/figure-5.png)
+
 _Figure 5 – First attempt at extending the tick lines. Use `view-1.3.1.js` to see this effect._
 
 Look for the transforms applied to the axis `<g>` containers in `drawAxes()`. The vertical position of the _x_-axis ticks was height minus margin. Changing it to simply vertical margin (`dim.margin.h`) will move it back up revealing the tick labels. The _y_-axis ticks need to be pushed right, changing their position from horizontal margin to width minus margin (`dim.w - dim.margin.w`).
@@ -397,6 +402,7 @@ The result is shown in _Figure 6_.
 
 ![Configuring the style and size of grid lines in the chart area](./images/figure-6.png)
 _Figure 6 – Configuring the style and size of grid lines in the chart area.
+
 Code: `StepByStep/5-axis-tick-styles/`._
 
 Although it seems much easier to relate the position of a dot to its values, it’s still difficult to identify their positions in this chart since they are too close to each other. Perhaps we can improve their visual distribution with a different scale.
@@ -418,8 +424,8 @@ app.axis.y.ticks(8, ',')
 That’s it, the logarithmic scale provided more space between the dots, and you can finally distinguish most of them, as shown in _Figure 7_.
 
 ![An improved chart using a logarithmic scale for the GDP per capita](./images/figure-7.png)
-_Figure 7 – An improved chart using a logarithmic scale for the GDP per capita.
-Code: `StepByStep/6-log-scale/`._
+
+_Figure 7 – An improved chart using a logarithmic scale for the GDP per capita. Code: `StepByStep/6-log-scale/`._
 
 We now have a lot of context information in our chart, but nothing to give us any clue about which countries are represented by them. There are several ways we can improve it:
 
