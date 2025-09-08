@@ -31,7 +31,7 @@ Mozambique,  Africa,        28829476,  0.437,     426.22197,   1287.23487
 Egypt,       Africa,        95688681,  0.696,    2412.72708,  10995.00567
 New Zealand, Oceania,        4693200,  0.917,   42940.57829,  42204.74574
 Italy,       Europe,        60627498,  0.880,   31952.97592,  41581.12079
-... +201 rows ...
+... +211 rows ...
 ```
 
 The complete file contains more headers and over 200 rows. The data from this file was compiled from multiple sources, such as the United Nations and the World Bank. Our goal, for the complete tutorial, is to create a visualization of this data in a scatter chart comparing the GDP (_Gross Domestic Product_) per capita (in international USD) and HDI (_Human Development Index_) of different countries and the continents they belong to. In the last step of _Part 2_ we will add population information and create a bubble chart.
@@ -401,9 +401,7 @@ The lines are still too dark and thick. Let’s make them thinner and lighter wi
 The result is shown in _Figure 6_.
 
 ![Configuring the style and size of grid lines in the chart area](./images/figure-6.png)
-_Figure 6 – Configuring the style and size of grid lines in the chart area.
-
-Code: `StepByStep/5-axis-tick-styles/`._
+_Figure 6 – Configuring the style and size of grid lines in the chart area. Code: `StepByStep/5-axis-tick-styles/`._
 
 Although it seems much easier to relate the position of a dot to its values, it’s still difficult to identify their positions in this chart since they are too close to each other. Perhaps we can improve their visual distribution with a different scale.
 
