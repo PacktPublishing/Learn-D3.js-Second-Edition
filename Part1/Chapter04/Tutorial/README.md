@@ -4,7 +4,7 @@
 
 # Creating a World Map with D3 and SVG Polygons
 
-This tutorial is part of _Learn D3.js Second Edition, Chapter 4_. It shows how to read a standard public-domain JSON data source containing geographic coordinates to draw a world map using D3. You will learn how to draw the shapes of all countries using scaled latitude and longitude coordinates from a data file as vertices of SVG polygons, and color the shapes using random colors.
+This tutorial shows how to read a standard public-domain JSON data source containing geographic coordinates to draw a world map using D3. You will learn how to draw the shapes of all countries using scaled latitude and longitude coordinates from a data file as vertices of SVG polygons, and color the shapes using random colors.
 
 The [GeoJSON](https://geojson.org/) file was previously used in the Canvas map example from *Chapter 2* (see [Chapter02/Canvas/2-canvas-map.html](../../Chapter02/Canvas/2-canvas-map.html)), but this time we draw the map with D3 and SVG.
 
@@ -21,6 +21,7 @@ The following sections are included in this tutorial:
 * [Step 4: Adjusting the viewport](#step-4-adjusting-the-viewport)
 * [Step 5: Flipping the coordinates](#step-5-flipping-the-coordinates)
 * [Step 6: Adding colors](#step-6-adding-colors)
+* [Exercise: Using an alternative scale](#exercise-using-an-alternative-scale)
 <!-- TOC -->
 
 The data visualization developed in this tutorial is also available as an [Observable notebook](https://observablehq.com/d/4733ef9186e84229) and as [CodePen examples](https://codepen.io/collection/VvYqOJ,{target="_blank"}) for each step.
@@ -54,10 +55,10 @@ The file contains a single object with a `features` property, which is an array 
 
 Each individual `feature` object in this file contains the following properties:
 
--   `type`, which is always `Feature` in this case.
--   `id`, an optional property which, in this file, contains a unique three-letter code for a country.
--   `properties`, an object containing properties for the object. In this file it contains a single property `name` which includes the name of the country in English.
--   `geometry`, an object containing two properties: `type` and `coordinates`. The `type` property (in this file) can either be `Polygon` (a single closed shape) or `MultiPolygon` (an array of closed shapes – e.g. a country with islands). The coordinates are arrays of 2-element arrays containing the longitude and latitude (in this order) of each point. If the shape is a `MultiPolygon`, it’s coordinates are nested one array level deeper.
+*   `type`, which is always `Feature` in this case.
+*   `id`, an optional property which, in this file, contains a unique three-letter code for a country.
+*   `properties`, an object containing properties for the object. In this file it contains a single property `name` which includes the name of the country in English.
+*   `geometry`, an object containing two properties: `type` and `coordinates`. The `type` property (in this file) can either be `Polygon` (a single closed shape) or `MultiPolygon` (an array of closed shapes – e.g. a country with islands). The coordinates are arrays of 2-element arrays containing the longitude and latitude (in this order) of each point. If the shape is a `MultiPolygon`, its coordinates are nested one array level deeper.
 
 Knowing the structure of the file, we can extract data from it and use it to draw a map in a cylindrical projection, using the latitudes as vertical coordinates, and the longitudes as horizontal coordinates. But first, let’s list some of its data.
 
@@ -200,14 +201,14 @@ Change it to `0 0 400 200` to make each pixel count as 2 pixels. This scales the
 
 _Figure 2 – Adjusting the viewport to fit the entire map. Code: [WorldMap/4-polygon-map-viewbox.html](../WorldMap/4-polygon-map-viewbox.html)_
 
-The map is now completely visible, but the continents are inverted. We need to flip it horizontally (and vertically, if you wish to display it in a standard position.)
+The map is now completely visible, but the continents are inverted. We need to flip it horizontally (and vertically, if you wish to display it in a standard position).
 
 ## Step 5: Flipping the coordinates
 
 You can flip the map horizontally and vertically with a transform SVG attribute. The following transform will invert latitudes and longitudes while keeping the scale:
 
 ```html
-<svg ... viewBox="-200 -100 400 200" transform="scale(1,-1)"></svg>
+<svg ... viewBox="-200 -100 400 200" transform="scale(1, -1)"></svg>
 ```
 
 Reload your page now and see the results.
@@ -236,8 +237,8 @@ Another way to adjust the viewport to fit geographical coordinates is using two 
 
 Geographical maps are a very important topic in data visualization, and D3 provides specific tools to create and interact efficiently with maps using different projections and spherical geometry in the *d3-geo* modules. This will be covered in detail in *Chapters 19* and *20*.
 
-## Exercise
+## Exercise: Using an alternative scale
 
-Templates and solutions to all exercises can be found in the [Exercises/](../Exercises) folder.
+Use a simple `<svg>` without `viewBox` or `transform` and adjust the map using `d3.scaleLinear()` functions so that it looks the same as the example from this section.
 
-*   4.7: Use a simple `<svg>` without `viewBox` or `transform` and adjust the map using `d3.scaleLinear()` functions so that it looks the same as the example from this section.
+This is an optional exercise to explore other ways of scaling the data. A commented template that you can use to start your code and the solution can be found in the `WorldMap/Exercise` folder.
