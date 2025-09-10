@@ -13,7 +13,7 @@
 <form></form>
 
 <script type="module">
-    import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
     import { app, dim } from "./js/common.js";
     import { load } from "./js/data.js";
 
@@ -24,7 +24,7 @@
     const plane = svg.append("g")
                      .attr("transform", `translate(${[dim.margin.planet, dim.height/2]})`);
 
-    // Loads the data file (see data-1.1.js for details)
+    // Loads the data file (see data.js for details)
     load().then(() => console.log(app.planets));
 
 </script>

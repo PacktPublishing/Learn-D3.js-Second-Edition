@@ -51,7 +51,9 @@ Each step in this tutorial is a folder that contains all the code necessary to r
 Let’s begin.
 
 ## Step 1 - setting up the page, scripts, stylesheet
-If you want to code along, start with the contents of the [`StepByStep/1-page-setup`](../StepByStep/1-page-setup) folder. It contains a simple page with some boilerplate code ([`index.html`](../StepByStep/1-page-setup/index.html)), a minimal CSS style sheet ([`css/main-1.0.css`](../StepByStep/1-page-setup/css/main-1.0.css)), and a script file ([`js/common.js`](../StepByStep/1-page-setup/js/common.js)) where we will declare the global objects used in the application. This section will describe all of them.
+If you want to code along, start with the contents of the [`StepByStep/1-page-setup`](../StepByStep/1-page-setup) folder. It contains a simple page with some boilerplate code ([`index.html`](../StepByStep/1-page-setup/index.html)), a minimal CSS style sheet ([`css/main.css`](../StepByStep/1-page-setup/css/main-1.0.css)), and a script file ([`js/common.js`](../StepByStep/1-page-setup/js/common-1.0.js)) where we will declare the global objects used in the application. This section will describe all of them.
+
+**Note**: in the code for each step, module files and stylesheets are versioned (e.g., `css/main-1.0.css`, `js/view-1.1.js`) so that you can keep track of the changes made in each step. However, here we will refer to them without the version number for simplicity. You can also do the same in your code.
 
 This is the `index.html` file:
 
@@ -60,7 +62,7 @@ This is the `index.html` file:
 <html lang="en">
 <head>
     <title>Moons: Step 1 - Page setup</title>
-    <link rel="stylesheet" href="css/main-1.0.css">
+    <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
 
@@ -119,17 +121,11 @@ The `app.current.id` key is used to select the planet that will be displayed. Th
 app.current.id = "p5";
 ```
 
-The planet's color can also be set at this stage, setting it from the `app.colors` array, which starts at the third planet:
-
-```js
-app.current.color = app.colors[(+app.current.id.substring(1) - 3)];
-```
-
 The `<script>` block in `index.html` imports the modular D3 library and the `js/common.js` module. It also configures the SVG container with a `viewBox` so that it will scale when the user resizes the browser window. The `plane` object is the guideline where the center coordinates for all circles will be placed. It is configured with a `translate()` transform that places it horizontally in the middle of the viewport and starting 100 pixels from the left:
 
 ```js
 <script type="module">
-  import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+  import * as d3 from "https://cdn.skypack.dev/d3@7";
   import { dim } from "./js/common.js";
 
   const svg = d3.select("#moons")
@@ -181,7 +177,7 @@ With this information, you can load the file, parse it and filter the `planets` 
 Start creating a new script file: `js/data.js`. It requires the _d3-fetch_ module (since we will use `d3.json()`) and the `js/common.js` (since we will populate the `app.planets` array). To keep things simple, at this stage, we will import the entire D3 library, since we might use other functions later. Add the following two lines to `js/data.js`:
 
 ```js
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+import * as d3 from "https://cdn.skypack.dev/d3@7";
 import {app} from "./common.js";
 ```
 
@@ -205,7 +201,7 @@ export async function load() {
 Now back to `index.html`, first import the module:
 
 ```js
-import { load } from "./js/load-1.0.js";
+import { load } from "./js/data.js";
 ```
 Then call the function. For now, print the result to the console so we can inspect it:
 
@@ -270,14 +266,14 @@ Our next step is to configure the view and fit the data we loaded in the space w
 Our final application will contain a user interface where the user can press a button and select a different planet. This will render a new view that requires updating the data bound to SVG elements, recalculating horizontal positions and scales (range and domain), since the diameter and number of moons will change.
 
 After the data is loaded and every time a view is selected, the application should:
-1)	Set the current planet, storing its data in the `app.current.planet` object
+1)	Set the current planet, storing its data in the `app.current.planet` object and its color in `app.current.color`.
 2)	Select the moons of the current planet that will be displayed, limiting them by diameter, and store their data in the `app.current.moons` object.
 3)	Recompute the chart’s margins, and use that data to reconfigure the scale (via `app.scale`), updating its range and domain.
 
 Although the application is not interactive yet, we will implement these features now, since they can be triggered by simply changing the value of `app.current.id`. This is done in the `js/config.js` file. It requires the following imports:
 
 ```js
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+import * as d3 from "https://cdn.skypack.dev/d3@7";
 import {app, dim} from "./common.js";
 ```
       
@@ -337,7 +333,7 @@ export function configure() {
 The `configure()` function is then imported into `index.html`:
 
 ```js
-import { configure } from "./js/config-1.0.js";
+import { configure } from "./js/config.js";
 ```
 And called after the data is loaded:
 
@@ -356,7 +352,7 @@ Since we have now calculated all the necessary values, we can start rendering th
 Let’s create a new module `js/view.js` for the code that renders the shapes. It will contain a `draw()` function to draw the circles for planet and moons. We will need the `dim` constants to place the objects, the `app` constant to obtain the data, and tools from the D3 library, so `js/view.js` should include the following imports:
 
 ```js
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+import * as d3 from "https://cdn.skypack.dev/d3@7";
 import {app, dim} from "./common.js";
 ```
 The `draw()` function will be called from the main page after `configure()`, so it needs to be imported in `index.html`:
@@ -404,7 +400,7 @@ function drawPlanet(plane) {
 
 This code appends an SVG `<circle>` with a `class="planet"` attribute to the orbital plane, and binds it (using `datum()`) to the object in `app.current.planet`, from where the diameter is obtained via the `diameterKm` property. The radius of the circle is a scaled version of the planet’s radius. The radius is also used to set a negative value for the planet’s `cx` coordinate, moving it to the left of the plane’s origin, which allows a small part (`dim.margin.planet`) of the planet to be displayed. An additional margin (`dim.margin.left`) is added to include some space between the planet and the first moon. If you open the page in a browser now, you should see a slightly curved black margin on the left, which is the visible part of the planet.
 
-The function also sets the planet’s color to `app.current.color`, which is currently `'black'`, but we will change this in another step.
+The function also sets the planet’s color to `app.current.color`, which is currently `'black'`, but we will change this in another function.
 
 Since the page will show a specific planet, the page’s title should display its name, which is obtained from the data file. Edit the `<h1>` header in `index.html` as shown below and add a `<span>` placeholder element with a corresponding ID in the HTML:
 
@@ -412,15 +408,18 @@ Since the page will show a specific planet, the page’s title should display it
 <h1>The largest moons of <span id="planetName"></span></h1>
 ```
 
-In `js/config.js`, we added a new function to update page elements called `updatePageView()`. It will be used to update any page elements after a view update. In this step, we will only change the page’s title, selecting the `<span>` element by its ID and setting the current planet’s name (obtained from `app.current.planet`):
+In `js/config.js`, we added a new function to update page elements called `updatePageView()`. It will be used to update any page elements after a view update. In this step, we will use it to update the page’s title, selecting the `<span>` element by its ID and setting the current planet’s name (obtained from `app.current.planet`), and to set the planet’s color (in `app.current.color`):
 
 ```js
 function updatePageView() {
-    d3.select('#planetName').text( () => app.current.planet.name )
+    d3.select('#planetName').text( () => app.current.planet.name );
+    app.current.color = app.colors[(+app.current.id.substring(1) - 3)];
 }
 ```
 
-Finally, call the `updatePageView()` function from `configure()` (in `js/config.js`), and we are done:
+The color is selected from the `app.colors` array, obtaining the index from the planet's ID, starting with Earth (`app.current.id = "p3"`).
+
+To finish this step, call the `updatePageView()` function from `configure()` (in `js/config.js`), and we are done:
 
 ```js
 export function configure() {
@@ -626,7 +625,7 @@ app.current.id = "p6";
 
 We can, however, improve the visual result by using images instead of circles for the larger moons. So let's make some visual improvements in this last step, so that the images are displayed in a more appealing way.
 
-First, configure the CSS to display the images and text over a dark background. This is done in `css/main-1.1.css`:
+First, configure the CSS to display the images and text over a dark background. This is done in `css/main.css`:
 
 ```css
 svg {
@@ -637,7 +636,7 @@ text {
 }
 ````
 
-Several public domain images with photos of the nearest or largest satellites from our Solar System are available in the `data/images` folder. Before using them, they need to be pre-loaded. This is done in the `load()` function in `js/data-1.1.js`, adding this code at the end of the function:
+Several public domain images with photos of the nearest or largest satellites from our Solar System are available in the `data/images` folder. Before using them, they need to be pre-loaded. This is done in the `load()` function in `js/data.js`, adding this code at the end of the function:
 
 ```js
 // Pre-load images
@@ -661,6 +660,8 @@ function imageFile(planet, moon) {
 ```
 
 The code will attempt to load an image for each moon of each planet. If the image is found, its URL is stored in a new property called `image` of the corresponding moon object. If the image is not found, the promise is rejected, but the error is ignored (the second argument to `then()` is an empty function). This way, if an image is not available, the corresponding `moon` object will simply not have an `image` property.
+
+**Note**: You may notice that the console displays several 404 errors when loading some images. This is expected, since not all moons have an image. The code, however, is designed to ignore these errors. Unfortunately, there is currently no way to turn off these warnings.
 
 Now we update the `js/view-1.4.js` module to use images instead of circles if the image exists. In the `appendObjects()` function, if an image exists, make the radius of the circle zero, otherwise, draw the circle as before. We also changed the color, so that it contrasts with the dark background:
 
@@ -689,6 +690,11 @@ Try changing the planet to see which moons have images available. If you choose 
 _Figure 8 — Using images instead of circles for the larger moons.
 Code: [`StepByStep/9-images`](../StepByStep/9-images)._
 
-The final code for this step can be found in [`StepByStep/9-images`](../StepByStep/9-images).
+The code for this step can be found in [`StepByStep/9-images`](../StepByStep/9-images).
 
-We finished the view for a single planet, but our app is prepared to display data for several other planets as well. To allow the viewer to switch planets, you will need to manage multiple views and joins, which will be covered in _Chapter 6_. After that, you can continue developing the rest of this application in the second part of this tutorial.
+We finished the view for a single planet, but our app is prepared to display data for several other planets as well. To allow the viewer to switch planets, you will need to manage multiple views and joins, covered in _Chapter 6_. 
+
+After _Chapter 6_, you can continue with _Part 2_ of this tutorial. It starts with the code in `StepByStep/static-chart`, which incorporates the suggestions from the exercises and includes some other improvements:
+* The `load()` function in `js/data.js` filters out properties that are not used (from planets and satellites).
+* The moons are no longer filtered in `js/config.js`; this is now also done in `js/data.js`, so the dataset contains only the moons that will be used.
+* The title was improved to treat Mars (two moons) and Earth (one moon) differently, since it doesn't make sense to use "the largest moons" in these cases. This is done in the `updatePageView()` function in `js/config.js` and by adding a `<span id="titleNumber"></span>` field in the page's `<h1>` title.

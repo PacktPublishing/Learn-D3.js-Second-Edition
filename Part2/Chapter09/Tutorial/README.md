@@ -102,7 +102,7 @@ In this step we set up dimensions, scales and the SVG viewport, where the chart 
 
 _Figure 1 – A sketch of the layout for the scatterplot. The data will be displayed in the inner rectangle. Axes (yellow rectangles) and labels will be placed in the margins._
 
-Create a `js/common.js` module to be shared by other modules. It will contain a dimensions object (`dim`) and an application object (`app`). The dimension object will define width, height, and margins:
+Create a `js/common-1.0.js` module to be shared by other modules. It will contain a dimensions object (`dim`) and an application object (`app`). The dimension object will define width, height, and margins:
 
 ```js
 const dim = {
@@ -140,7 +140,7 @@ export {dim, app};
 Now go to the `js/data.js` module, add an import for the app object and update the `load()` function so that it copies the data obtained in the previous step to the `app.data` object, storing it in a new `countries` property.
 
 ```js
-import {app} from './common.js';
+import {app} from './common-1.0.js';
 /* ... */
 export async function load() {
     app.data.countries = await d3.csv(file, function(row) { /* ... */ });
@@ -170,11 +170,11 @@ For now, add just one rule to `main.css`, placing a border around the SVG viewpo
 svg { border: solid 1px; }
 ```
 
-Let’s create one more module: `js/view.js`. It will be used to render the chart. For now, it will just contain a `draw()` function with the code that generates the SVG viewport. This requires imports for the D3 library and for the `dim` object (from `js/common.js`):
+Let’s create one more module: `js/view.js`. It will be used to render the chart. For now, it will just contain a `draw()` function with the code that generates the SVG viewport. This requires imports for the D3 library and for the `dim` object (from `js/common-1.0.js`):
 
 ```js
 import * as d3 from 'https://cdn.skypack.dev/d3@7';
-import {dim} from './common.js';
+import {dim} from './common-1.0.js';
 
 export function draw() {
     d3.select("#chart")
@@ -230,7 +230,7 @@ export async function load() {
 Now we can plot the dots. Add an import for the `app` object in `js/view.js`, since we need access to `app.data.countries`, `app.scale.x` and `app.scale.y`:
 
 ```js
-import {dim, app} from './common.js';
+import {dim, app} from './common-1.0.js';
 ```
 
 Next, create the `drawChart()` function below. It binds 1.5-pixel circles to the data entries and uses the pair of scaled GDP/HDI values as each circle’s center coordinates:
@@ -270,7 +270,7 @@ The chart shows an exponential relationship between HDI and GDP, but we don’t 
 
 A typical Cartesian chart has a horizontal _x_-axis with tick labels at the bottom, and a vertical _y_-axis with tick labels on the left side.
 
-Let’s add axis functions to the app object in `js/common.js` and connect them to their respective scales:
+Let’s add axis functions to the app object in `js/common-1.0.js` and connect them to their respective scales:
 
 ```js
 app.axis = {
@@ -356,7 +356,7 @@ But maybe just hiding them will be enough. Adding this rule in `css/main.css` wi
 }
 ```
 
-It’s hard to read the dots that are far from the axes. We could fix this by creating a visible grid behind the dots. By adding a couple of tick configuration methods to each axis function you can increase the lengths of the tick lines so that they fill the entire chart area. We can compute the correct sizes using the margins and viewport dimensions. Let’s try it. Edit this code in the `js/common.js`:
+It’s hard to read the dots that are far from the axes. We could fix this by creating a visible grid behind the dots. By adding a couple of tick configuration methods to each axis function you can increase the lengths of the tick lines so that they fill the entire chart area. We can compute the correct sizes using the margins and viewport dimensions. Let’s try it. Edit this code in the `js/common-1.0.js`:
 
 ```js
 app.axis = {
@@ -406,7 +406,7 @@ _Figure 6 – Configuring the style and size of grid lines in the chart area. Co
 Although it seems much easier to relate the position of a dot to its values, it’s still difficult to identify their positions in this chart since they are too close to each other. Perhaps we can improve their visual distribution with a different scale.
 
 ## Step 6: Using a logarithmic scale
-Since the GDP per capita grows exponentially, and most data points use the first 10% of the scale, a non-linear scale might improve readability. Since all GDP values in our dataset are greater than zero, we can use a logarithmic scale: just replace `scaleLinear()` with `scaleLog()` (in `js/common.js`).
+Since the GDP per capita grows exponentially, and most data points use the first 10% of the scale, a non-linear scale might improve readability. Since all GDP values in our dataset are greater than zero, we can use a logarithmic scale: just replace `scaleLinear()` with `scaleLog()` (in `js/common-1.0.js`).
 
 ```js
 app.scale.y = d3.scaleLog()

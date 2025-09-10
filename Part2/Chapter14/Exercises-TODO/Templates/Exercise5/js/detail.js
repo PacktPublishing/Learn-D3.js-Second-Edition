@@ -5,7 +5,7 @@ import {app} from './common.js';
 import {inBrush, isValid} from "../../../../js/brush-utils.js";
 
 // EXERCISE.
-// 1) See common.js; 2) and 3) See view.js
+// 1) See common-1.0.js; 2) and 3) See view.js
 // 4) Declare a variable to store the current brush selection
 // ADD CODE HERE
 

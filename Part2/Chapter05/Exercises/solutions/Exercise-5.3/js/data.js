@@ -1,4 +1,4 @@
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+import * as d3 from "https://cdn.skypack.dev/d3@7";
 
 import {app} from "./common.js";
 
@@ -19,7 +19,7 @@ export async function load() {
     const data = await d3.json(dataFile);
     app.planets = data.planets
         .filter(p => +p.id.substring(1) >= 3 && +p.id.substring(1) <= 8)
-        // EXERCISE 6.3 - Keep only the 'id', 'name', 'diameterKm' and 'satellites'
+        // EXERCISE 5.3 - Keep only the 'id', 'name', 'diameterKm' and 'satellites'
         //                properties for each planet. Hint: add a map() method to
         //                the chain to replace each object with a new one that contains
         //                just these four properties.

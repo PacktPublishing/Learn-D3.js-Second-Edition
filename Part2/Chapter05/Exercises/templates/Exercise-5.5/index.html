@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Moons: Step 2 - Loading the data</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+<h1>Exercise 5.4 - Moons with filtered datasets (2)</h1>
+<div id="container" width="500" height="300">
+    <svg height="100%" width="100%" id="moons"></svg>
+</div>
+<form></form>
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import { app, dim } from "./js/common.js";
+    import { load } from "./js/data.js";
+
+    // GRAPHICS CONTEXT
+    const svg = d3.select("#moons")
+                  .attr("viewBox", `0 0 ${dim.width} ${dim.height}`);
+    const plane = svg.append("g")
+                     .attr("transform", `translate(${[dim.margin.planet, dim.height/2]})`);
+
+    // Loads the data file (see data.js for details)
+    load().then(() => console.log(app.planets));
+
+</script>
+
+
+</body>
+</html>

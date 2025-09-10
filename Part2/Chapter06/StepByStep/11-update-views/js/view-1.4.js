@@ -1,6 +1,6 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
-import {app, dim} from "./common.js";
+import {app, dim} from "./common-1.0.js";
 
 // VIEW RENDERING
 
@@ -45,7 +45,7 @@ function drawPlanet(plane) {
  */
 function drawMoons(plane) {
     plane.selectAll("g.moon")
-        .data(app.current.moons)
+         .data(app.current.moons)
             .join("g")
                 .attr("class", "moon")
                 .attr("transform", d => `translate(${[d.cx,0]})`)

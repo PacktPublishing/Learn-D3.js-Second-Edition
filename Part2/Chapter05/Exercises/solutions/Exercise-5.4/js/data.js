@@ -1,4 +1,4 @@
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+import * as d3 from "https://cdn.skypack.dev/d3@7";
 
 import {app} from "./common.js";
 
@@ -23,7 +23,7 @@ export async function load() {
         .map(p => ({  id: p.id,
                       name: p.name,
                       diameterKm: p.diameterKm,
-// EXERCISE 6.4 - Keep only the 'name' and 'diameterKm' properties of each satellite.
+// EXERCISE 5.4 - Keep only the 'name' and 'diameterKm' properties of each satellite.
 //                Hint: again, use map(), this time on the p.satellites array, replacing
 //                each object with one containing these two properties.
                       satellites: p.satellites.map(s => ({ name: s.name, diameterKm: s.diameterKm }))

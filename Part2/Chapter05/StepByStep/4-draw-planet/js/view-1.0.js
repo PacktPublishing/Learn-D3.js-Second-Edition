@@ -1,6 +1,6 @@
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+import * as d3 from "https://cdn.skypack.dev/d3@7";
 
-import {app, dim} from "./common.js";
+import {app, dim} from "./common-1.0.js";
 
 // VIEW RENDERING
 

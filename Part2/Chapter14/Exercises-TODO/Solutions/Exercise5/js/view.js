@@ -5,7 +5,7 @@ import {drawLegend} from './legend.js';
 import * as tooltip from './tooltips.js';
 
 // Exercise.
-// 1) See common.js
+// 1) See common-1.0.js
 // 2) Import the detail.js module
 import * as brush from './detail.js';
 

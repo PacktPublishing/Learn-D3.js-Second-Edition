@@ -9,7 +9,7 @@ In the first part of this tutorial we plotted dots representing countries on a C
 ![Scatterplot comparing GDP and HDI, but no colors or labels](./images/figure-1.png)
 _Figure 1 – Scatterplot comparing GDP and HDI developed in [part 1](../../Chapter09/Tutorial). It has_
 
-The CSV data source used is also copied in this chapter's repository, in `[Chapter10/data/un_regions_2017.csv](../data/un_regions_2017.csv)`. A fragment is shown below listing some headers and rows:
+The CSV data source used is also copied in this chapter's repository, in [`Chapter10/data/un_regions_2017.csv`](../data/un_regions_2017.csv). A fragment is shown below listing some headers and rows:
 
 ```csv
 Country,     Continent,     Pop_2016, HDI_2017, GDP_NOM_2017, GDP_PPP_2017
@@ -19,7 +19,7 @@ Argentina,   South America, 43847430,  0.825,   14398.35877,  23597.11775
 ... +216 rows ...
 ```
 
-Now we will continue improving this chart. You can continue the project you started in the first part of the tutorial or start with the last step, which is copied in `[Chapter10/StepByStep/6-log-scale](../StepByStep/6-log-scale)`.
+Now we will continue improving this chart. You can continue the project you started in the first part of the tutorial or start with the last step, which is copied in [`Chapter10/StepByStep/6-log-scale`](../StepByStep/6-log-scale).
 
 The chart, as it is, doesn’t provide enough context for the viewer, since it is not possible to know which country represents each dot. Placing the name of the country beside each dot is impractical, but we can assign a specific color for each country that belongs to the same continent. For that, we need to obtain that information from the CSV source. This will be done in the next step.
 
@@ -46,7 +46,7 @@ app.data.countries = await d3.csv(file, function(row) {
 
 Now that each data point object contains a `continent` property, we can use it as a category to group countries and identify them with a color code.
 
-The color can be specified as a function selected by continent, implemented with an ordinal scale. The `app.color` function will return a color from the `d3.schemeDark2` color scheme for each category. This function should be added as a property to the `app` object in `js/common.js`:
+The color can be specified as a function selected by continent, implemented with an ordinal scale. The `app.color` function will return a color from the `d3.schemeDark2` color scheme for each category. This function should be added as a property to the `app` object in `js/common-1.0.js`:
 
 ```js
 app.color = d3.scaleOrdinal(d3.schemeDark2);
@@ -66,7 +66,7 @@ _Figure 2 – Adding a different color for each continent._
 
 Now it is possible to identify which dots belong to the same continents, but we still need to identify the continent. Let’s add a legend.
 
-The legend is implemented using a `<g class="legend">` element placed in an empty part of the chart. It contains one `<g class="item">` element for each continent, which contains a rectangle, filled with the continent’s color, and a `<text>` element, with the continent’s name. Let’s store the rectangle’s dimensions in the dim object (`js/common.js`):
+The legend is implemented using a `<g class="legend">` element placed in an empty part of the chart. It contains one `<g class="item">` element for each continent, which contains a rectangle, filled with the continent’s color, and a `<text>` element, with the continent’s name. Let’s store the rectangle’s dimensions in the dim object (`js/common-1.0.js`):
 
 ```js
 dim.legend = {w: 20, h: 10}
@@ -95,7 +95,7 @@ Now we can generate the legend, binding rectangles and text elements to the `con
 
 ```js
 import * as d3 from 'https://cdn.skypack.dev/d3@7';
-import {dim, app} from './common.js';
+import {dim, app} from './common-1.0.js';
 
 export function drawLegend() {
     // creates one <g> for the legend, and moves it near the top-left corner
@@ -152,7 +152,7 @@ circle, .legend rect {
 
 The full code so far is in `StepByStep/7-category-colors/`. The result is shown in _Figure 3_. The chart now reveals which continents have higher or lower GDP and HDI:
 
-![Dots are colored by continent, and a legend is added](./images/figure-3.png)
+![Using color to group dots by continent](./images/figure-3.png)
 
 _Figure 3 – Using color to group dots by continent. Code: `StepByStep/7-category-colors/`._
 
@@ -162,11 +162,11 @@ You are probably curious to know what European country is that dot at the top ri
 
 To provide the viewer with information about each dot, we will create a tooltip component with a rectangle and some text fields so that when the user hovers over a dot, it displays the data near the dot. It will be implemented it in a new `js/tooltips.js` module.
 
-The module requires D3 and the `app` object from `js/common.js`. It should export three functions. One will draw the tooltip and the other two will respond to events.
+The module requires D3 and the `app` object from `js/common-1.0.js`. It should export three functions. One will draw the tooltip and the other two will respond to events.
 
 ```js
 import * as d3 from 'https://cdn.skypack.dev/d3@7';
-import {app} from './common.js';
+import {app} from './common-1.0.js';
 
 function draw() {}
 function show(event, d) {}
@@ -213,7 +213,7 @@ const fields = [
 ];
 ```
 
-The value for the GDP field is returned by a function that takes the data and formats it as currency. This function was added to our app object in `js/common.js`:
+The value for the GDP field is returned by a function that takes the data and formats it as currency. This function was added to our app object in `js/common-1.0.js`:
 
 ```js
 app.format = {
@@ -224,8 +224,7 @@ app.format = {
 The tooltip will be rendered as an invisible `<g>` element containing a rectangle (initially 80 pixels wide with vertical space for three lines) and three empty text fields. When the user hovers over a dot, the event handler receives the datum for the selected country and uses it to populate the `fields` array with the data to be displayed, which will be bound to the text elements. The rectangle is then resized to fit the text, moved to a position near the selected dot, and finally made visible. _Figure 4_ illustrates this process.
 
 ![Tooltip design](./images/figure-4.png)
-
-## Figure 4 – Tooltip design.
+_Figure 4 – Tooltip design._
 
 Let’s implement this in code. The `draw()` function will generate a `<g>` container that is initially hidden (`opacity: 0`), containing a `<rect>` element with rounded corners.
 
@@ -246,7 +245,7 @@ function draw() {
 
 Note that the code will adjust the height of the box, depending on the number of lines. Currently we are displaying three lines, but if more are added, we won’t have to change this code.
 
-The function above uses two top-level constants that were declared in this module: a 3-pixel padding for the text inside the rectangle, and 15 pixels of vertical space for each line (see _Figure 3_):
+The function above uses two top-level constants that were declared in this module: a 3-pixel padding for the text inside the rectangle, and 15 pixels of vertical space for each line:
 
 ```js
 const padding = 3;
@@ -444,7 +443,7 @@ Also, in `data.js`, sort the `app.data.countries` dataset in the `config()` func
 app.data.countries.sort((a,b) => d3.descending(a.pop, b.pop));
 ```
 
-In `js/common.js` we need to set a new scale. Since the population will be represented by the area of the circle, a square root scale is best. In the app object, set the range (it will allow circles from 2 to 30 pixels wide):
+In `js/common-1.0.js` we need to set a new scale. Since the population will be represented by the area of the circle, a square root scale is best. In the app object, set the range (it will allow circles from 2 to 30 pixels wide):
 
 ```js
 app.scale.r = d3.scaleSqrt().range([1, 15]);

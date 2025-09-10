@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Moons: Final step for Part 1 - optimize</title>
+    <link rel="stylesheet" href="css/main-1.1.css">
+</head>
+<body>
+
+<h1>The <span id="titleNumber"></span> of <span id="planetName"></span></h1>
+<div id="container" width="500" height="300">
+    <svg height="100%" width="100%" id="moons"></svg>
+</div>
+<form></form>
+
+<script type="module">
+    // Final app for Part 1 - refer to code changes in data-1.2.js and config-1.4.js
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import { dim } from "./js/common-1.0.js";
+    import { load } from "./js/data-1.2.js";
+    import { configure } from "./js/config-1.4.js";
+    import { draw } from "./js/view-1.3.js";
+
+    // GRAPHICS CONTEXT
+    const svg = d3.select("#moons")
+                  .attr("viewBox", `0 0 ${dim.width} ${dim.height}`);
+    const plane = svg.append("g")
+                     .attr("transform", `translate(${[dim.margin.planet, dim.height/2]})`);
+
+    load().then(() => {
+        configure();
+        draw(plane);
+    });
+
+</script>
+
+
+</body>
+</html>

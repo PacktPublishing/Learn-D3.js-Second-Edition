@@ -1,4 +1,4 @@
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+import * as d3 from "https://cdn.skypack.dev/d3@7";
 
 // GLOBAL CONSTANTS: app & dim
 
@@ -25,7 +25,6 @@ export const app = {
     }
 }
 app.current.id = "p5"; // starting with Jupiter id = "p5"
-app.current.color  = app.colors[(+app.current.id.substring(1) - 3)]; // Set the initial color for the planet
 
 /**
  * dim: This object contains dimensions for the view.

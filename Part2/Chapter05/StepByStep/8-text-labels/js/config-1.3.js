@@ -1,7 +1,7 @@
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+import * as d3 from "https://cdn.skypack.dev/d3@7";
 
 // import the app and dim objects
-import {app, dim} from "./common.js";
+import {app, dim} from "./common-1.0.js";
 
 // VIEW CONFIGURATION (called after each view change)
 
@@ -30,6 +30,7 @@ export function configure() {
 }
 
 function setPlanet() {
+    // 1) Set the current planet
     app.current.planet = app.planets.filter(p => p.id === app.current.id)[0];
 }
 
@@ -57,7 +58,10 @@ function configScale() {
 }
 
 function updatePageView() {
+    // 1) Update page title
     d3.select('#planetName').text( () => app.current.planet.name )
+    // 2) Update the current color for the planet
+    app.current.color  = app.colors[(+app.current.id.substring(1) - 3)];
 }
 
 function computeCenterCoordinates() {

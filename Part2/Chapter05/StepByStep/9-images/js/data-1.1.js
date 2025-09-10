@@ -1,6 +1,6 @@
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+import * as d3 from "https://cdn.skypack.dev/d3@7";
 
-import {app} from "./common.js";
+import {app} from "./common-1.0.js";
 
 // LOADING AND PARSING DATA
 
@@ -25,14 +25,19 @@ export async function load() {
                  && +p.id.substring(1) <= 8);
 
     // Pre-load images
-    const promises = [];
-    app.planets.forEach(planet => {
-        planet.satellites.forEach(moon => {
-            promises.push(
-                d3.image(imageFile(planet, moon))
-                    .then(img => moon.image = img.src, () => {})); // ignore missing files (the errors may still show up in the console, in some browsers, but the app is not blocked)
-        });
-    });
+    const promises =
+        app.planets.flatMap(planet =>
+          planet.satellites.map(moon =>
+              d3.image(imageFile(planet, moon))
+                .then(img => {
+                    moon.image = img.src;
+                })
+                .catch(() => {
+                    // Ignore missing files (errors may still show up in the console in some browsers,
+                    // but the app is not blocked)
+                })
+          )
+    );
     return Promise.all(promises);
 }
 
