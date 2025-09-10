@@ -2,13 +2,14 @@
 <link href="./css/fonts.css" rel="stylesheet">
 <link href="./css/styles.css" rel="stylesheet">
 
-# Online tutorial: creating a scatterplot – part 1
+# Online tutorial: Creating a scatterplot – part 1
 
 In this tutorial, you will apply what you learned in the last 3 chapters to create a scatterplot. We will start by loading the data to create a simple chart, set up dimensions and scales, plot the dots, then add axes, labels, and adjust the scales. In the second part, we will add colors, and interactive features.
 
 You can run and view complete code for each step in the `Chapter09/StepByStep/` folder. As in other tutorials, each step contains a complete application folder, consisting of an `index.html` file, a local `js/` subfolder where JavaScript modules will be stored, and a local `css/` subfolder, for the stylesheets. To code as you read, you can create a similar structure or start with step 1 (`StepByStep/1-load-data/`). To view the results after each step, launch the `index.html` file in a local web server and preview it in your browser.
 
 ## Table of contents
+The following section are contained in this tutorial:
 - [The data](#the-data)
 - [Step 1: Loading and preparing the data](#step-1-loading-and-preparing-the-data)
 - [Step 2: Setting up the page](#step-2-setting-up-the-page)
@@ -34,7 +35,7 @@ Italy,       Europe,        60627498,  0.880,   31952.97592,  41581.12079
 ... +211 rows ...
 ```
 
-The complete file contains more headers and over 200 rows. The data from this file was compiled from multiple sources, such as the United Nations and the World Bank. Our goal, for the complete tutorial, is to create a visualization of this data in a scatter chart comparing the GDP (_Gross Domestic Product_) per capita (in international USD) and HDI (_Human Development Index_) of different countries and the continents they belong to. In the last step of _Part 2_ we will add population information and create a bubble chart.
+The complete file contains more headers and over 200 rows. The data from this file was compiled from multiple sources, such as the United Nations and the World Bank. Our goal, for the complete tutorial, is to create a visualization of this data in a scatter chart comparing the _Gross Domestic Product_ (GDP) per capita (in international USD) and _Human Development Index_ (HDI) of different countries and the continents they belong to. In the last step of _Part 2_, we will add population information and create a bubble chart.
 
 So, let’s start.
 
@@ -49,7 +50,7 @@ import * as d3 from 'https://cdn.skypack.dev/d3@7';
 const file = "data/un_regions_2017.csv";
 ```
 
-**Note**: The CSV file’s location will depend on where you store it. The code above assumes you copied it to the local `data/` folder in your project folder (which is your document root). If you are using the code examples directly from the `StepByStep/` folder, a relative URL that points to `Chapter09/data/` is used.
+**Important Note**: The CSV file’s location will depend on where you store it. The code above assumes you copied it to the local `data/` folder in your project folder (which is your document root). If you are using the code examples directly from the `StepByStep/` folder, a relative URL that points to `Chapter09/data/` is used.
 
 Now let’s create a function to load the CSV and obtain the data we need for the chart. Since this function will be used outside the module, it needs to be exported. It should also be asynchronous, since it will return a promise containing the parsed data:
 
@@ -377,9 +378,7 @@ Reload the file in your browser. What do you see? It seems that the tick lines i
 
 _Figure 5 – First attempt at extending the tick lines. Use `view-1.3.1.js` to see this effect._
 
-Look for the transforms applied to the axis `<g>` containers in `drawAxes()`. The vertical position of the _x_-axis ticks was height minus margin. Changing it to simply vertical margin (`dim.margin.h`) will move it back up revealing the tick labels. The _y_-axis ticks need to be pushed right, changing their position from horizontal margin to width minus margin (`dim.w - dim.margin.w`).
-
-To make these changes you can either call the following code at the end of `drawAxes()` or replace the original transforms:
+The ticks grew left and down. To make them occupy the chart area, we need to move them up and right. The _x_-axis ticks should start at the top margin, so its vertical position is `dim.margin.h`. The _y_-axis starts at the right margin, which is the position `dim.w - dim.margin.w`. Call the following code at the end of `drawAxes()` (or replace the original transforms) to apply these changes:
 
 ```js
 d3.select(".x-axis")

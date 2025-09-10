@@ -2,30 +2,31 @@
 <link href="./css/fonts.css" rel="stylesheet">
 <link href="./css/styles.css" rel="stylesheet">
 
-# Creating an interactive data-driven visualization - Part 1
+# Creating an interactive data-driven visualization - part 1
 
-This tutorial is part of _Learn D3.js Second Edition, Chapter 5_. The goal is to guide you through the process of designing and developing a complete interactive data visualization with D3 using other shapes and images. With D3 you can create visualizations with all the resources you have available in HTML and SVG, so we don’t have to stick to conventional bar, line and pie charts. 
+The goal of this tutorial is to guide you through the process of designing and developing a complete interactive data visualization with D3 using other shapes and images. With D3 you can create visualizations with all the resources you have available in HTML and SVG, so we don’t have to stick to conventional bar, line, and pie charts. 
 
 It’s a larger and more complex example than the bar chart created in _Chapter 4_, but the concepts are the same. It reviews all the features that were covered in the last two chapters and introduces a bit of what we will see ahead, detailing important steps you will encounter in any data visualization, such as creating scripts, importing modules, analyzing the structure of a data file, loading, parsing it, and selecting the data to be used, designing views, and configuring scales.
 
-This tutorial is divided in two parts. In _Part 1_ (this document), we will develop a static chart in 9 steps. In [Part 2](../Chapter06/Tutorial/README.md), the application will be modified to support more data, automatic updates and interactive features. Each step is described with code examples, and you can code along, or run the full code available in the [StepByStep/](../StepByStep) folder. Exercises are suggested in some sections. Their templates and solutions are available in the [Chapter05/Exercises/](../Exercises/) folder.
+This tutorial is divided in two parts. In _Part 1_ (this document), we will develop a static chart in 9 steps. In [Part 2](../Chapter06/Tutorial/README.md), the application will be modified to support more data, automatic updates, and interactive features. Each step is described with code examples, and you can code along, or run the full code available in the [StepByStep/](../StepByStep) folder. Exercises are suggested in some sections. Their templates and solutions are available in the [Chapter05/Exercises/](../Exercises/) folder.
 
-This tutorial is also publicly available as an interactive Observable notebook (see link in [Chapter5/README.md](../README.md)), where you can run and modify its code and see the results immediately.
+This tutorial is also publicly available as an interactive _Observable_ notebook (see link in [Chapter5/README.md](../README.md)), where you can run and modify its code and see the results immediately.
 
 ## Table of contents
 
 This tutorial includes the following sections:
 
 - [What are we going to create?](#what-are-we-going-to-create)
-- [Step 1 - setting up the page, scripts, stylesheet](#step-1---setting-up-the-page-scripts-stylesheet)
-- [Step 2 - loading the data](#step-2---loading-the-data)
-- [Step 3 - configuring scales and filtering data](#step-3---configuring-scales-and-filtering-data)
-- [Step 4 - drawing the planet](#step-4---drawing-the-planet)
-- [Step 5 - calculating the position of each moon](#step-5---calculating-the-position-of-each-moon)
-- [Step 6 - drawing the moons](#step-6---drawing-the-moons)
-- [Step 7 - sorting the moons by size](#step-7---sorting-the-moons-by-size)
-- [Step 8 - adding text labels](#step-8---adding-text-labels)
-- [Step 9 - adding images](#step-9---adding-images)
+- [Step 1: Setting up the page, scripts, stylesheet](#step-1---setting-up-the-page-scripts-stylesheet)
+- [Step 2: Loading the data](#step-2---loading-the-data)
+- [Step 3: Configuring scales and filtering data](#step-3---configuring-scales-and-filtering-data)
+- [Step 4: Drawing the planet](#step-4---drawing-the-planet)
+- [Step 5: Calculating the position of each moon](#step-5---calculating-the-position-of-each-moon)
+- [Step 6: Drawing the moons](#step-6---drawing-the-moons)
+- [Step 7: Sorting the moons by size](#step-7---sorting-the-moons-by-size)
+- [Step 8: Adding text labels](#step-8---adding-text-labels)
+- [Step 9: Adding images](#step-9---adding-images)
+- [Final application: A static chart](#final-application-a-static-chart)
 
 ## What are we going to create?
 We will code a visualization that shows and compares the diameters of the largest natural satellites (moons) of planets in the Solar System using circles and images. In each view, the circumference of the planet will be partially visible, and its largest moons will be lined up and sorted by their diameters. In the first part of the tutorial, we will create the static visualization shown in _Figure 1_.
@@ -35,7 +36,7 @@ _Figure 1 — The visualization we will generate in Part 1 of this tutorial._
 
 Although static, you will be able to choose which planet to display by changing the value of a single constant in the code. In the second part of the tutorial, a control panel will be added so the user can switch views and display different planets and moons.
 
-We will use data from the [`data/sol_2019.json`](../data/sol_2019.json) file -– a compilation of planetary data obtained from open databases (mostly from the [NASA Open Data portal](https://data.nasa.gov/)). This same file was used in _Chapter 4_ to create a bar chart comparing average orbit distances. This time we will extract data from other parts of this file.
+We will use data from the [`data/sol_2019.json`](../data/sol_2019.json) file – a compilation of planetary data obtained from open databases (mostly from the [NASA Open Data portal](https://data.nasa.gov/)). This same file was used in _Chapter 4_ to create a bar chart comparing average orbit distances. This time we will extract data from other parts of this file.
 
 _Figure 2_ shows a sketch of the visualization we plan to create. It contains all the coordinates, spacing and margins we will have to consider when drawing the shapes.
 
@@ -50,7 +51,7 @@ Each step in this tutorial is a folder that contains all the code necessary to r
 
 Let’s begin.
 
-## Step 1 - setting up the page, scripts, stylesheet
+## Step 1: Setting up the page, scripts, stylesheet
 If you want to code along, start with the contents of the [`StepByStep/1-page-setup`](../StepByStep/1-page-setup) folder. It contains a simple page with some boilerplate code ([`index.html`](../StepByStep/1-page-setup/index.html)), a minimal CSS style sheet ([`css/main.css`](../StepByStep/1-page-setup/css/main-1.0.css)), and a script file ([`js/common.js`](../StepByStep/1-page-setup/js/common-1.0.js)) where we will declare the global objects used in the application. This section will describe all of them.
 
 **Note**: in the code for each step, module files and stylesheets are versioned (e.g., `css/main-1.0.css`, `js/view-1.1.js`) so that you can keep track of the changes made in each step. However, here we will refer to them without the version number for simplicity. You can also do the same in your code.
@@ -137,13 +138,13 @@ The `<script>` block in `index.html` imports the modular D3 library and the `js/
 </script>
 ```
 
-If you load the page in your browser, you should see the header “The largest moons” followed by the SVG viewport (which has a border, added in CSS). This is where the chart will be rendered.
+If you load the page in your browser, you should see the header **The largest moons** followed by the SVG viewport (which has a border, added in CSS). This is where the chart will be rendered.
 
 This was the initial step. Use the full code in [`StepByStep/1-page-setup`](../StepByStep/1-page-setup) as a starting point if you wish to code as you read.
 
 Now let’s load some data.
 
-## Step 2 - loading the data
+## Step 2: Loading the data
 
 The data is the most important part of your visualization. Textual data is typically provided in a response to an asynchronous HTTP request to a server endpoint via a URL, as we have seen in this chapter. Before using your data, you must have good knowledge of its structure and how to navigate the raw file and the parsed object or array to find exactly the information you need.
 
@@ -203,7 +204,7 @@ Now back to `index.html`, first import the module:
 ```js
 import { load } from "./js/data.js";
 ```
-Then call the function. For now, print the result to the console so we can inspect it:
+Then call the `load()` function and handle the promise. For now, print the result to the console so we can inspect it:
 
 ```js
 load().then(data => {
@@ -251,15 +252,17 @@ app.planets[3].diameterKm
 
 The dataset contains many properties that won’t be used in this project. You might prefer to previously filter them out so that the `app.planets` array contains only the data you will effectively use. This is optional and will be left as an exercise!
 
-### Exercises
-
-Templates (based on `StepByStep/2-load-data`) with tips (comments), as well as the complete solutions for these exercises can be found in the [`Exercises/`](../Exercises) folder.
-
-* 6.3. Remove unnecessary properties so that the resulting dataset (`app.planets`) only contains the data that will effectively be used in the app: each planet should contain just the `id`, `name`, `diameterKm` and `satellites` properties. The relevant code is in `js/data.js`. _Hint_: Use the JavaScript `map()` function to replace each object from the `app.planets` array with a new one containing just the required properties.
-
-* 6.4. Add a filter for the satellites array of each planet so that each satellite contains only the data that will be used in the app: each satellite should contain just `name` and `diameterKm` of each satellite. The relevant code is in `js/data.js`. _Hint_: use the JavaScript `map()` function to replace each object from the `satellites` array with a new one containing just the required properties.
-
 Our next step is to configure the view and fit the data we loaded in the space we have available.
+
+## Exercises: filter out unncessary data
+
+This section is optional and you can safely skip it if you wish. It contains two exercises to practice filtering data. It applies some changes on the code developed in step 2. These changes will be incorporated only to the final step. 
+
+Templates (based on `StepByStep/2-load-data`) with tips (comments) and solutions can be found in the [`StepByStep/Exercise1`](../StepByStep/Exercise1) and [`StepByStep/Exercise2`](../StepByStep/Exercise2) folders.
+
+* **Exercise 1**: Remove unnecessary properties so that the resulting dataset (`app.planets`) only contains the data that will effectively be used in the app: each planet should contain just the `id`, `name`, `diameterKm` and `satellites` properties. The relevant code is in `js/data.js`. _Hint_: Use the JavaScript `map()` function to replace each object from the `app.planets` array with a new one containing just the required properties.
+
+* **Exercise 2**: Add a filter for the `satellites` array of each planet so that each satellite contains only the data that will be used in the app: each satellite should contain just `name` and `diameterKm` of each satellite. The relevant code is in `js/data.js`. _Hint_: use the JavaScript `map()` function to replace each object from the `satellites` array with a new one containing just the required properties.
 
 ## Step 3 - configuring scales and filtering data
 
@@ -572,7 +575,7 @@ function drawMoons(plane) {
 }
 ```
 
-The selection now binds the `app.current.moons` array to `<g>` elements labelled with the class `'moon'`. Compare this to the previous version of this code, which bound `<circle>` elements to this array.
+The selection now binds the `app.current.moons` array to `<g>` elements labelled with the class `'moon'`. Compare this to the previous version of this code, from _Step 6_, which bound `<circle>` elements to this array.
 
 If you load the page now, you will notice that the visual result is the same, but now we can append a text label to the `<g>` container. A good fit is to rotate it ninety degrees counterclockwise and place it in a central position a few pixels from the edges of each circle. This is done below with a transform applied to the `<text>` element:
 
@@ -691,6 +694,8 @@ _Figure 8 — Using images instead of circles for the larger moons.
 Code: [`StepByStep/9-images`](../StepByStep/9-images)._
 
 The code for this step can be found in [`StepByStep/9-images`](../StepByStep/9-images).
+
+## Final application: A static chart
 
 We finished the view for a single planet, but our app is prepared to display data for several other planets as well. To allow the viewer to switch planets, you will need to manage multiple views and joins, covered in _Chapter 6_. 
 
