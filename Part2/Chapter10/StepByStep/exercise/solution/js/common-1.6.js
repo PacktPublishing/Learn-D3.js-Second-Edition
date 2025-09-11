@@ -19,9 +19,18 @@ const app = {
         r: d3.scaleSqrt()
             .range([1,15])
     },
-    axis: {x: null, y: null},   // will be set by chart-utils.js
     format: {
         gdp: d3.format("$,.0f"),
         pop: d3.format(",.3s")
     }
+}
+
+app.axis = {
+    x: d3.axisBottom(app.scale.x)
+        .tickSize(dim.h - dim.margin.h * 2 + 10)
+        .tickPadding(2),
+    y: d3.axisLeft(app.scale.y)
+        .tickSize(dim.w - dim.margin.h * 2 + 10)
+        .tickPadding(2)
+        .ticks(8, ',')
 }

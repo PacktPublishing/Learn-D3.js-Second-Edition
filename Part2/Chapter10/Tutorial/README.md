@@ -24,10 +24,13 @@ Now we will continue improving this chart. You can continue the project you star
 The chart, as it is, doesn’t provide enough context for the viewer, since it is not possible to know which country represents each dot. Placing the name of the country beside each dot is impractical, but we can assign a specific color for each country that belongs to the same continent. For that, we need to obtain that information from the CSV source. This will be done in the next step.
 
 ## Table of contents
+This tutorial contains the following sections:
 * [Step 7: Grouping dots by category](#step-7-grouping-dots-by-category)
 * [Step 8: Adding tooltips](#step-8-adding-tooltips)
 * [Step 9: Making the legends interactive](#step-9-making-the-legends-interactive)
 * [Step 10: Creating a bubble chart](#step-10-creating-a-bubble-chart)
+* [Exercise - Make the legend clickable](#exercise---make-the-legend-clickable)
+* [Final version](#final-version)
 
 ## Step 7: Grouping dots by category
 
@@ -503,12 +506,20 @@ It's done. The full code for the bubble chart is in `StepByStep/10-bubble/`. A s
 
 _Figure 7 – A bubble chart encoding population as the area of each circle. Code: `StepByStep/8-bubble.html`._
 
-There are still a few improvements that could be made. For example, you could select a continent and click on it to freeze the selection until you click again. This is left as an exercise, but you can see it working in `StepByStep/final/`. This final version also uses the Cartesian chart module (`chart-utils.js`) from _Chapter 8_ instead of the one we created here. 
+There are still many improvements that could be made. You might feel that the chart could be more interactive, for example, to zoom in, especially in parts of the chart where many countries are clustered together. We will do that, but only after _Chapter 14_, where this chart will be revisited to add zooming behavior. For now, you can try a simple improvement to the legend, making it clickable and freezing the continent selection. This is suggested as an exercise below.
 
-You might feel that the chart could be more interactive, for example, to zoom in, especially in parts of the chart where many countries are clustered together. We will do that, but only after _Chapter 14_, where this chart will be revisited to add zooming behavior.
+## Exercise - Make the legend clickable
 
-### Exercise
-Templates and solutions for all exercises are available in the `Exercises/` folder.
+The legend currently only responds to mouse over events. Make it clickable and handle the `'click'` event so that it freezes the selection of dots when the user clicks on the rectangle or the name of the continent. Clicking again on the legend should clear the selection and return the chart to its previous state.
 
-* 10.5. The legend currently only responds to mouse over events. Make it clickable and handle the `'click'` event so that it freezes the selection of dots corresponding to the clicked continent when the user clicks on the rectangle or the name of the continent. Clicking again on the legend should clear the selection and return the chart to its previous state.
+This exercise only requires changes in the `js/legend.js` module. You can start with the commented [template](../StepByStep/exercise/template) application and try ou the result in the [solution](../StepByStep/exercise/solution).
+
+## Final version
+
+The final version, which you can access in `StepByStep/final/`, incorporates the changes from the exercise above, and a few minor changes, such as:
+
+* The `view.js` module reuses the Cartesian chart module (`chart-utils.js`) instead of the one we created here from scratch (mostly to review what was learned in _Chapter 8_). This module is used in several Cartesian charts in this book.
+* All the JavaScript code in `index.html` was moved to a single `js/main.js` module, which imports all the other modules. This is a better practice than placing code in script tags in the HTML file.
+
+
 

@@ -25,3 +25,6 @@ const app = {
         pop: d3.format(",.3s")
     }
 }
+
+// In this version, axes will be set by chart-utils.js
+// in view.js

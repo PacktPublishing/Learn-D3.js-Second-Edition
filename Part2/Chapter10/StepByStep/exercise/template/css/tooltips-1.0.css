@@ -1,0 +1,19 @@
+
+.tooltip {
+    pointer-events: none;
+    transition: opacity 500ms;
+}
+.tooltip rect {
+    fill: #eee;
+    fill-opacity: 0.7;
+    stroke: lightgray;
+    stroke-opacity: .5;
+}
+
+.tooltip text {
+    alignment-baseline: hanging;
+}
+
+.tooltip .name {
+    font-weight: bold;
+}

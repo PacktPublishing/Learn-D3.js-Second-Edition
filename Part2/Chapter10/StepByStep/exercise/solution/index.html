@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Annual GDP compared to HDI (2017)</title>
-    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/main-1.5.css">
     <style>
         h1 {
             font: bold 18pt sans-serif;
@@ -25,6 +25,21 @@
     <p>Sources: <i>World Bank</i> and <i>UN</i></p>
 </header>
 <div id="chart"></div>
-<script type="module" src="./js/main.js"></script>
+<script type="module">
+    import * as d3 from 'https://cdn.skypack.dev/d3@7';
+    import {load} from './js/data-1.4.js';
+    import {draw} from './js/view-1.6.js';
+
+    // FOR EXERCISE: make changes in legend.js
+
+    const app = await load();
+    console.log(app.data);  // inspect app.data.countries
+    draw();
+
+    // For testing purposes (remove in production)
+    window.d3 = d3;
+    window.app = app;
+
+</script>
 </body>
 </html>

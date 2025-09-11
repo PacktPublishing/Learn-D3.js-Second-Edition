@@ -1,0 +1,48 @@
+@import url('tooltips-1.0.css');
+
+svg {
+    /* border: solid 1px; */
+}
+
+/* Chart styles */
+text {
+    font-family: 'Arial Narrow', sans-serif;
+    font-size: 7pt;
+}
+.label {
+    font-size: 8pt;
+    text-anchor: middle;
+}
+
+/* Axis styles */
+.domain {
+    opacity: 0;
+}
+.y-axis line, .x-axis line {
+    stroke-width: .25;
+    stroke: rgba(114, 138, 74, 0.5);
+}
+
+/* Legend styles */
+.legend text {
+    alignment-baseline: middle;
+}
+
+circle, .legend rect {
+    stroke: black;
+    stroke-width: .2;
+    fill-opacity: .7;  /* added so the grid appears under the bubbles */
+}
+
+/* Legend events */
+.item, .dot {
+    transition: all 250ms;
+}
+
+.show {
+    stroke: black;
+    stroke-width: .5;
+}
+.fade {
+    opacity: .3;
+}

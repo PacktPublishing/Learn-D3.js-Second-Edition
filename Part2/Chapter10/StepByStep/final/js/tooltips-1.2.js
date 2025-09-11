@@ -1,5 +1,5 @@
 import * as d3 from 'https://cdn.skypack.dev/d3@7';
-import {app} from './common.js';
+import {app} from './common-1.7.js';
 
 export {draw, show, clear};
 
@@ -52,6 +52,13 @@ function makeTooltip(d) {
     d3.select(".tooltip rect").attr("width", boxWidth);
 }
 
+/**
+    This version places the tooltip so that it is always fully visible
+    within the SVG area. It does this by checking how much space is
+    available to the right and below the point being hovered over,
+    and placing the tooltip to the left or above if there isn't enough
+    space.
+ */
 function placeAndShow(d) {
     // a) Get the dimensions of the tooltip box
     const boxWidth  = d3.select(".tooltip rect").attr("width");

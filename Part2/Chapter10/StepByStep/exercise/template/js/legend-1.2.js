@@ -1,5 +1,5 @@
 import * as d3 from 'https://cdn.skypack.dev/d3@7';
-import {dim, app} from './common.js';
+import {dim, app} from './common-1.6.js';
 
 export function drawLegend() {
     const legend = d3.select("svg")
@@ -12,7 +12,8 @@ export function drawLegend() {
              .join("g").attr("class", "item")
                 .on("mouseenter", showContinents)           // event handlers
                 .on("mouseleave", clearContinents)
-                .on("click", toggleFixContinents)
+        // EXERCISE: (1) add click handler to toggle fixed selection
+        // calling a function which will be implemented below, in (3)
                 .each(function(d, i) {
                     d3.select(this)
                       .append("rect")
@@ -29,33 +30,28 @@ export function drawLegend() {
                 });
 }
 
-let fixContinent = false;
+// EXERCISE: (2) add Boolean variable to track fixed selection
+// ADD YOUR CODE HERE
 
-function toggleFixContinents(event) {
-    if(fixContinent) {
-        clearContinents(event);
-    }
-    fixContinent = !fixContinent;
-}
+// EXERCISE: (3) add a function to toggle the variable. This function
+//           should be called when the user clicks on a legend item,
+//           clear the continent selection and invert the variable
+//           that tracks whether the selection is fixed or not.
 
+// EXERCISE: (4) modify showContinents() to only work if not continents are not fixed
 function showContinents(event, d) {
-    if(!fixContinent) {
-        d3.selectAll(".item")
-            .classed("fade", k => k !== d)
-        d3.selectAll(".dot")
-            .classed("fade", k => k.continent !== d)
-            .classed("show", k => k.continent === d);
-    }
+    d3.selectAll(".item")
+        .classed("fade", k => k !== d)
+    d3.selectAll(".dot")
+        .classed("fade", k => k.continent !== d)
+        .classed("show", k => k.continent === d);
 }
 
-// If the continent selection is not fixed, or if it is fixed but the user clicks
-// this will clear the selection
-function clearContinents(event) {
-    if(!fixContinent || event.type === "click") {
-        d3.selectAll(".item, .dot")
-            .classed("fade", false)
-        d3.selectAll(".dot")
-            .classed("show", false);
-    }
-
+// EXERCISE: (5) modify clearContinents() to only work if continents not fixed,
+// OR if fixed but user clicks (the event.type is "click")
+function clearContinents() {
+    d3.selectAll(".item, .dot")
+        .classed("fade", false)
+    d3.selectAll(".dot")
+        .classed("show", false);
 }

@@ -1,10 +1,7 @@
 import * as d3 from 'https://cdn.skypack.dev/d3@7';
-
-import * as utils from '../../../js/chart-utils.js';
-
-import {dim, app} from './common.js';
-import {drawLegend} from './legend.js';
-import * as tooltip from './tooltips.js';
+import {dim, app} from './common-1.6.js';
+import {drawLegend} from './legend-1.2.js';
+import * as tooltip from './tooltips-1.1.js';
 
 export function draw() {
     d3.select("#chart")
@@ -33,15 +30,27 @@ function drawChart() {
 }
 
 function drawAxes() {
-    const [xAxis,yAxis] =
-        utils.cartesianAxes().container(d3.select("svg"))
-         .xScale(app.scale.x)
-         .yScale(app.scale.y)
-         .xLabel('Human Development Index (HDI)')
-         .yLabel('Annual GDP per capita (International USD)')
-         .showHorizontalGrid(true)
-         .showVerticalGrid(true)();
-    d3.select(".x-axis .label").attr("dy", "-1em");
-    yAxis.ticks(8, ',');
-    d3.select(".y-axis").call(yAxis);
+    d3.select("svg")
+        .append("g")
+        .attr("class", "x-axis")
+        .attr("transform", `translate(${[0, dim.margin.h]})`)
+        .call(app.axis.x);
+
+    d3.select("svg")
+        .append("g")
+        .attr("class", "y-axis")
+        .attr("transform", `translate(${[dim.w - dim.margin.w/2, 0]})`)
+        .call(app.axis.y);
+
+    d3.select("svg")
+        .append("text")
+        .attr("class","label")
+        .text("Human Development Index (HDI)")
+        .attr("transform", `translate(${[dim.w/2, dim.h - 3]})`)
+
+    d3.select("svg")
+        .append("text")
+        .attr("class","label")
+        .text("Annual GDP per capita (International USD)")
+        .attr("transform", `translate(${[3, dim.h/2]}) rotate(90)`)
 }

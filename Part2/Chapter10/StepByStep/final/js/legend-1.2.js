@@ -1,5 +1,5 @@
 import * as d3 from 'https://cdn.skypack.dev/d3@7';
-import {dim, app} from './common.js';
+import {dim, app} from './common-1.7.js';
 
 export function drawLegend() {
     const legend = d3.select("svg")
@@ -48,8 +48,6 @@ function showContinents(event, d) {
     }
 }
 
-// If the continent selection is not fixed, or if it is fixed but the user clicks
-// this will clear the selection
 function clearContinents(event) {
     if(!fixContinent || event.type === "click") {
         d3.selectAll(".item, .dot")
