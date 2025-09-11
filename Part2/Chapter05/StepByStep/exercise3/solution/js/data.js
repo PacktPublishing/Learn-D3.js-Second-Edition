@@ -23,7 +23,7 @@ export async function load() {
         .map(p => ({  id: p.id,
                       name: p.name,
                       diameterKm: p.diameterKm,
-// EXERCISE 5.5 - Filter the satellites to keep only those that have 1/25 of
+// EXERCISE 3 - Filter the satellites to keep only those that have 1/25 of
 // the diameter of the largest satellite or larger.
                       satellites: p.satellites
                                    .filter(s => s.diameterKm >= d3.max(p.satellites, s => s.diameterKm) / 25)

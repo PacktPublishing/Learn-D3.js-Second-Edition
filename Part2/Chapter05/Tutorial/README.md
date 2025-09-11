@@ -259,11 +259,13 @@ Our next step is to configure the view and fit the data we loaded in the space w
 
 This section is optional and you can safely skip it if you wish. It contains two exercises to practice filtering data. It applies some changes on the code developed in step 2. These changes will be incorporated only to the final step. 
 
-Templates (based on `StepByStep/2-load-data`) with tips (comments) and solutions can be found in the [`StepByStep/Exercise1`](../StepByStep/Exercise1) and [`StepByStep/Exercise2`](../StepByStep/Exercise2) folders.
+Templates (based on `StepByStep/2-load-data`) with tips (comments) and solutions can be found in the [`StepByStep/exercise1`](../StepByStep/exercise1), [`StepByStep/exercise2`](../StepByStep/exercise2) and [`StepByStep/exercise3`](../StepByStep/exercise3) folders.
 
 * **Exercise 1**: Remove unnecessary properties so that the resulting dataset (`app.planets`) only contains the data that will effectively be used in the app: each planet should contain just the `id`, `name`, `diameterKm` and `satellites` properties. The relevant code is in `js/data.js`. _Hint_: Use the JavaScript `map()` function to replace each object from the `app.planets` array with a new one containing just the required properties.
 
 * **Exercise 2**: Add a filter for the `satellites` array of each planet so that each satellite contains only the data that will be used in the app: each satellite should contain just `name` and `diameterKm` of each satellite. The relevant code is in `js/data.js`. _Hint_: use the JavaScript `map()` function to replace each object from the `satellites` array with a new one containing just the required properties.
+
+* **Exercise 3**: Filter the satellites to keep only those that have 1/25 of the diameter of the largest satellite or larger. Hint: use `d3.max()` to get the largest diameter, divide it by 25, and then filter the satellites array to keep only those that have a diameter larger than this value.
 
 ## Step 3 - configuring scales and filtering data
 
@@ -701,6 +703,6 @@ The code for this step can be found in [`StepByStep/9-images`](../StepByStep/9-i
 We finished the view for a single planet, but our app is prepared to display data for several other planets as well. To allow the viewer to switch planets, you will need to manage multiple views and joins, covered in _Chapter 6_. 
 
 After _Chapter 6_, you can continue with _Part 2_ of this tutorial. It starts with the code in `StepByStep/static-chart`, which incorporates the suggestions from the exercises and includes some other improvements:
-* The `load()` function in `js/data.js` filters out properties that are not used (from planets and satellites).
-* The moons are no longer filtered in `js/config.js`; this is now also done in `js/data.js`, so the dataset contains only the moons that will be used.
+* The `load()` function in `js/data.js` filters out unused properties from planets (exercise 1) and satellites (exercise 2).
+* The moons are no longer filtered in `js/config.js`; this is now also done in `js/data.js`, so the dataset contains only the moons that will be used (exercise 3).
 * The title was improved to treat Mars (two moons) and Earth (one moon) differently, since it doesn't make sense to use "the largest moons" in these cases. This is done in the `updatePageView()` function in `js/config.js` and by adding a `<span id="titleNumber"></span>` field in the page's `<h1>` title.
