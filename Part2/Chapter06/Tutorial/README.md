@@ -309,7 +309,7 @@ Templates and solutions for all exercises in _Chapter 6_ are available in the ch
 Add a button to allow the viewer to toggle the scale used in the views:  either a separate scale for each planet (as it is currently) or a common scale for all views, that will allow satellites to be compared (_Figure 6_). 
 
 ![Figure 6 - Using a common scale for all views](./images/figure-6.png)
-_Figure 6 - Using a common scale for all views (right) allows the viewer to compare diameters of satellites that orbit different planets, but makes small moons harder to see. Code: [`StepByStep/exercise1/solution`](../StepByStep/exercise1/solution)._
+_Figure 6 - Using a common scale for all views (right) allows the viewer to compare diameters of satellites that orbit different planets, but makes small moons harder to see. Code: [`StepByStep/exercise1-common-scale/solution`](../StepByStep/exercise1-common-scale/solution)._
 
 To implement this:
 
@@ -319,16 +319,16 @@ To implement this:
 
 3. Refactor the `configScale()` function in `js/config.js` to configure the common scale to be used in all views when the user sets the variable to use it, rendering the planets and moons in scale for the entire application. 
 
-You can start with the [template](../StepByStep/exercise1/template), which is the same as `StepByStep/12-join` but contains comments and hints.
+You can start with the [template](../StepByStep/exercise1-common-scale/template), which is the same as `StepByStep/12-join` but contains comments and hints.
 
 ## Exercise 2 - Add tooltips
 
 When the user hovers above a moon or planet, they should see a tooltip containing its diameter in km (_Figure 7_). 
 
 ![Figure 7 - Tooltip showing the diameter of a moon when hovering above it](./images/figure-7.png)
-_Figure 7 - Tooltip showing the diameter of a moon when hovering above it. Code: [`StepByStep/exercise2/solution`](../StepByStep/exercise2/solution)._
+_Figure 7 - Tooltip showing the diameter of a moon when hovering above it. Code: [`StepByStep/exercise2-tooltips/solution`](../StepByStep/exercise2-tooltips/solution)._
 
-This exercise involves several topics we didn’t cover yet, but you can try starting with the [template](../StepByStep/exercise2/solution) file (which is based on the previous exercise) and follow the comments in each file. It will require modifications in `index.html` and `js/view.js` and two new files: `css/tooltips.css` and `js/tooltips.js`.
+This exercise involves several topics we didn’t cover yet, but you can try starting with the [template](../StepByStep/exercise2-tooltips/template) file (which is based on the previous exercise) and follow the comments in each file. It will require modifications in `index.html` and `js/view.js` and two new files: `css/tooltips.css` and `js/tooltips.js`.
 
 ## Final application
 
