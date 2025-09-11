@@ -48,25 +48,19 @@ function configScale() {
     // 2) Else, if using a planet-specific scale, use the existing code that
     //    configures the scale to fit the moons of the current planet summing the
     //    diameters and calculating the available space
-    if(app.useCommonScale) {
-        const maxDiameter = d3.max(d3.merge(app.planets.map(p => p.satellites)), s => s.diameterKm);
+    // ADD YOUR CODE HERE
 
-        // 2) Configure the scales with a domain that will fit all moons in all views (e.g. [0, maxDiameter*2.5])
-        app.scale.range([0, dim.height - dim.margin.top*2])
-            .domain([0, maxDiameter*2.2]);
-    } else {
-        // a) add diameters (they will be drawn side by side)
-        const sumDiameters = d3.sum(app.current.moons,d => d.diameterKm);
+    // a) add diameters (they will be drawn side by side)
+    const sumDiameters = d3.sum(app.current.moons,d => d.diameterKm);
 
-        // b) calculate space occupied by the circles
-        const horizSpace = dim.width - (dim.margin.planet + dim.margin.left*2
-                                      + app.current.moons.length * dim.margin.moon);
-        const vertSpace  = dim.height - dim.margin.top*2;
+    // b) calculate space occupied by the circles
+    const horizSpace = dim.width - (dim.margin.planet + dim.margin.left*2
+                                  + app.current.moons.length * dim.margin.moon);
+    const vertSpace  = dim.height - dim.margin.top*2;
 
-        // c) configure the scale
-        app.scale.range([0, d3.min([vertSpace, horizSpace])])
-            .domain([0, sumDiameters]);
-    }
+    // c) configure the scale
+    app.scale.range([0, d3.min([vertSpace, horizSpace])])
+        .domain([0, sumDiameters]);
 }
 
 function updatePageView() {

@@ -1,10 +1,8 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
-import {app, dim} from "./common.js";
+import {app, dim} from "./common-1.1.js";
 
-// EXERCISE 6.5: Import the showTooltip and hideTooltip functions from tooltips-1.0.js
-
-
+// VIEW RENDERING
 
 /**
  * Draws the current view. Calls drawPlanet() and drawMoons() to draw the planet and moons.
@@ -25,9 +23,6 @@ export function draw(plane) {
 
     // 3) draw the moons
     drawMoons(plane);
-
-    // EXERCISE 6.5: Add event handlers for mouseover and mouseout to show and hide the tooltip
-
 }
 
 /**
@@ -69,6 +64,7 @@ function createMoons(enter) {
                 .each(function() {
                     const moon = d3.select(this);
                     moon.append("circle");
+                    moon.append("image")    // append an <image> element for all moons
                     moon.append("text");
                 });
 }
@@ -80,7 +76,17 @@ function createMoons(enter) {
 function updateObjects(moon) {
     // Update the radius of the circle using the moon's diameter
     moon.select("circle")
-        .attr("r", d => app.scale(d.diameterKm) / 2);
+        .attr("r", d => !d.image ? app.scale(d.diameterKm) / 2 : 0) // if no image, draw circle
+        .style("fill", "lightgray")
+        .style("stroke", "gray");
+
+    // Update the image
+    moon.select("image")
+        .attr("x", d => -app.scale(d.diameterKm/2))
+        .attr("y", d => -app.scale(d.diameterKm/2))
+        .attr("height", d => app.scale(d.diameterKm))
+        .attr("width", d => app.scale(d.diameterKm))
+        .attr("href", d => d.image);
 
     // Update the label of the moon, placing it above each circle
     moon.select("text")

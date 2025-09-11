@@ -1,4 +1,4 @@
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+import * as d3 from "https://cdn.skypack.dev/d3@7";
 
 // GLOBAL CONSTANTS: app & dim
 
@@ -13,10 +13,13 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
  *   app.current.color: Color of the planet
  *   app.current.moons: Moons to be displayed
  */
+// EXERCISE 6.9: add a Boolean property to app and store 'false' or 'true' whether to use
+// a common scale for all planets (e.g. app.useCommonScale: false, for the default case)
 export const app = {
     planets: [],
     colors: ['#4169e1','#cc8530','#d4a450','#dab520','#7fffd4','#1e90ff'],
     scale: d3.scaleLinear(),
+    useCommonScale: false, // whether to use a common scale for all planets
     current: {
         id: null,           // key to select current object
         planet: {},         // the object used in the current view

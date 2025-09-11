@@ -1,0 +1,13 @@
+/* EXERCISE 2: import the tooltips.css stylesheet here (if you didn't use <link> in HTML */
+
+svg {
+    border: solid 1px;
+    background: black;
+}
+* {
+    font-family: sans-serif;
+}
+text {
+    font-size: 10px;
+    fill: white;
+}

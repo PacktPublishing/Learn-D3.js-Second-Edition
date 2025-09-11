@@ -1,0 +1,13 @@
+@import url(./tooltips-1.0.css);
+
+svg {
+    border: solid 1px;
+    background: black;
+}
+* {
+    font-family: sans-serif;
+}
+text {
+    font-size: 10px;
+    fill: white;
+}

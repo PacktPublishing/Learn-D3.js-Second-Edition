@@ -2,6 +2,9 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 import {app, dim} from "./common-1.1.js";
 
+// EXERCISE 2: (1) Import the showTooltip and hideTooltip functions from tooltips.js
+import {hideTooltip, showTooltip} from "./tooltips-1.0.js";
+
 // VIEW RENDERING
 
 /**
@@ -23,6 +26,11 @@ export function draw(plane) {
 
     // 3) draw the moons
     drawMoons(plane);
+
+    // EXERCISE 2: (2) Add event handlers for mouseover and mouseout to show and hide the tooltip
+    d3.selectAll("g.moon, .planet")
+        .on("mouseover", showTooltip)
+        .on("mouseout", hideTooltip);
 }
 
 /**

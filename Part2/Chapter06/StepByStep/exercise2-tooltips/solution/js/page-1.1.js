@@ -2,7 +2,7 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 import {dim, app} from "./common-1.1.js";
 import {configure} from "./config-1.6.js";
-import {draw} from "./view-1.6.js";
+import {draw} from "./view-1.7.js";
 
 // VIEW INITIALIZATION (called once after loading the data)
 
@@ -28,17 +28,12 @@ export function init(plane) {
         draw(plane);
     });
 
-    // EXERCISE 1 - ADD A CONTROL TO TOGGLE COMMON SCALE
-    // 1) Add a button or checkbox so the viewer can toggle to use or not a common scale.
     const scaleToggle = d3.select("form")
                             .append("button").attr("type", "button")
                               .text("Use common scale")
                               .attr("id", "scale-type")
                               .style("float", "right");
 
-    // 2) Add the event handler to toggle the scale mode, changing the state of the global
-    // variable used to keep track of the state (and update the control's status or text, if necessary).
-    // Then call configure() and draw() to update the view.
     scaleToggle.on("click", function() {
         app.useCommonScale = !app.useCommonScale;
         d3.select("#scale-type")

@@ -1,7 +1,7 @@
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+import * as d3 from "https://cdn.skypack.dev/d3@7";
 
 // import the app and dim objects
-import {app, dim} from "./common.js";
+import {app, dim} from "./common-1.1.js";
 
 // VIEW CONFIGURATION (called after each view change)
 
@@ -13,7 +13,7 @@ export function configure() {
     // 1) populate app.current.planet with data from app.planets filtered by app.current.id
     setPlanet();
 
-    // 2) Populate app.current.moons with moons of the current planet
+    // 2) Populate app.current.moons with satellites to display for the current planet
     setMoons();
 
     // 3) Configure the scales for this view
@@ -34,43 +34,46 @@ function setPlanet() {
 }
 
 function setMoons() {
-    // a) obtain the diameter of the largest moon
-    const maxDiameter = d3.max(app.current.planet.satellites, d => d.diameterKm);
-
-    // b) include only moons with 1/50 of the size of the largest moon or larger
-    app.current.moons = app.current.planet.satellites
-                                          .filter(s => s.diameterKm > maxDiameter/50);
+    app.current.moons = app.current.planet.satellites;
 }
 
 function configScale() {
-    // a) add diameters (they will be drawn side by side)
-    const sumDiameters = d3.sum(app.current.moons,d => d.diameterKm);
+    if(app.useCommonScale) {
+        const maxDiameter = d3.max(d3.merge(app.planets.map(p => p.satellites)), s => s.diameterKm);
 
-    // b) calculate space occupied by the circles
-    const horizSpace = dim.width - (dim.margin.planet + dim.margin.left*2
-                                           + app.current.moons.length * dim.margin.moon);
-    const vertSpace  = dim.height - dim.margin.top*2;
+        // 2) Configure the scales with a domain that will fit all moons in all views (e.g. [0, maxDiameter*2.5])
+        app.scale.range([0, dim.height - dim.margin.top*2])
+            .domain([0, maxDiameter*2.2]);
+    } else {
+        // a) add diameters (they will be drawn side by side)
+        const sumDiameters = d3.sum(app.current.moons,d => d.diameterKm);
 
-    // c) configure the scale
-    app.scale.range([0, d3.min([vertSpace, horizSpace])])
-             .domain([0, sumDiameters]);
+        // b) calculate space occupied by the circles
+        const horizSpace = dim.width - (dim.margin.planet + dim.margin.left*2
+                                      + app.current.moons.length * dim.margin.moon);
+        const vertSpace  = dim.height - dim.margin.top*2;
+
+        // c) configure the scale
+        app.scale.range([0, d3.min([vertSpace, horizSpace])])
+            .domain([0, sumDiameters]);
+    }
 }
 
 function updatePageView() {
-    // 1) Change page title
-    d3.select('#planetName').text( () => app.current.planet.name )
+    // 1) Update page title
+    d3.select('#planetName').text( () => app.current.planet.name );
 
-    // 2) Disable button for currently displayed planet
+    // 2) Update the current color for the planet
+    app.current.color  = app.colors[(+app.current.id.substring(1) - 3)];
+
+    // 3) Disable button for currently displayed planet
     d3.selectAll("button").property("disabled", false);
     d3.select("button#"+app.current.id).property("disabled", true);
-
-    // 3) Set the current color for the planet
-    app.current.color  = app.colors[(+app.current.id.substring(1) - 3)];
 
     // This improves the title - see <span> tags in <h1>
     if (app.current.moons.length === 1) { // Earth
         d3.select('#titleNumber').text("moon");
-    } else if (app.current.moons.length === app.current.planet.satellites.length) { // Mars
+    } else if (app.current.moons.length === 2) { // Mars
         d3.select('#titleNumber').text("moons");
     } else { // Others
         d3.select('#titleNumber').text("largest moons");
@@ -78,7 +81,7 @@ function updatePageView() {
 }
 
 function computeCenterCoordinates() {
-    // 5) Compute cx center coordinates to position each moon
+    // Compute cx center coordinates to position each moon
     app.current.moons.forEach(function(moon, i) {
         let space = 0;
         if(i > 0) {

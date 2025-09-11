@@ -38,16 +38,6 @@ function setMoons() {
 }
 
 function configScale() {
-    // EXERCISE 1 - CONFIGURE THE SCALE TO BE COMMON OR PLANET-SPECIFIC
-    // This function should run different code depending on the value of
-    // the global variable that indicates whether we want a common scale or not.
-    //
-    // 1) If using a common scale, find the largest moon in the entire dataset
-    //    and use it to configure the scale's domain. Use a max value that will
-    //    fit all moons in all views (e.g. maxDiameter*2.5)
-    // 2) Else, if using a planet-specific scale, use the existing code that
-    //    configures the scale to fit the moons of the current planet summing the
-    //    diameters and calculating the available space
     if(app.useCommonScale) {
         const maxDiameter = d3.max(d3.merge(app.planets.map(p => p.satellites)), s => s.diameterKm);
 

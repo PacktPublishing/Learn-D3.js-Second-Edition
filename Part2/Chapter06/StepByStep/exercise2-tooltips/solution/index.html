@@ -3,8 +3,8 @@
 <head>
     <title>Comparing the largest natural satellites of the Solar System</title>
     <link rel="stylesheet" href="css/main-1.2.css">
-    <!-- EXERCISE 2: (1) Link tooltips.css style sheet for the tooltips (or import it from main.css) -->
-    <!-- ADD CODE HERE -->
+    <!-- EXERCISE 2: (1) Link tooltips.css style sheet for the tooltips or import it from main.css -->
+    <link rel="stylesheet" href="css/tooltips-1.0.css">
 </head>
 <body>
 
@@ -39,7 +39,10 @@
     // - Append a <g> element to the plane and assign it the class "tooltip".
     // - Append a <rect> element to the tooltip.
     // - Append a <text> element to the tooltip.
-    // ADD CODE HERE
+    const tooltip = plane.append("g")
+                         .attr("class", "tooltip");
+    tooltip.append("rect");
+    tooltip.append("text");
 
     await load();
     init(plane);

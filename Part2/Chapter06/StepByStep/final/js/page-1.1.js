@@ -2,7 +2,7 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 import {dim, app} from "./common-1.1.js";
 import {configure} from "./config-1.6.js";
-import {draw} from "./view-1.6.js";
+import {draw} from "./view-1.7.js";
 
 // VIEW INITIALIZATION (called once after loading the data)
 

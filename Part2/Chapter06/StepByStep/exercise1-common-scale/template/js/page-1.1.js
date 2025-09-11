@@ -30,22 +30,12 @@ export function init(plane) {
 
     // EXERCISE 1 - ADD A CONTROL TO TOGGLE COMMON SCALE
     // 1) Add a button or checkbox so the viewer can toggle to use or not a common scale.
-    const scaleToggle = d3.select("form")
-                            .append("button").attr("type", "button")
-                              .text("Use common scale")
-                              .attr("id", "scale-type")
-                              .style("float", "right");
+    // ADD YOUR CODE HERE
 
     // 2) Add the event handler to toggle the scale mode, changing the state of the global
     // variable used to keep track of the state (and update the control's status or text, if necessary).
     // Then call configure() and draw() to update the view.
-    scaleToggle.on("click", function() {
-        app.useCommonScale = !app.useCommonScale;
-        d3.select("#scale-type")
-            .text(app.useCommonScale ? "Use scale per planet" : "Use common scale");
-        configure();
-        draw(plane);
-    });
+    // ADD YOUR CODE HERE
 
     // Render the initial view
     configure();
