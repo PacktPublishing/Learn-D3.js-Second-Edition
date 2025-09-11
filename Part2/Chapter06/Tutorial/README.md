@@ -328,7 +328,7 @@ When the user hovers above a moon or planet, they should see a tooltip containin
 ![Figure 7 - Tooltip showing the diameter of a moon when hovering above it](./images/figure-7.png)
 _Figure 7 - Tooltip showing the diameter of a moon when hovering above it. Code: [`StepByStep/exercise2-tooltips/solution`](../StepByStep/exercise2-tooltips/solution)._
 
-This exercise involves several topics we didn’t cover yet, but you can try starting with the [template](../StepByStep/exercise2-tooltips/template) file (which is based on the previous exercise) and follow the comments in each file. It will require modifications in `index.html` and `js/view.js` and two new files: `css/tooltips.css` and `js/tooltips.js`.
+This exercise involves several topics we didn’t cover yet, but you can try starting with the [template](../StepByStep/exercise2-tooltips/template) application (which is based on the previous exercise) and follow the comments in each file. It will require modifications in `index.html` and `js/view.js` and two new files: `css/tooltips.css` and `js/tooltips.js`.
 
 ## Final application
 
