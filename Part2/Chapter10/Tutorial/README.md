@@ -49,7 +49,7 @@ app.data.countries = await d3.csv(file, function(row) {
 
 Now that each data point object contains a `continent` property, we can use it as a category to group countries and identify them with a color code.
 
-The color can be specified as a function selected by continent, implemented with an ordinal scale. The `app.color` function will return a color from the `d3.schemeDark2` color scheme for each category. This function should be added as a property to the `app` object in `js/common-1.0.js`:
+The color can be specified as a function selected by continent, implemented with an ordinal scale. The `app.color` function will return a color from the `d3.schemeDark2` color scheme for each category. This function should be added as a property to the `app` object in `js/common.js`:
 
 ```js
 app.color = d3.scaleOrdinal(d3.schemeDark2);
@@ -69,7 +69,7 @@ _Figure 2 – Adding a different color for each continent._
 
 Now it is possible to identify which dots belong to the same continents, but we still need to identify the continent. Let’s add a legend.
 
-The legend is implemented using a `<g class="legend">` element placed in an empty part of the chart. It contains one `<g class="item">` element for each continent, which contains a rectangle, filled with the continent’s color, and a `<text>` element, with the continent’s name. Let’s store the rectangle’s dimensions in the dim object (`js/common-1.0.js`):
+The legend is implemented using a `<g class="legend">` element placed in an empty part of the chart. It contains one `<g class="item">` element for each continent, which contains a rectangle, filled with the continent’s color, and a `<text>` element, with the continent’s name. Let’s store the rectangle’s dimensions in the dim object (`js/common.js`):
 
 ```js
 dim.legend = {w: 20, h: 10}
@@ -98,7 +98,7 @@ Now we can generate the legend, binding rectangles and text elements to the `con
 
 ```js
 import * as d3 from 'https://cdn.skypack.dev/d3@7';
-import {dim, app} from './common-1.0.js';
+import {dim, app} from './common.js';
 
 export function drawLegend() {
     // creates one <g> for the legend, and moves it near the top-left corner
@@ -165,11 +165,11 @@ You are probably curious to know what European country is that dot at the top ri
 
 To provide the viewer with information about each dot, we will create a tooltip component with a rectangle and some text fields so that when the user hovers over a dot, it displays the data near the dot. It will be implemented it in a new `js/tooltips.js` module.
 
-The module requires D3 and the `app` object from `js/common-1.0.js`. It should export three functions. One will draw the tooltip and the other two will respond to events.
+The module requires D3 and the `app` object from `js/common.js`. It should export three functions. One will draw the tooltip and the other two will respond to events.
 
 ```js
 import * as d3 from 'https://cdn.skypack.dev/d3@7';
-import {app} from './common-1.0.js';
+import {app} from './common.js';
 
 function draw() {}
 function show(event, d) {}
@@ -216,7 +216,7 @@ const fields = [
 ];
 ```
 
-The value for the GDP field is returned by a function that takes the data and formats it as currency. This function was added to our app object in `js/common-1.0.js`:
+The value for the GDP field is returned by a function that takes the data and formats it as currency. This function was added to our app object in `js/common.js`:
 
 ```js
 app.format = {
@@ -446,7 +446,7 @@ Also, in `data.js`, sort the `app.data.countries` dataset in the `config()` func
 app.data.countries.sort((a,b) => d3.descending(a.pop, b.pop));
 ```
 
-In `js/common-1.0.js` we need to set a new scale. Since the population will be represented by the area of the circle, a square root scale is best. In the app object, set the range (it will allow circles from 2 to 30 pixels wide):
+In `js/common.js` we need to set a new scale. Since the population will be represented by the area of the circle, a square root scale is best. In the app object, set the range (it will allow circles from 2 to 30 pixels wide):
 
 ```js
 app.scale.r = d3.scaleSqrt().range([1, 15]);
