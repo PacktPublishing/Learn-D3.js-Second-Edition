@@ -19,6 +19,7 @@ This tutorial includes the following sections:
 - [What are we going to create?](#what-are-we-going-to-create)
 - [Step 1: Setting up the page, scripts, stylesheet](#step-1---setting-up-the-page-scripts-stylesheet)
 - [Step 2: Loading the data](#step-2---loading-the-data)
+- [Exercises: filter out unncessary data](#exercises-filter-out-unncessary-data)
 - [Step 3: Configuring scales and filtering data](#step-3---configuring-scales-and-filtering-data)
 - [Step 4: Drawing the planet](#step-4---drawing-the-planet)
 - [Step 5: Calculating the position of each moon](#step-5---calculating-the-position-of-each-moon)
@@ -666,7 +667,7 @@ The code will attempt to load an image for each moon of each planet. If the imag
 
 **Note**: You may notice that the console displays several 404 errors when loading some images. This is expected, since not all moons have an image. The code, however, is designed to ignore these errors. Unfortunately, there is currently no way to turn off these warnings.
 
-Now we update the `js/view-1.4.js` module to use images instead of circles if the image exists. In the `appendObjects()` function, if an image exists, make the radius of the circle zero, otherwise, draw the circle as before. We also changed the color, so that it contrasts with the dark background:
+Now we update the `js/view.js` module to use images instead of circles if the image exists. In the `appendObjects()` function, if an image exists, make the radius of the circle zero, otherwise, draw the circle as before. We also changed the color, so that it contrasts with the dark background:
 
 ```js
 moon.append("circle")
