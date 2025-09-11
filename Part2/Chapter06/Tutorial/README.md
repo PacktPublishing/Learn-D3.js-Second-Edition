@@ -21,10 +21,10 @@ This tutorial is also publicly available as an interactive _Observable_ notebook
 
 This tutorial includes the following sections:
 - [Step 10 - changing views](#step-10---changing-views)
-- [Step 11 - updating views](#step-10---updating-views)
-- [Step 12 - fixing the data join](#step-11---fixing-the-data-join)
-- [Exercise - use a common scale](#exercise---use-a-common-scale)
-- [Exercise - add tooltips](#exercise---add-tooltips)
+- [Step 11 - updating views](#step-11---updating-views)
+- [Step 12 - fixing the data join](#step-12---fixing-the-data-join)
+- [Exercise 1 - use a common scale](#exercise-1---use-a-common-scale)
+- [Exercise 2 - add tooltips](#exercise-2---add-tooltips)
 - [Final application](#final-application)
 
 ## Step 10 - changing views
@@ -159,7 +159,7 @@ You can view the full code for this step in `StepByStep/11-update-views`.
 
 We fixed the duplicating planets problem, but we still have overlapping moons. Let's fix them.
 
-## Step 11 - fixing the data join
+## Step 12 - fixing the data join
 
 The moons are still not being updated correctly. Let’s use the element inspector again to view the generated code. Note that the number of moons is correct. There is one for Earth. There are two for Mars. There are six for Jupiter. But there are many more images on the screen. What is wrong?
 
@@ -304,7 +304,7 @@ These ideas are left as exercises, described in the following sections, but you 
 
 Templates and solutions for all exercises in _Chapter 6_ are available in the chapter's `Exercises/` folder. The numbering of the exercises continues from _Chapter 6_.
 
-## Exercise 6.9 - Use a common scale
+## Exercise 1 - Use a common scale
 
 Add a button to allow the viewer to toggle the scale used in the views:  either a separate scale for each planet (as it is currently) or a common scale for all views, that will allow satellites to be compared (_Figure 6_). 
 
@@ -321,7 +321,7 @@ To implement this:
 
 You can start with the template, which is the same as `StepByStep/12-join` but contains comments and hints.
 
-## Exercise 6.10 - Add tooltips
+## Exercise 2 - Add tooltips
 
 When the user hovers above a moon or planet, they should see a tooltip containing its diameter in km (_Figure 7_). 
 
