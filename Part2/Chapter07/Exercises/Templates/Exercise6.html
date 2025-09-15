@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exercise 7.6 - Shuffling values</title>
+</head>
+<body>
+<svg></svg>
+<form></form>
+<script type="module">
+    import * as d3 from 'https://cdn.skypack.dev/d3@7';
+
+    // EXERCISE 6:
+    // a) Create an array with the positions of the cards (0 to 51)
+    const positions = [];   // REPLACE the empty array with your code
+
+    // b) Implement this function.
+    function shuffleDeck() {
+        // Shuffle the positions array in place. Hint: use d3.shuffle()
+        // ADD YOUR CODE HERE
+        // Apply the shuffled positions to the deck. Hint: use d3.permute()
+        // ADD YOUR CODE HERE
+        // Return the shuffled deck
+        return [];  // REPLACE the empty array with the shuffled deck
+    }
+
+    // The data: a deck of cards
+    const suits = ['♠', '♥', '♦', '♣'];
+    const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+    const deck = d3.cross(suits, ranks, (suit, rank) => ({suit: suit, rank: rank, position: ranks.indexOf(rank) + suits.indexOf(suit) * 13}));
+    console.log(deck);
+
+    // A grid to display the cards
+    const cardWidth = 60;
+    const cardHeight = 90;
+    const margin = 10;
+
+    // Utility functions to compute the position of each card in the grid
+    const posX = d => (d.position % 13) * cardWidth + margin / 2;
+    const posY = d => Math.floor(d.position / 13) * cardHeight + margin / 2;
+
+    // Obtain and configure the SVG container
+    const svg = d3.select("svg")
+                  .attr("width", cardWidth * 13 + margin)
+                  .attr("height", cardHeight * 4 + margin)
+                  .style("background-color", "#ccc");
+
+    // Draw the cards in their initial order
+    const cards = svg.selectAll("g")
+                    .data(deck)
+                      .join("g")
+                        .attr("transform", d => `translate(${posX(d)},${posY(d)})`);
+
+    cards.append("rect")
+        .attr("width", cardWidth - 4)
+        .attr("height", cardHeight - 4)
+        .attr("x", 2)
+        .attr("y", 2)
+        .attr("rx", 10)
+        .attr("ry", 10)
+        .style("fill", "white")
+        .style("stroke", "black");
+
+    cards.append("text")
+        .attr("x", cardWidth / 2)
+        .attr("y", cardHeight / 2)
+        .style("text-anchor", "middle")
+        .style("alignment-baseline", "central")
+        .style("font-size", "24px")
+        .style("font-family", "Arial")
+        .text(d => d.rank + d.suit)
+        .style("fill", d => (d.suit === '♥' || d.suit === '♦') ? "red" : "black");
+
+    // Buttons
+    d3.select("form")
+      .append("button").attr("type", "button")
+        .text("Shuffle deck")
+        .on("click", () => {
+          cards.data(shuffleDeck())
+              .transition()
+                  .duration(1000)
+                  .attr("transform", d => `translate(${posX(d)},${posY(d)})`);
+      });
+
+    // d) Add button to reset to original order
+    d3.select("form")
+      .append("button").attr("type", "button")
+        .text("Reset")
+        .on("click", () => {
+            cards.data(deck)
+                .transition()
+                    .duration(1000)
+                    .attr("transform", d => `translate(${posX(d)},${posY(d)})`);
+
+        });
+
+</script>
+
+</body>
+</html>

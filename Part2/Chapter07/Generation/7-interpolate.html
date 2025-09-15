@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Interpolation examples</title>
+    <style>
+        text {
+            font-family: 'Yanone Kaffeesatz', sans-serif;
+            font-size: 12pt;
+        }
+        svg {border: solid 1px blue}
+    </style>
+</head>
+<body>
+<h3>Open console for results</h3>
+<script type="module">
+    import * as d3 from 'https://cdn.skypack.dev/d3@7';
+
+    // Basic interpolation
+    const interpolate1 = d3.interpolate(23, 123)  // creates interpolate1(t)
+    interpolate1(0.25)		// 49.5
+    interpolate1(0.5)		// 74
+    interpolate1(0.75)		// 98.5
+    console.log(`d3.interpolate(23, 123)(0.25) = ${interpolate1(0.25)}`);
+    console.log(`d3.interpolate(23, 123)(0.5) = ${interpolate1(0.5)}`);
+    console.log(`d3.interpolate(23, 123)(0.75) = ${interpolate1(0.75)}`);
+
+    // Interpolation in strings
+    const interpolate2 = d3.interpolate("Part 0 of 100","Part 100 of 100")
+    interpolate2(0.02) 		// 'Part 2 of 100'
+    interpolate2(0.25) 		// 'Part 25 of 100'
+    console.log(`d3.interpolate("Part 0 of 100","Part 100 of 100")(0.02) = ${interpolate2(0.02)}`);
+    console.log(`d3.interpolate("Part 0 of 100","Part 100 of 100")(0.25) = ${interpolate2(0.25)}`);
+
+    // Date interpolation
+    const interpolate3 = d3.interpolate(new Date(2023,10,14), new Date(2024,4,8))
+    interpolate3(0.5)		// '2024-02-10'
+    console.log(`d3.interpolate(new Date(2023,10,14), new Date(2024,4,8))(0.5) = ${interpolate3(0.5).toISOString().substring(0,10)}`);
+
+    // Array interpolation
+    const interpolate4 = d3.interpolate([3,10,100],[30,100,0])
+    interpolate4(0.5) 			// [16.5, 55, 50]
+    console.log(`d3.interpolate([3,10,100],[30,100,0])(0.5) = [${interpolate4(0.5)}]`);
+
+    // Color interpolation
+    const interpolate5 = d3.interpolate ("red", "blue")
+    interpolate5(0.25) 		// 'rgb(191, 0, 64)'
+    interpolate5(0.75) 		// 'rgb(64, 0, 191)'
+    console.log(`d3.interpolate ("red", "blue")(0.25) = ${interpolate5(0.25)}`);
+    console.log(`d3.interpolate ("red", "blue")(0.75) = ${interpolate5(0.75)}`);
+
+    // Object interpolation
+    const interpolate6 = d3.interpolate({a:-30, b:'red'}, {a:50, b:'blue'})
+    interpolate6(0.5)
+    console.log(`d3.interpolate({a:-30, b:'red'}, {a:50, b:'blue'})(0.5) = ${JSON.stringify(interpolate6(0.5))}`);
+
+</script>
+
+</body>
+</html>

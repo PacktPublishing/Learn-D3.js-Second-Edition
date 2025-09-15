@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Step-by-step: creating a heatmap table</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<h1>Rainfall in São Paulo, Brazil (in mm) from 1984 to 2017</h1>
+<table></table>
+<p>source: inmet.gov.br</p>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    const dataFile = "../data/rain_sao_paulo_tidy.csv"; // check file location
+
+    const data = await d3.csv(dataFile);
+    console.log(data);
+
+    // For testing in the console
+    window.d3 = d3;
+</script>
+</body>
+</html>

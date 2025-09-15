@@ -7,7 +7,7 @@
 In the first part of this tutorial we plotted dots representing countries on a Cartesian graph that crossed their GDP and HDI values (for 2017). The GDP was plotted with a logarithmic scale, and a light-gray grid was used for context, as shown in _Figure 1_.
 
 ![Scatterplot comparing GDP and HDI, but no colors or labels](./images/figure-1.png)
-_Figure 1 – Scatterplot comparing GDP and HDI developed in [part 1](../../Chapter09/Tutorial). It has_
+_Figure 1 – Scatterplot comparing GDP and HDI developed in [part 1](../../Chapter09/Tutorial)._
 
 The CSV data source used is also copied in this chapter's repository, in [`Chapter10/data/un_regions_2017.csv`](../data/un_regions_2017.csv). A fragment is shown below listing some headers and rows:
 
@@ -512,14 +512,11 @@ There are still many improvements that could be made. You might feel that the ch
 
 The legend currently only responds to mouse over events. Make it clickable and handle the `'click'` event so that it freezes the selection of dots when the user clicks on the rectangle or the name of the continent. Clicking again on the legend should clear the selection and return the chart to its previous state.
 
-This exercise only requires changes in the `js/legend.js` module. You can start with the commented [template](../StepByStep/exercise/template) application and try ou the result in the [solution](../StepByStep/exercise/solution).
+This exercise only requires changes in the `js/legend.js` module. You can start with the commented [template](../StepByStep/exercise/template) application and see the expected result in the [solution](../StepByStep/exercise/solution).
 
 ## Final version
 
 The final version, which you can access in `StepByStep/final/`, incorporates the changes from the exercise above, and a few minor changes, such as:
 
-* The `view.js` module reuses the Cartesian chart module (`chart-utils.js`) instead of the one we created here from scratch (mostly to review what was learned in _Chapter 8_). This module is used in several Cartesian charts in this book.
+* The `js/view.js` module reuses the Cartesian chart module (`chart-utils.js`) instead of the one we created here from scratch (mostly to review what was learned in _Chapter 8_). This module is used in several Cartesian charts in this book.
 * All the JavaScript code in `index.html` was moved to a single `js/main.js` module, which imports all the other modules. This is a better practice than placing code in script tags in the HTML file.
-
-
-

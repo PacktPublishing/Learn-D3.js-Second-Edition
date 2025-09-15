@@ -7,27 +7,27 @@
 In the first part of this tutorial, we created the static chart shown in `Figure 1`. Although static, you could display a different planet editing the code and assigning a different `app.current.id`.
 
 ![Figure 1 – The static visualization created in Part 1](./images/figure-1.png)
-_Figure 1 – The static visualization created in Part 1, showing the natural satellites of Neptune (`app.current.id = "p8"`)._
+_Figure 1 – The static visualization created in [the first part of this tutorial](../../Chapter05/Tutorial), showing the natural satellites of Neptune (`app.current.id = "p8"`)._
 
 In this second part, we will allow the viewer to select the planet they want to see via a control panel. Although this might seem trivial, it involves advanced concepts about joining and reusing graphical elements in a view that we covered in _Chapter 6_.
 
-As before, each step is described with code examples, and you can code along, or run the full code available in the [`StepByStep/`](../StepByStep) folder. Some additional exercises are suggested at the end. Their commented templates and solutions are available in the [`Exercises/`](../Exercises/) folder. The final visualization incorporates all changes from the exercises. You can run it from the [`StepByStep/final`](../StepByStep/final) folder.
+As before, each step is described with code examples, and you can code along, or run the full code available in the [`StepByStep/`](../StepByStep) folder. Some additional exercises are suggested at the end. The final visualization incorporates all changes from the exercises. You can run it from the [`StepByStep/final`](../StepByStep/final) folder.
 
-Start with the project you created in `part 1`, or use the files in [`StepByStep/9-static-chart`](../StepByStep/9-static-chart), which contains all the changes made in part 1.
+Start with the project you created in [part 1](../../Chapter05/Tutorial), or use the files in [`StepByStep/9-static-chart`](../StepByStep/9-static-chart), which contains all the changes made in part 1.
 
 This tutorial is also publicly available as an interactive _Observable_ notebook (see link in [`Chapter06/README.md`](../README.md)), where you can run and modify its code and see the results immediately.
 
 ## Table of contents
 
 This tutorial includes the following sections:
-- [Step 10 - changing views](#step-10---changing-views)
-- [Step 11 - updating views](#step-11---updating-views)
-- [Step 12 - fixing the data join](#step-12---fixing-the-data-join)
-- [Exercise 1 - use a common scale](#exercise-1---use-a-common-scale)
-- [Exercise 2 - add tooltips](#exercise-2---add-tooltips)
-- [Final application](#final-application)
+* [Step 10: Changing views](#step-10-changing-views)
+* [Step 11: Updating views](#step-11-updating-views)
+* [Step 12: Fixing the data join](#step-12-fixing-the-data-join)
+* [Exercise 1: Use a common scale](#exercise-1-use-a-common-scale)
+* [Exercise 2: Add tooltips](#exercise-2-add-tooltips)
+* [Final application](#final-application)
 
-## Step 10 - changing views
+## Step 10: Changing views
 
 Now that we successfully displayed one complete view, we can demonstrate the power of D3 by automatically updating the view with new datasets. For that, we need a user interface to trigger the changes, such as a panel with buttons where the viewer can select a view. We will set them up inside a new module called `js/page.js`, which will also set up the page. 
 
@@ -112,7 +112,7 @@ _Figure 3 – Inspector shows five `<circle class="planet">` elements after clic
 
 Look at that! After clicking twice on Jupiter, you have not one, but three identical `<circle class="planet">` elements! Click on other buttons, and more planet circles are added, but never removed. Moons are sometimes removed or not. We have several problems to fix. Let’s start with the duplicate planets.
 
-## Step 11 - updating views
+## Step 11: Updating views
 
 First, let’s eliminate the possibility of clicking many times on the same button. This is easy. We can set the `disabled` attribute to false in all buttons, and then set it to true only when the button’s ID is equal to `app.current.id`. A good place for this code is in the `updatePageView()` function (in the `js/config.js` module):
 
@@ -159,7 +159,7 @@ You can view the full code for this step in `StepByStep/11-update-views`.
 
 We fixed the duplicating planets problem, but we still have overlapping moons. Let's fix them.
 
-## Step 12 - fixing the data join
+## Step 12: Fixing the data join
 
 The moons are still not being updated correctly. Let’s use the element inspector again to view the generated code. Note that the number of moons is correct. There is one for Earth. There are two for Mars. There are six for Jupiter. But there are many more images on the screen. What is wrong?
 
@@ -299,12 +299,10 @@ You can run the full code in `StepByStep/12-join`.
 We are done, but there are always small improvements you can make in this chart to improve the user’s experience. Here are some examples:
 * Each view shows a planet in scale with its satellites, but perhaps it would be interesting to have all the views in the same scale, to compare satellites of different planets.
 * The data source contains a lot of interesting information about planets and moons, such as their diameters. It could be provided to the viewer using tooltips.
-* 
+
 These ideas are left as exercises, described in the following sections, but you can see the full solution in `StepByStep/final`, which incorporates all these changes.
 
-Templates and solutions for all exercises in _Chapter 6_ are available in the chapter's `Exercises/` folder. The numbering of the exercises continues from _Chapter 6_.
-
-## Exercise 1 - Use a common scale
+## Exercise 1: Use a common scale
 
 Add a button to allow the viewer to toggle the scale used in the views:  either a separate scale for each planet (as it is currently) or a common scale for all views, that will allow satellites to be compared (_Figure 6_). 
 
@@ -319,18 +317,18 @@ To implement this:
 
 3. Refactor the `configScale()` function in `js/config.js` to configure the common scale to be used in all views when the user sets the variable to use it, rendering the planets and moons in scale for the entire application. 
 
-You can start with the [template](../StepByStep/exercise1-common-scale/template), which is the same as `StepByStep/12-join` but contains comments and hints.
+You can start with the [template](../StepByStep/exercise1-common-scale/template), which contains the same code as `StepByStep/12-join` but includes extra comments and hints.
 
-## Exercise 2 - Add tooltips
+## Exercise 2: Add tooltips
 
 When the user hovers above a moon or planet, they should see a tooltip containing its diameter in km (_Figure 7_). 
 
 ![Figure 7 - Tooltip showing the diameter of a moon when hovering above it](./images/figure-7.png)
 _Figure 7 - Tooltip showing the diameter of a moon when hovering above it. Code: [`StepByStep/exercise2-tooltips/solution`](../StepByStep/exercise2-tooltips/solution)._
 
-This exercise involves several topics we didn’t cover yet, but you can try starting with the [template](../StepByStep/exercise2-tooltips/template) application (which is based on the previous exercise) and follow the comments in each file. It will require modifications in `index.html` and `js/view.js` and two new files: `css/tooltips.css` and `js/tooltips.js`.
+This exercise involves several topics we didn’t cover yet, but you can try starting with the [template](../StepByStep/exercise2-tooltips/template), which is based on the [previous exercise](#exercise-1-use-a-common-scale), and follow the comments in each file. It will require modifications in `index.html` and `js/view.js` and two new files: `css/tooltips.css` and `js/tooltips.js`.
 
 ## Final application
 
-The final application, which incorporates all changes from the exercises, is available in `StepByStep/final`.
+The final application, which incorporates all changes from the exercises, is available in [`StepByStep/final`](../StepByStep/final).
 

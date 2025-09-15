@@ -17,15 +17,11 @@
     console.log(rainfall);
 
     function makeTidyRow(row, index, headers) {
-        const year = [];
-        headers.slice(1).forEach(h => {
-            year.push({
-                Year: +row.Year,
-                Month: h,
-                Rain: +row[h]
-            });
-        });
-        return year;
+        return headers.slice(1).map(h => ({
+            Year: +row.Year,
+            Month: h,
+            Rain: +row[h]
+        }));
     }
 
     window.d3 = d3;

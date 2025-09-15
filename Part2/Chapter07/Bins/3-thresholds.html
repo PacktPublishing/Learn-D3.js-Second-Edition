@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bins</title>
+</head>
+<body>
+<h3>Open console to see results</h3>
+<svg width="100%" height="100%" viewBox="0 0 500 300"/>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    const data = [15, 9, 2, 13, 20, 7, 19, 6, 21, 3, 0, 1, 5]   // Array(13)
+
+    // Suggesting a number of bins
+    const bin3 = d3.bin().thresholds(3)
+    console.log("\nd3.bin().thresholds(3)", bin3(data));
+    console.log("Thresholds:", bin3(data).map(d => d.x0));
+
+    // Using explicit bin thresholds
+    const bin4 = d3.bin().thresholds([0,5,7,10])
+    console.log("\nd3.bin().thresholds([0,5,7,10])", bin4(data));
+    console.log("Thresholds:", bin4(data).map(d => d.x0));
+
+    // Using quantiles as thresholds
+    const bin5 = d3.bin().thresholds([0, d3.quantile(data, .25),
+                                         d3.quantile(data, .5),
+                                         d3.quantile(data, .75)]) // [0, 3, 7, 15]
+    console.log("\nbins using quartiles (0,3,7,15)", bin5(data));
+    console.log("Quartile thresholds:", bin5(data).map(d => d.x0));
+
+    // Using a function to compute the thresholds array
+    // a) Freedman-Diaconis
+    const bin6 = d3.bin().thresholds( d3.thresholdFreedmanDiaconis )
+    console.log("\nbins using Freedman-Diaconis formula", bin6(data));
+    console.log("Freedman-Diaconis thresholds:", bin6(data).map(d => d.x0));
+
+    // b) Scott's
+    const bin7 = d3.bin().thresholds( d3.thresholdScott )
+    console.log("bins using Scott's formula", bin7(data));
+    console.log("Scott's thresholds:", bin7(data).map(d => d.x0));
+
+    // c) Sturges' (default)
+    const bin8 = d3.bin()
+    console.log("\nbins using Sturges' formula (default)", bin8(data));
+    console.log("Sturges' thresholds:", bin8(data).map(d => d.x0));
+
+
+
+
+    window.d3 = d3;
+</script>
+
+</body>
+</html>

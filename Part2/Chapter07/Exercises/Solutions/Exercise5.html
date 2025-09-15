@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exercise 7.5 - Format numbers</title>
+    <style>
+        text {
+            font-family: 'Arial Narrow', sans-serif;
+            alignment-baseline: middle;
+            text-anchor: middle;
+            fill: white;
+        }
+    </style>
+</head>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    const width = 1200;
+    const height = 900;
+    const margin = 100;
+
+    const file = '../../data/un_regions_gdp.csv';
+
+    // EXERCISE 5: the chart currently prints the raw numbers (d.value). Use a formatter to display the population
+    // in a more readable format, e.g. 1,234,567,890 or 1.23B (you can use SI units and replace "G" with "B").
+    //const displayPopulation = d => d.value;
+    //const displayPopulation = d => d3.format(",")(d.value); // use thousands separator (may be comma or decimal point depending on locale)
+    const displayPopulation = d => d3.format(".2s")(d.value).replace("G","B"); // with SI units and 2 decimals
+
+    const color = d3.scaleOrdinal(d3.schemeDark2);
+    const radius = d3.scaleSqrt().range([5,100]);
+
+    // proportional positions for the continents
+    const continentNames = ['North America','South America','Europe','Africa','Antarctica','Asia','Oceania'];
+    const xScale = d3.scaleOrdinal()
+            .range([-.32,-.28,0.1,0.02,-.2,.3,.5])
+            .domain(continentNames);
+    const yScale = d3.scaleOrdinal()
+            .range([-.3,.15,-.21,-.1,.49,-.24,.15])
+            .domain(continentNames);
+
+    const links = [];
+    const continentSet = new Set();
+
+    d3.csv(file, function(row) {
+        continentSet.add(row.Continent);
+        return {node: row.Country, value: +row.Pop_2016, group: row.Continent};
+    }).then(function(countries) {
+        const root = [{node: 'World', value: 0}, {node: 'Americas', value: 0}, {node: 'Eurasia', value: 0}];
+        const continents = Array.from(continentSet).map(d => ({node: d, value: 0}));
+        const nodes = d3.merge([root, countries, continents]);
+
+        const nodeIndex = name => nodes.map(n => n.node).indexOf(name);
+        root.slice(1).forEach(row => links.push({ target: nodeIndex(row.node), source: nodeIndex('World') }));
+
+        continents.forEach(row => {
+            const source = (row.node === 'Europe' || row.node === 'Asia')
+                            ? nodeIndex('Eurasia')
+                                : row.node.includes('America')
+                                    ? nodeIndex('Americas')
+                                        : nodeIndex('World');
+            links.push({ target: nodeIndex(row.node), source });
+        });
+
+        countries.forEach(row => links.push({ target: nodeIndex(row.node), source: nodeIndex(row.group) }));
+
+        color.domain([0,continents.length]);
+        radius.domain([0,d3.max(nodes, d => d.value)]);
+
+        const svg = d3.select("body").append("svg").attr("width",width).attr("height",height);
+        const chart = svg.append("g").attr("transform", `translate(${[width * .5, height * .45]})`);
+
+        const sim = d3.forceSimulation(nodes)
+                        .force("manybody", d3.forceManyBody().strength(-200))
+                        .force("center", d3.forceCenter())
+                        .force("y", d3.forceY().y(d => height * yScale(d.group)).strength(.8))
+                        .force("x", d3.forceX().x(d => width  * xScale(d.group)).strength(.8))
+                        .force("link", d3.forceLink(links).strength(2))
+                        .force("collide", d3.forceCollide(d => radius(d.value) + 1).iterations(5))
+                        .alphaDecay(.38);
+
+        for(let i = 0; i < 150; i++) {
+            sim.tick();
+        }
+        sim.stop();
+        draw(chart, nodes);
+    });
+
+    function draw(chart, nodes) {
+
+        chart.selectAll("circle")
+            .data(nodes).join("circle")
+            .attr("r", d => radius(d.value))
+            .attr("cx", d => d.x)
+            .attr("cy", d => d.y)
+            .style("fill", (d,i) => color(d.group))
+            .style("opacity", d => d.value === 0 ? 0 : 1)
+
+        chart.selectAll("text.node")
+            .data(nodes).join("text").attr("class", "node")
+            .text(d => d.node)
+            .attr("x", d => d.x)
+            .attr("y", d => d.y)
+            .attr("font-size", function(d) {
+                const size = Math.min(3*radius(d.value), (3*radius(d.value) - 8) / this.getComputedTextLength() * 9);
+                return size > 7 ? size : 0;
+            })
+
+        chart.selectAll("text.value")
+            .data(nodes).join("text").attr("class", "value")
+            .text(displayPopulation)
+            .attr("x", d => d.x)
+            .attr("y", d => d.y + radius(d.value)*.6)
+            .attr("font-size", function(d) {
+                const size = radius(d.value) * .38;
+                return size > 16 ? size * .75 : 0;
+            })
+    }
+
+</script>
+</body>
+</html>

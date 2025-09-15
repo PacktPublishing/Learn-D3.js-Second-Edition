@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Random number generators</title>
+    <style>
+        text {
+            font-family: 'Yanone Kaffeesatz', sans-serif;
+            font-size: 12pt;
+        }
+        svg {border: solid 1px blue}
+    </style>
+</head>
+<body>
+
+<script type="module">
+    import * as d3 from 'https://cdn.skypack.dev/d3@7';
+
+    const seed = 123;
+
+    const seededRand = d3.randomInt.source(d3.randomLcg(seed));
+    const rand = d3.randomInt;
+
+    const dataSeed1 = [...Array(5)].map(seededRand(0,100));
+    console.log(dataSeed1);
+
+    const dataNoSeed = [...Array(5)].map(rand(0,100));
+    console.log(dataNoSeed);
+
+    // for console access
+    window.d3 = d3;
+    window.seededRand = seededRand;
+    window.rand = rand;
+
+
+</script>
+
+</body>
+</html>

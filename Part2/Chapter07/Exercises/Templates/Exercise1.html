@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exercise 7.1 - Exploring sstatistics with d3-array functions</title>
+</head>
+<body>
+<script type="module">
+    import * as d3 from 'https://cdn.skypack.dev/d3@7';
+
+    const file = "../../data/un_regions_gdp.csv";
+
+    const fmt = d3.format('.3f');
+
+    // Load the data
+    const data = await d3.csv(file);
+
+    // Prepare the data: array of objects with country name and HDI value
+    const datasource = data.map(d => ({ name: d.Country, hdi: +d.HDI_2017 }) )
+                           .filter(d => d.hdi > 0)
+                           .sort((a, b) => d3.ascending(a.hdi, b.hdi));
+
+    // Call the functions to compute the statistics
+    statsA(datasource);
+    statsB(datasource);
+
+    // General statistics
+    function statsA(ds) {
+
+        // EXERCISE 1:
+        // a) Get the statistics: smallest, largest, mean, median, closest to median (use bisectCenter to get the index)
+        // REPLACE the 0s below with your code
+        const smallest = 0;
+        const largest  = 0;
+        const mean     = 0;
+        const median   = 0;
+        const center   = 0;
+        const closest = ds[center];
+
+        // Display the results in the HTML
+        d3.select("#smallest-value").text(smallest.hdi)
+        d3.select("#smallest-name").text(smallest.name)
+
+        d3.select("#largest-value").text(largest.hdi)
+        d3.select("#largest-name").text(largest.name)
+
+        d3.select("#mean-value").text(fmt(mean))
+        d3.select("#median-value").text(fmt(median))
+
+        d3.select("#median-country").text(closest.name)
+        d3.select("#median-country-hdi").text(closest.hdi)
+
+    }
+
+    // Statistics per quartile
+    function statsB(ds) {
+
+        // EXERCISE 1:
+        // b) Compute the quartiles (use quantileIndex to get the indexes and quantile to get the values)
+        // REPLACE the 0s below with your code
+        const qIndexes = [], quartiles = [];
+        for(let i = 0; i <= 4; i++) {
+            qIndexes.push(0);
+            quartiles.push(0);
+        }
+
+        // Inspect
+        console.log('qIndexes', qIndexes);
+        console.log('quartiles', quartiles);
+
+        // Slice the data into quartiles using the indexes
+        const q1 = ds.slice(qIndexes[0], qIndexes[1]+1)
+        const q2 = ds.slice(qIndexes[1]+1, qIndexes[2]+1)
+        const q3 = ds.slice(qIndexes[2]+1, qIndexes[3]+1)
+        const q4 = ds.slice(qIndexes[3]+1, qIndexes[4]+1)
+
+        console.log('q1', q1)
+        console.log('q2', q2)
+        console.log('q3', q3)
+        console.log('q4', q4)
+
+        // Compute the mean HDI for each quartile and display it
+        d3.select("#q1-mean").text(fmt(d3.mean(q1, d => d.hdi)))
+        d3.select("#q2-mean").text(fmt(d3.mean(q2, d => d.hdi)))
+        d3.select("#q3-mean").text(fmt(d3.mean(q3, d => d.hdi)))
+        d3.select("#q4-mean").text(fmt(d3.mean(q4, d => d.hdi)))
+
+        // Find the country closest to the mean of each quartile (use bisectCenter)
+        const q1c = d3.bisectCenter(ds.map(d => d.hdi), d3.median(q1, d => d.hdi));
+        const q2c = d3.bisectCenter(ds.map(d => d.hdi), d3.median(q2, d => d.hdi));
+        const q3c = d3.bisectCenter(ds.map(d => d.hdi), d3.median(q3, d => d.hdi));
+        const q4c = d3.bisectCenter(ds.map(d => d.hdi), d3.median(q4, d => d.hdi));
+
+        // Display the country name and HDI value
+        d3.select("#q1-country").text(`${ds[q1c].name}, ${ds[q1c].hdi}`)
+        d3.select("#q2-country").text(`${ds[q2c].name}, ${ds[q2c].hdi}`)
+        d3.select("#q3-country").text(`${ds[q3c].name}, ${ds[q3c].hdi}`)
+        d3.select("#q4-country").text(`${ds[q4c].name}, ${ds[q4c].hdi}`)
+    }
+</script>
+
+<h1>HDI statistics (2017)</h1>
+
+<ul>
+    <li>Smallest HDI: <span id="smallest-value"></span> (<span id="smallest-name"></span>)</li>
+    <li>Largest HDI: <span id="largest-value"></span> (<span id="largest-name"></span>)</li>
+    <li>Mean HDI: <span id="mean-value"></span></li>
+    <li>Median HDI: <span id="median-value"></span></li>
+    <li>Closest to median: <span id="median-country"></span> (<span id="median-country-hdi"></span>)</li>
+</ul>
+
+<h1>Average HDI per quartile</h1>
+
+<ul>
+    <li>First quartile: <span id="q1-mean"></span> (<span id="q1-country"></span>)</li>
+    <li>Second quartile: <span id="q2-mean"></span> (<span id="q2-country"></span>)</li>
+    <li>Third quartile: <span id="q3-mean"></span> (<span id="q3-country"></span>)</li>
+    <li>Fourth quartile: <span id="q4-mean"></span> (<span id="q4-country"></span>)</li>
+</ul>
+
+</body>
+</html>

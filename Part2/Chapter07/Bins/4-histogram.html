@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Creating a simple histogram</title>
+</head>
+<body>
+<svg/>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    const dim = {width: 800, height: 600, margin: {top: 25, left: 25}};
+
+    const data = {};
+
+    const numSamples = 10000;
+    const numBins = 100;
+
+    // 1) Generate data
+    const center = 100; // mean
+    const spread = 15;  // standard deviation
+    data.values = d3.range(numSamples)
+                    .map(d3.randomNormal(center, spread));
+
+    // 2) Create bins
+    data.bins = d3.bin()
+                  .thresholds(numBins)(data.values); // value() is not needed, as  input is array of numbers
+
+    // 3) Configure SVG container
+    const svg = d3.select("svg")
+                  .attr("width", dim.width)
+                  .attr("height", dim.height);
+
+    // 4) Set up scales
+    const scaleX = d3.scaleBand()
+                     .range([dim.margin.left, dim.width - dim.margin.left])
+                     .domain(data.bins.map(d => d.x0)); // bin start values
+    const scaleY = d3.scaleLinear()
+                     .range([dim.height - dim.margin.top, dim.margin.top])
+                     .domain([0, d3.max(data.bins, d => d.length)]);
+    const color  = d3.scaleLinear()
+                     .range(["darkgreen", "brown"])
+                     .domain(scaleY.domain());
+
+    // 5) Draw bars
+    svg.selectAll("rect.bins")
+       .data(data.bins)
+           .join("rect").attr("class", "bins")
+               .attr("x", d => scaleX(d.x0))
+               .attr("y", d => scaleY(d.length))
+               .attr("width", scaleX.bandwidth())
+               .attr("height", d => scaleY(0) - scaleY(d.length))
+               .style("fill", d => color(d.length));
+
+    // For access via the console prompt
+    window.d3 = d3;
+    window.data = data;
+
+</script>
+
+</body>
+</html>
