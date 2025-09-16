@@ -2,18 +2,18 @@
 
 # Creating a heatmap table
 
-In this tutorial we will use grouping techniques to transform data so that it easily maps to an HTML table and use it to create a heatmap visualization with a HTML table.
+In this tutorial we will use grouping techniques to transform data so that it easily maps to an HTML table and use it to create a heatmap visualization.
 
-Of course, instead of HTML cells, you could use SVG rectangles, circles, or even other symbols. These are suggested as exercises.
+Of course, instead of HTML cells, you could use SVG rectangles, circles, or even other symbols. This is suggested as an exercise.
 
-In this example we will use an HTML table to highlight the average amount of rain for each month using a gradient of two hues. The goal is to demonstrate how to bind to a hierarchical nested structure. This will be a step-by-step tutorial, so you can code along, or load the files from each sub-section in your browser. You will find them in this chapter’s `HeatmapTable/` subdirectory.
+The heatmap will highlight the average amount of rain for each month using a gradient of two hues. The goal is to practice grouping and binding to a hierarchical nested structure. This is a step-by-step tutorial, so you can code along, or view the files from each step in your browser. You will find them in the [`Chapter07/HeatmapTable/`](../Chapter07/HeatmapTable/) subdirectory.
 
-The `HeatmapTable/0-empty.html` contains an HTML `<table/>` element, a CSS style sheet, and the following script block, which loads the D3 library and contains the URL of a CSV data source in tidy format:
+This is a small application, so we will use a single HTML file to contain the code. You can start with an empty HTML file, or use the template provided in [`HeatmapTable/0-empty.html`](../HeatmapTable/0-empty.html). It contains an HTML `<table/>` element, a CSS style sheet, and the following script block, which loads the D3 library and contains the URL of a CSV data source in tidy format:
 
 ```js
 <script type="module">
     import * as d3 from "https://cdn.skypack.dev/d3@7";
-    const dataFile = "../data/rain_sao_paulo_tidy.csv";   // check file location
+    const dataFile = "../data/rain_sao_paulo_tidy.csv";   // check if file location is correct
 </script>
 ```
 
@@ -21,7 +21,7 @@ Note that the URL is a relative path (you might have to adjust it, or move the f
 
 ## Table of contents
 
-* [Creating a heatmap table](#creating-a-heatmap-table)
+* [The data](#the-data)
 * [Step 1: Loading the CSV file](#step-1-loading-the-csv-file)
 * [Step 2: Transforming the data structure](#step-2-transforming-the-data-structure)
 * [Step 3: Binding the data to visual elements](#step-3-binding-the-data-to-visual-elements)
@@ -30,11 +30,38 @@ Note that the URL is a relative path (you might have to adjust it, or move the f
 * [Exercise 1: Refactor to display a vertical table](#exercise-1-refactor-to-display-a-vertical-table)
 * [Exercise 2: Make the chart responsive](#exercise-2-make-the-chart-responsive)
 * [Exercise 3: Refactor using SVG](#exercise-3-refactor-using-svg)
+* [Final application](#final-application)
 
+## The data
 
-## Step 1: Loading the CSV file
+The original CSV file that contains the data used in this tutorial is [`data/rain_sao_paulo_wide.csv`](../data/rain_sao_paulo_wide.csv), obtained from the Brazil's National Institute of Meteorology ([`bdmet.inmet.org.br`](https://bdmet.inmet.org.br)) and contains the average amount of rain in millimeters measured monthly in the city of São Paulo, from 1984 to 2017. Its 35 rows and 13 columns are structured in a wide format. Here is an excerpt:
 
-The first step is to load and parse the file, obtaining an array of objects with the data. We shall use the `d3.csv()` parser and then check to see if the data was parsed as expected:
+```csv
+Year,Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec
+1984,259.3,32.5,54,96.8,113,0.1,26.7,110.6,162.5,31.1,140,139.6
+1985,190.1,281.4,166.9,31.4,107.2,14.2,0.6,21.6,110.1,11.2,86,176.3
+1986,250.7,268.4,230.6,84.9,84.6,2.4,28.1,97.2,34.7,43.9,155.6,383.2
+... +30 rows ...
+2017,454,127.3,160.4,143.1,153.4,102.9,0.8,60.5,11.1,149.4,159.8,151.3
+```
+
+In `Chapter 7`, we used the `d3.csv()` parser with a row function to reorganize the file into a tidy format, which is easier to group. This type of transformation, however, is usually better performed at the server side, so for this tutorial we will use a tidy CSV, which was saved in [`data/rain_sao_paulo_tidy.csv`](../data/rain_sao_paulo_tidy.csv). It has the following general structure.
+
+```csv
+Month,Year,Rain
+1,1984,259.3
+2,1984,32.5
+3,1984,54
+... +403 rows ...
+11,2017,159.8
+12,2017,151.3
+```
+
+This is the file that we will load in the next section.
+
+## Step 1: Loading and inspecting the CSV file
+
+The first step is to load and parse the file, obtaining an array of objects with the data. We shall use the `d3.csv()` parser with the `d3.autoType` row function to parse numeric strings into numbers, and then check to see if the data is in the desired format:
 
 ```js
 const data = await d3.csv(dataFile, d3.autoType);
@@ -46,7 +73,7 @@ _Figure 1_ illustrates this process and compares the original CSV file structure
 ![Figure 1 – Loading a CSV file and parsing it into a JavaScript object.](images/figure-1.png)
 _Figure 1 – Loading a CSV file and parsing it into a JavaScript object. Code: [`HeatmapTable/1-load-parse.html`](../HeatmapTable/1-load-parse.html)._
 
-Note that although the data is in a tidy format, unlike the example we used in the previous subsections, the months here are numbers.
+Note that although the data is in a tidy format, unlike the example we used in _Chapter 7_, the months here are numbers.
 
 The next step is to reorganize the data in a format that is suitable for display.
 
@@ -180,9 +207,26 @@ A fragment of the generated HTML is listed below. You can see this in your brows
 </table>
 ```
 
-The full code is available in [`HeatmapTable/4-headers.html`](../HeatmapTable/4-headers.html). Now, to finish our visualization, let’s turn this table into a colorful heatmap.
+The result is shown in `Figure 5`.
+
+![Figure 5 - The table after adding headers.](images/figure-5.png)
+_Figure 5 - The table after adding headers. Code: [`HeatmapTable/4-headers.html`](../HeatmapTable/4-headers.html)._
+
+We still have some details to fix. The months are displayed as numbers. With `d3.dateFormat()` we can easily convert them to locale-specific month names. And to turn the table into a heatmap, we need to add colors. These issues will be addressed in the next section.
 
 ## Step 5: Creating a heatmap
+
+First, let's fix the month labels. Declare a formatting function using `d3.timeFormat()` to convert a date into a 3-letter month name, compatible with your locale:
+
+```js
+const fmt = d3.timeFormat("%b");
+```
+Now use it to replace the month numbers in the first column. The formatting function requires a JavaScript `Date` object. To create one, subtract 1 from the key (`m[0]`), since JavaScript months start counting from `0` and use it to set the text for the `<th>` month elements:
+
+```js
+tr.selectAll("th.month-label")
+    .text(m => fmt(new Date().setMonth(m[0]-1)));	// Jan, Feb, etc.
+```
 
 You can create a heatmap visualization by mapping a color scale to represent the drier and wetter months in each table cell. An exponential scale (using `d3.scalePow()`) will allow you to control the contrast between dry and wet months, by adjusting the exponent from approximately `0.5` (drier) to `2` (wetter). We will use an intermediate value:
 
@@ -210,18 +254,16 @@ d3.selectAll("td.year")
     .style("color", y => color(y[1]) > .5 ? 'white' : 'black');
 ```    
 
-The result is shown in `Figure 5` (with CSS styling, titles and footnote added in static HTML).
+The result is shown in `Figure 6` (with CSS styling, titles and footnote added in static HTML).
 
-![Figure 5 – Heatmap created in HTML by grouping data in table format.](images/figure-5.png)
-_Figure 5 – Heatmap created in HTML by grouping data in table format. Code: [`Heatmap/5-heatmap.html`](../Heatmap/5-heatmap.html)._
+![Figure 6 – Heatmap created in HTML by grouping data in table format.](images/figure-6.png)
+_Figure 6 – Heatmap created in HTML by grouping data in table format. Code: [`Heatmap/5-heatmap.html`](../Heatmap/5-heatmap.html)._
 
 The final code is available in [`HeatmapTable/5-heatmap.html`](../HeatmapTable/5-heatmap.html). If you want to continue improving this chart, try some of the exercises in the next sections.
 
 ## Exercise 1: Refactor to display a vertical table
-Swap months and years in the heatmap visualization to display a vertical table, which should scroll vertically and display well in a mobile device, as shown in _Figure 6_.
 
-![Figure 6 – Heatmap table with swapped month and year headers.](images/figure-6.png)
-_Figure 6 – Heatmap table with swapped month and year headers._
+Swap months and years in the heatmap visualization to display a vertical table, which should scroll vertically and display well in a mobile device.
 
 ## Exercise 2: Make the chart responsive
 
@@ -231,6 +273,11 @@ Create a responsive chart that displays the table horizontally if viewed in a sc
 window.matchMedia("screen and (max-width: 700px)")
 ```
 
+To test, open the file in a browser, and resize the window. The chart should change orientation when the width crosses the 700px threshold. Figure 7 shows how it would appear in a computer and a mobile phone.
+
+![Figure 7 – Responsive heatmap table displayed in a desktop browser and mobile device browser.](images/figure-7.png)
+_Figure 7 – Responsive heatmap table displayed in a desktop browser and mobile device browser._
+
 You can then add a `'change'` event listener to it and redraw the chart when the width changes. See the template file for more hints.
 
 ## Exercise 3: Refactor using SVG
@@ -239,7 +286,11 @@ Replace the HTML table with SVG.
 
 Since you are not bound to a strict hierarchical structure like an HTML table, you don't need to use `d3.insert()` or any complex selectors. The joins will be much simpler. You can also add rounded corners to the rectangles, as shown in _Figure 7_, or even use other shapes.
 
-![Figure 7 – Heatmap table implemented with SVG.](images/figure-7.png)
-_Figure 7 – Heatmap table implemented with SVG._
+![Figure 8 – Heatmap table implemented with SVG.](images/figure-8.png)
+_Figure 8 – Heatmap table implemented with SVG._
+
+## Final application
+
+The final code, which incorporates the changes in all exercises (a responsive SVG heatmap table), is available in [`HeatmapTable/final-heatmap-table.html`](../HeatmapTable/final-heatmap-table.html).
 
 
