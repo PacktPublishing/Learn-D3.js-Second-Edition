@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Step-by-step: creating a heatmap</title>
+</head>
+<body>
+<h1>Rainfall in São Paulo, Brazil (in mm) from 1984 to 2017</h1>
+<svg height="500" width="1400">
+    <g id="heatmap" transform="translate(40,20)"></g>
+</svg>
+<script type="module">
+        import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+        const dataFile = "../data/rain_sao_paulo_tidy.csv"; // check file location
+
+        // Step 1 - Load and parse the data
+        const data = await d3.csv(dataFile, d3.autoType);
+
+        // Step 2 - Nest by month, then year
+        const nested = d3.rollups(data, v => v[0].Rain,   // reduce function
+            d => d.Month,     // first key
+            d => d.Year);     // second key
+
+        // Step 3 - Create the main group
+        const table = d3.select("#heatmap");
+
+        const tr = table.selectAll(chart.landscape ? 'tr.month' : 'tr.year')
+            .data(chart.nested)
+            .join("tr").attr("class", chart.landscape ? 'month' : 'year')
+               .attr("title", d => d[0]);
+
+        tr.selectAll(chart.landscape ? 'td.year' : 'td.month')
+            .data(d => d[1])
+            .join("td").attr("class", chart.landscape ? 'year' : 'month')
+               .attr("title", d => d[0])
+               .text(d => d[1]);
+
+        tr.insert("th", "td:first-of-type")
+            .attr("class", chart.landscape ? "year-label" : "month-label")
+            .text(d => d[0]);
+
+        const header = table.insert("tr", "tr:first-of-type")
+            .attr("class", "header-row");
+
+        header.selectAll(chart.landscape ? "th.year-label" : "th.month-label")
+            .data(chart.nested[0][1])
+            .join("th").attr("class", chart.landscape ? "year-label" : "month-label")
+            .text(d => chart.landscape ? d[0] : fmt(new Date(2000, d[0]-1, 1)));
+
+        header.insert("td", "th:first-of-type");
+
+        d3.selectAll(chart.landscape ? "td.year" : "td.month")
+            .style("background-color", d => d3.interpolateYlGnBu(color(d[1])))
+            .style("color", d => color(d[1]) > .5 ? 'white' : 'black');
+    }
+</script>
+</body>
+</html>
