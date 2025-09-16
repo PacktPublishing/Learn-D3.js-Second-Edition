@@ -155,7 +155,7 @@ We have month numbers (the `<tr>` keys), but not month names. You can create a f
 const fmt = d3.timeFormat("%b");
 ```
 
-To place a column before the first column, use `selection.insert()` (see _Chapter 6_) in the `<tr>` context. These are the month labels. Since the `fmt()` function we defined requires a JavaScript `Date` object, we created one and set the month by subtracting 1 from the key (`d[0]`), since JavaScript months start counting from `0`:
+To place a column before the first column, use `selection.insert()` (see _Chapter 6_) in the `<tr>` context. These are the month labels. Since the `fmt()` function we defined requires a JavaScript `Date` object, we created one and set the month by subtracting 1 from the key (`m[0]`), since JavaScript months start counting from `0`:
 
 ```js
 tr.insert("th", "td:first-of-type")
@@ -214,21 +214,9 @@ The result is shown in `Figure 5`.
 ![Figure 5 - The table after adding headers.](images/figure-5.png)
 _Figure 5 - The table after adding headers. Code: [`HeatmapTable/4-headers.html`](../HeatmapTable/4-headers.html)._
 
-We still have some details to fix. The months are displayed as numbers. With `d3.dateFormat()` we can easily convert them to locale-specific month names. And to turn the table into a heatmap, we need to add colors. These issues will be addressed in the next section.
+To turn the table into a heatmap, we need to add colors. This will be addressed in the next section.
 
 ## Step 5: Creating a heatmap
-
-First, let's fix the month labels. Declare a formatting function using `d3.timeFormat()` to convert a date into a 3-letter month name, compatible with your locale:
-
-```js
-const fmt = d3.timeFormat("%b");
-```
-Now use it to replace the month numbers in the first column. The formatting function requires a JavaScript `Date` object. To create one, subtract 1 from the key (`m[0]`), since JavaScript months start counting from `0` and use it to set the text for the `<th>` month elements:
-
-```js
-tr.selectAll("th.month-label")
-    .text(m => fmt(new Date().setMonth(m[0]-1)));	// Jan, Feb, etc.
-```
 
 You can create a heatmap visualization by mapping a color scale to represent the drier and wetter months in each table cell. An exponential scale (using `d3.scalePow()`) will allow you to control the contrast between dry and wet months, by adjusting the exponent from approximately `0.5` (drier) to `2` (wetter). We will use an intermediate value:
 
