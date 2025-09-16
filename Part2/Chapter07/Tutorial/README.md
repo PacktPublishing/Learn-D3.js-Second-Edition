@@ -92,7 +92,7 @@ const nested = d3.rollups(data,
 
 _Figure 2_ compares the nested structure and the original object dataset. Pay attention to the properties used in each function. `Month` and `Year` respectively become the major and the minor keys to access the data. The `Rain` property provides the values that we want to display. The reduce function (in green) transforms this data into the leaves of the tree.
 
-![Figure 2 – Converting a flat tabular structure into a two-level-deep nested tree using d3.rollups().](images/figure-3.png)
+![Figure 2 – Converting a flat tabular structure into a two-level-deep nested tree using d3.rollups().](images/figure-2.png)
 _Figure 2 – Converting a flat tabular structure into a two-level-deep nested tree using `d3.rollups()`. Code: [`HeatmapTable/2-nest-rollup.html`](../HeatmapTable/2-nest-rollup.html)_.
 
 The result is a 12-element array, where each element is a tuple representing a month. The first element (the major key) is the number of the month, and the second, a 34-element array of year tuples, where the first element (the minor key) is the year, and the second is the data: the amount of rain measured in millimeters.
@@ -135,7 +135,7 @@ After the join, the data bound to each `<td>` now has two elements: the first is
 
 _Figure 3_ compares the nested data structure to the nested HTML `<table>` elements.
 
-![Figure 3 – Mapping the nested data to a nested HTML table selection.](images/figure-2.png)
+![Figure 3 – Mapping the nested data to a nested HTML table selection.](images/figure-3.png)
 _Figure 3 – Mapping the nested data to a nested HTML table selection. Code: [`HeatmapTable/3-html-table.html`](../HeatmapTable/3-html-table.html)._
 
 Now that the data was bound to graphical elements, you can launch the page and finally see the rendered result on your screen. The table should look like the screenshot in `Figure 4`. If it doesn’t, use your browser tools to inspect the generated HTML. It may give you some clues about what went wrong.
