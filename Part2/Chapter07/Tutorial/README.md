@@ -4,7 +4,7 @@
 
 In this tutorial we will use grouping techniques to transform data so that it easily maps to an HTML table and use it to create a heatmap visualization.
 
-Of course, instead of HTML cells, you could use SVG rectangles, circles, or even other symbols. This is suggested as an exercise.
+Of course, instead of HTML cells, you could use SVG rectangles, circles, or even other symbols. This is suggested as an exercise. 
 
 The heatmap will highlight the average amount of rain for each month using a gradient of two hues. The goal is to practice grouping and binding to a hierarchical nested structure. This is a step-by-step tutorial, so you can code along, or view the files from each step in your browser. You will find them in the [`Chapter07/HeatmapTable/`](../Chapter07/HeatmapTable/) subdirectory.
 
