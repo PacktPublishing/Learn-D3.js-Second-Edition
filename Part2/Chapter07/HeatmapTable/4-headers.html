@@ -42,9 +42,11 @@
 
     // Step 4 - add headers
     // insert a column before first column for month labels
+    const fmt = d3.timeFormat("%b");
+
     tr.insert("th", "td:first-of-type")
-      .attr("class", "month-label")
-        .text(d => d[0]) // Jan, Feb, etc.
+        .attr("class", "month-label")
+        .text(m => fmt(new Date().setMonth(m[0]-1))) // Jan, Feb, etc.
 
     // insert a row above first row for year labels
     const header = table.insert("tr", "tr:first-of-type")

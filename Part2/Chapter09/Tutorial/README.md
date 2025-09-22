@@ -2,11 +2,11 @@
 <link href="./css/fonts.css" rel="stylesheet">
 <link href="./css/styles.css" rel="stylesheet">
 
-# Online tutorial: Creating a scatterplot – part 1
+# Creating a Scatterplot – Part 1
 
-In this tutorial, you will apply what you learned in the last 3 chapters to create a scatterplot. We will start by loading the data to create a simple chart, set up dimensions and scales, plot the dots, then add axes, labels, and adjust the scales. In the second part, we will add colors, and interactive features.
+In this tutorial, you will apply what you learned in the last three chapters to create a scatterplot. We will start by loading the data to create a simple chart, set up dimensions and scales, plot the dots, then add axes, labels, and adjust the scales. In the second part, we will add colors and interactive features.
 
-You can run and view complete code for each step in the `Chapter09/StepByStep/` folder. As in other tutorials, each step contains a complete application folder, consisting of an `index.html` file, a local `js/` subfolder where JavaScript modules will be stored, and a local `css/` subfolder, for the stylesheets. To code as you read, you can create a similar structure or start with step 1 (`StepByStep/1-load-data/`). To view the results after each step, launch the `index.html` file in a local web server and preview it in your browser.
+You can run and view the complete code for each step in the `Chapter09/StepByStep/` folder. As in other tutorials, each step contains a complete application folder, consisting of an `index.html` file, a local `js/` subfolder where JavaScript modules will be stored, and a local `css/` subfolder for the stylesheets. To code as you read, you can create a similar structure or start with step 1 (`StepByStep/1-load-data/`). To view the results after each step, launch the `index.html` file in a local web server and preview it in your browser.
 
 ## Table of contents
 The following section are contained in this tutorial:
@@ -20,7 +20,7 @@ The following section are contained in this tutorial:
 
 ## The data
 
-For this visualization we will use the `un_regions_2017.csv` data file, located in the `Chapter10/data/` folder (you can copy it to a `data/` subfolder in your application folder). A fragment is shown below highlighting some of its headers and listing some data rows:
+For this visualization, we will use the `un_regions_2017.csv` data file, located in the `Chapter10/data/` folder (you can copy it to a `data/` subfolder in your application folder). A fragment is shown here, highlighting some of its headers and listing some data rows:
 
 ```csv
 Country,     Continent,     Pop_2016, HDI_2017, GDP_NOM_2017, GDP_PPP_2017
@@ -35,13 +35,13 @@ Italy,       Europe,        60627498,  0.880,   31952.97592,  41581.12079
 ... +211 rows ...
 ```
 
-The complete file contains more headers and over 200 rows. The data from this file was compiled from multiple sources, such as the United Nations and the World Bank. Our goal, for the complete tutorial, is to create a visualization of this data in a scatter chart comparing the _Gross Domestic Product_ (GDP) per capita (in international USD) and _Human Development Index_ (HDI) of different countries and the continents they belong to. In the last step of _Part 2_, we will add population information and create a bubble chart.
+The complete file contains more headers and over 200 rows. The data from this file was compiled from multiple sources, such as the United Nations and the World Bank. Our goal, for the complete tutorial is to create a visualization of this data in a scatter chart comparing the _Gross Domestic Product_ (GDP) per capita (in international USD) and _Human Development Index_ (HDI) of different countries and the continents they belong to. In the last step of _Part 2_, we will add population information and create a bubble chart.
 
 So, let’s start.
 
 ## Step 1: Loading and preparing the data
 
-To create the visualization from scratch, start by creating a project folder for your application using your IDE, then create three subfolders: `js/`, `css/` and `data/`. Next, copy `un_regions_2017.csv` from `Chapter09/data` to the `data/` directory. Then create a new JavaScript module called `data.js` file in the `js/` folder. It will contain an asynchronous function to load and parse the data source.
+To create the visualization from scratch, start by creating a project folder for your application using your IDE, then create three subfolders: `js/`, `css/`, and `data/`. Next, copy `un_regions_2017.csv` from `Chapter09/data` to the `data/` directory. Then, create a new JavaScript module called `data.js` in the `js/` folder. It will contain an asynchronous function to load and parse the data source.
 
 Add the following two lines to `js/data.js`. This code will import the D3 library (as an ESM module from the SkyPack CDN) and store the URL for the data source.
 
@@ -50,7 +50,7 @@ import * as d3 from 'https://cdn.skypack.dev/d3@7';
 const file = "data/un_regions_2017.csv";
 ```
 
-**Important Note**: The CSV file’s location will depend on where you store it. The code above assumes you copied it to the local `data/` folder in your project folder (which is your document root). If you are using the code examples directly from the `StepByStep/` folder, a relative URL that points to `Chapter09/data/` is used.
+**Important Note**: The CSV file’s location will depend on where you store it. The preceding code assumes you copied it to the local `data/` folder in your project folder (which is your document root). If you are using the code examples directly from the `StepByStep/` folder, a relative URL that points to `Chapter09/data/` is used.
 
 Now let’s create a function to load the CSV and obtain the data we need for the chart. Since this function will be used outside the module, it needs to be exported. It should also be asynchronous, since it will return a promise containing the parsed data:
 
@@ -87,7 +87,7 @@ To run this code, import the load function from `js/data.js` in `index.html`, ca
 </script>
 ```
 
-This will log the dataset to your browser’s console. It should contain 200 entries, since 19 were filtered out. Inspect it and select any object to view its properties. Make sure each object has `name`, `hdi` and `gdp` properties. For example:
+This will log the dataset to your browser’s console. It should contain 200 entries, since 19 were filtered out. Inspect it and select any object to view its properties. Make sure each object has `name`, `hdi`, and `gdp` properties. Here's an example:
 
 ```js
 {name: "Canada", hdi: 0.926, gdp: 48317.1745835151}
@@ -97,7 +97,7 @@ See the full code for this step in `StepByStep/1-load-data/`. Now let’s set up
 
 ## Step 2: Setting up the page
 
-In this step we set up dimensions, scales and the SVG viewport, where the chart will be rendered. _Figure 1_ contains a sketch of the chart’s layout.
+In this step, we set up dimensions, scales, and the SVG viewport, where the chart will be rendered. _Figure 1_ contains a sketch of the chart’s layout.
 
 ![A sketch of the layout for the scatterplot](./images/figure-1.png)
 
@@ -138,7 +138,7 @@ We also need to export these two objects so they can be used in other modules:
 export {dim, app};
 ```
 
-Now go to the `js/data.js` module, add an import for the app object and update the `load()` function so that it copies the data obtained in the previous step to the `app.data` object, storing it in a new `countries` property.
+Now go to the `js/data.js` module, add an import for the app object, and update the `load()` function so that it copies the data obtained in the previous step to the `app.data` object, storing it in a new `countries` property.
 
 ```js
 import {app} from './common-1.0.js';
@@ -151,7 +151,7 @@ export async function load() {
 
 We are returning the app object so we can inspect it from `index.html`.
 
-Back to `index.html`, create a `<div>` to accommodate the `<svg>` element. This will allow you to resize the chart later and make the page responsive if you wish. Also add a link to `css/main.css`, where we will place CSS rules:
+Back to `index.html`, create a `<div>` to accommodate the `<svg>` element. This will allow you to resize the chart later and make the page responsive if you wish. Also, add a link to `css/main.css`, where we will place CSS rules:
 
 ```html
 <!DOCTYPE html>
@@ -204,11 +204,11 @@ This will make the SVG occupy all the space available. If you resize the browser
 
 _Figure 2 – Generated SVG code after step 2_
 
-The full code for this step is in `StepByStep/2-setup-page/`. In the next step we set the scale’s domains and use them to finally plot the dots on the screen.
+The full code for this step is in `StepByStep/2-setup-page/`. In the next step, we set the scale’s domains and use them to finally plot the dots on the screen.
 
 ## Step 3: Drawing dots on a Cartesian grid
 
-To compare GDP with HDI we will use a Cartesian space, with one axis for the GDP and the other for the HDI. In this step, we will just plot the dots without any context.
+To compare GDP with HDI, we will use a Cartesian space, with one axis for the GDP and the other for the HDI. In this step, we will just plot the dots without any context.
 
 The domain for each scale will be the full extent of its data. Let’s create a `config()` function in `js/data.js` to configure the domains:
 
@@ -228,13 +228,13 @@ export async function load() {
     return app;
 }
 ```
-Now we can plot the dots. Add an import for the `app` object in `js/view.js`, since we need access to `app.data.countries`, `app.scale.x` and `app.scale.y`:
+Now we can plot the dots. Add an import for the `app` object in `js/view.js`, since we need access to `app.data.countries`, `app.scale.x`, and `app.scale.y`:
 
 ```js
 import {dim, app} from './common-1.0.js';
 ```
 
-Next, create the `drawChart()` function below. It binds 1.5-pixel circles to the data entries and uses the pair of scaled GDP/HDI values as each circle’s center coordinates:
+Next, create the `drawChart()` function. It binds 1.5-pixel circles to the data entries and uses the pair of scaled GDP/HDI values as each circle’s center coordinates:
 
 ```js
 function drawChart() {
@@ -248,7 +248,7 @@ function drawChart() {
 }
 ```
 
-Don’t forget to add the `'dot'` class to the circle after the `join()`, since it is used in the `selectAll()`. This will avoid a common bug (discussed in _Chapter 6_).
+Don’t forget to add the `'dot'` class to the circle after `join()`, since it is used in `selectAll()`. This will avoid a common bug (discussed in _Chapter 6_).
 
 To render the dots, just add a call to `drawChart()` from your `draw()` function:
 
@@ -263,7 +263,7 @@ Reload the page and you should now have something like _Figure 3_ on your screen
 
 ![A simple scatterplot comparing GDP per capita with HDI](./images/figure-3.png)
 
-_Figure 3 – A simple scatterplot comparing GDP per capita (y-axis) with HDI (x-axis) among 194 countries in 2017. Code: `StepByStep/3-scatter-dots/`._
+_Figure 3 – A simple scatterplot comparing GDP per capita (_y _axis) with HDI (_x _axis) among 194 countries in 2017. Code: `StepByStep/3-scatter-dots/`_
 
 The chart shows an exponential relationship between HDI and GDP, but we don’t know which countries are represented, which axis is HDI, which is GDP nor any values. Context is necessary. We will provide it with axes and labels in the next step.
 
@@ -280,7 +280,7 @@ app.axis = {
 }
 ```
 
-Now open `js/view.js` where we will create a new `drawAxes()` function to draw the axes and labels. It should be called in the `draw()` function before calling `drawChart()`, so that the axes are rendered under the data:
+Now open `js/view.js`, where we will create a new `drawAxes()` function to draw the axes and labels. It should be called in the `draw()` function before calling `drawChart()`, so that the axes are rendered under the data:
 
 ```js
 export function draw() {
@@ -290,7 +290,7 @@ export function draw() {
 }
 ```
 
-As we have seen in _Chapter 8_, the usual way to render an axis is using the `call()` method in a selection chain. This is done below in the `drawAxes()` function, which also translates each axis (originally at the viewport’s origin), to their classical Cartesian positions. It’s also good practice to add a descriptive class to each axis, such as _x_-axis and _y_-axis used below:
+As we saw in _Chapter 8_, the usual way to render an axis is using the `call()` method in a selection chain. This is done here in the `drawAxes()` function, which also translates each axis (originally at the viewport’s origin) to its classical Cartesian position. It’s also good practice to add a descriptive class to each axis, such as _x_-axis and _y_-axis, as used here:
 
 ```js
 function drawAxes() {
@@ -305,7 +305,7 @@ function drawAxes() {
 }
 ```
 
-This function should also add labels for the axes, a horizontal label below the _x_-axis and a vertical label to the left of the _y_-axis, and. The vertical label is rotated 90 degrees.
+This function should also add labels for the axes, a horizontal label below the _x_-axis and a vertical label to the left of the _y_-axis. The vertical label is rotated 90 degrees.
 
 ```js
 function drawAxes() {
@@ -337,13 +337,13 @@ After making all these changes, preview the `index.html` file. Your chart should
 
 ![Adding a simple Cartesian grid and labels](./images/figure-4.png)
 
-_Figure 4 – Adding a simple Cartesian grid and labels. Code: `StepByStep/4-axes-labels/`._
+_Figure 4 – Adding a simple Cartesian grid and labels. Code: `StepByStep/4-axes-labels/`_
 
-Now we have some context and can see that high GDP values are somewhat related to high HDI values, that the growth is exponential, and that it seems that most countries have a GDP per capita below 10 thousand international dollars. There is still a lot we can do to improve it. In the next section, we will explore some other ways to style your axes.
+Now we have some context and can see that high GDP values are somewhat related to high HDI values, that the growth is exponential, and that it seems that most countries have a GDP per capita below 10,000 international dollars. There is still a lot we can do to improve it. In the next section, we will explore some other ways to style your axes.
 
 ## Step 5: Configuring axis styles
 
-Let’s configure some styles to reduce the clutter and make the chart easier to read. Perhaps we don’t need those thick domain lines, since there are so many dots that appear right on top of them. You could easily remove them from the DOM with:
+Let’s configure some styles to reduce the clutter and make the chart easier to read. Perhaps we don’t need those thick domain lines, since there are so many dots that appear right on top of them. You could easily remove them from the DOM with the following:
 
 ```js
 d3.select(".domain").remove();
@@ -357,7 +357,7 @@ But maybe just hiding them will be enough. Adding this rule in `css/main.css` wi
 }
 ```
 
-It’s hard to read the dots that are far from the axes. We could fix this by creating a visible grid behind the dots. By adding a couple of tick configuration methods to each axis function you can increase the lengths of the tick lines so that they fill the entire chart area. We can compute the correct sizes using the margins and viewport dimensions. Let’s try it. Edit this code in the `js/common-1.0.js`:
+It’s hard to read the dots that are far from the axes. We could fix this by creating a visible grid behind the dots. By adding a couple of tick configuration methods to each axis function, you can increase the lengths of the tick lines so that they fill the entire chart area. We can compute the correct sizes using the margins and viewport dimensions. Let’s try it. Edit this code in `js/common-1.0.js`:
 
 ```js
 app.axis = {
@@ -370,15 +370,15 @@ app.axis = {
 }
 ```
 
-Here we extended the horizontal axis tick line to fill the chart's vertical space, and the vertical axis tick line to fill its horizontal space, adding extra 10 pixels to cross the domain line.
+Here, we extended the horizontal axis tick line to fill the chart's vertical space, and the vertical axis tick line to fill its horizontal space, adding an extra 10 pixels to cross the domain line.
 
-Reload the file in your browser. What do you see? It seems that the tick lines indeed grew longer, but they moved offscreen. In _Figure 5_ we extended the viewport to show all four quadrants, and you can see that they grew down and to the left. The lines need to be moved in the other direction.
+Reload the file in your browser. What do you see? It seems that the tick lines indeed grew longer, but they moved offscreen. In _Figure 5_, we extended the viewport to show all four quadrants, and you can see that they grew down and to the left. The lines need to be moved in the other direction.
 
 ![First attempt at extending the tick lines](./images/figure-5.png)
 
 _Figure 5 – First attempt at extending the tick lines. Use `view-1.3.1.js` to see this effect._
 
-The ticks grew left and down. To make them occupy the chart area, we need to move them up and right. The _x_-axis ticks should start at the top margin, so its vertical position is `dim.margin.h`. The _y_-axis starts at the right margin, which is the position `dim.w - dim.margin.w`. Call the following code at the end of `drawAxes()` (or replace the original transforms) to apply these changes:
+The ticks grew left and down. To make them occupy the chart area, we need to move them up and right. The _x_-axis ticks should start at the top margin, so the vertical position is `dim.margin.h`. The _y_-axis starts at the right margin, which is the `dim.w - dim.margin.w` position. Call the following code at the end of `drawAxes()` (or replace the original transforms) to apply these changes:
 
 ```js
 d3.select(".x-axis")
@@ -418,16 +418,16 @@ After this change, you might notice that the ticks in the vertical scale now app
 app.axis.y.ticks(8, ',')
 ```
 
-That’s it, the logarithmic scale provided more space between the dots, and you can finally distinguish most of them, as shown in _Figure 7_.
+That’s it, the logarithmic scale provides more space between the dots, and you can finally distinguish most of them, as shown in _Figure 7_.
 
 ![An improved chart using a logarithmic scale for the GDP per capita](./images/figure-7.png)
 
-_Figure 7 – An improved chart using a logarithmic scale for the GDP per capita. Code: `StepByStep/6-log-scale/`._
+_Figure 7 – An improved chart using a logarithmic scale for the GDP per capita. Code: `StepByStep/6-log-scale/`_
 
-We now have a lot of context information in our chart, but nothing to give us any clue about which countries are represented by them. There are several ways we can improve it:
+We now have a lot of context information in our chart, but nothing to give us any clue about which countries are represented. There are a couple of ways we can improve it:
 
 * Using _tooltips_ that appear when the user hovers over a dot. The tooltip should include at least the name of the country. It could also include the country’s GDP and HDI data.
-* Applying _colors_ to the dots according to the continent they belong to. This would require that we also extract continent information from the data source and create a legend informing the continent represented by each color.
+* Applying _colors_ to the dots according to the continent they belong to. This would require that we also extract continent information from the data source and create a legend showing the continent represented by each color.
 
 These steps will be implemented in the second part of this tutorial, after _Chapter 10_, which covers everything about colors in D3. If you think you already know how to do it, go ahead! Coding is the best way to learn.
 

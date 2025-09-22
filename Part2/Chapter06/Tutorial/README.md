@@ -1,5 +1,3 @@
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
-<link href="./css/fonts.css" rel="stylesheet">
 <link href="./css/styles.css" rel="stylesheet">
 
 # Creating an interactive data-driven visualization - Part 2

@@ -2,9 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Using d3-selection-multi</title>
+    <title>Using d3-selection-multi (deprecated)</title>
 </head>
 <body>
+<h3>Example using d3-selection-multi (deprecated)</h3>
+<p>The <code>d3-selection-multi</code> module allows the use of a single method to apply multiple styles and attributes.
+Although convenient, it is currently deprecated and not recommended. Itwas very popular in older versions of D3 and
+still works, but it is not bundled with <code>d3.js</code> and conflicts with ESM usage of D3.
+If you have legacy code that uses it, either use with <code>npm</code> (with a JavaScript Node dev environment),
+or load the scripts (not using ESM) as in this file.</p>
+
 <svg width="400" height="400"></svg>
 
 <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -19,6 +26,7 @@
     ];
 
     // Data objects
+    // Styles
     const shapeStyles = {
         fill: d => d.color,
         stroke: "black",
@@ -27,12 +35,14 @@
         "stroke-opacity": 1
     };
 
+    // Attributes
     const circleData = {
         cx: d => d.x,
         cy: d => d.y,
         r: 50
     };
 
+    // Attributes
     const rectData = {
         x: d => size - d.x,
         y: d => size - d.y,
@@ -41,20 +51,19 @@
     };
 
     // Using the library
-
     d3.select("svg")
         .selectAll("circle")
         .data(data)
         .join("circle")
-            .styles(shapeStyles)
-            .attrs(circleData);
+            .styles(shapeStyles)    // Applying several styles
+            .attrs(circleData);     // Applying several attributes
 
     d3.select("svg")
         .selectAll("rect")
         .data(data)
         .join("rect")
-            .styles(shapeStyles)
-            .attrs(rectData);
+            .styles(shapeStyles)    // Applying several styles
+            .attrs(rectData);       // Applying several attributes
 
 </script>
 </body>

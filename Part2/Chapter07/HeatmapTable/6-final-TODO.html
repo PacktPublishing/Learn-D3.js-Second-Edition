@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Heatmap: Rainfall in São Paulo, Brazil (in mm)</title>
+    <style>
+        * {
+            font-family: "Arial Narrow", sans-serif;
+            font-size: 10pt;
+        }
+        h1 {
+            font-size: 16pt;
+        }
+        p {
+            text-align: right;
+        }
+        table {
+            border-collapse: collapse;
+        }
+        td, th {
+            border: solid 1px darkslategray;
+            text-align: center;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+<h1>Rainfall in São Paulo, Brazil (in mm) from 1984 to 2017</h1>
+<table></table>
+<p>source: inmet.gov.br</p>
+<script type="module">
+    import * as d3 from 'https://cdn.skypack.dev/d3@7';
+
+    // responsive chart
+    const mediaQuery = window.matchMedia("screen and (max-width: 700px)");
+    mediaQuery.addEventListener('change', resize);
+
+    const fmt = d3.timeFormat("%b");
+    const color = d3.scalePow().exponent(.75);
+    const chart = {}; // container for chart data and attributes
+
+    d3.csv("../../data/rain_sao_paulo.csv")
+        .then(function(data) {
+            chart.data = data;
+            resize(mediaQuery);
+        });
+
+    // Called when the page width changes
+    function resize(media) {
+        if (media.matches) {
+            chart.landscape = false;
+        } else {
+            chart.landscape = true;
+        }
+        process();
+    }
+
+    function process() {
+        chart.nested = d3.rollups(chart.data,
+            v => +v[0].Rain_mm,
+            d => chart.landscape ? +d.Month : +d.Year,
+            d => chart.landscape ? +d.Year : +d.Month);
+
+        const numbers = chart.data.map(d => +d.Rain_mm);
+        color.domain(d3.extent(numbers));
+
+        const table = d3.select("table");
+        table.selectChildren().remove(); // since resizing is rare, this is ok
+
+        const tr = table.selectAll(chart.landscape ? 'tr.month' : 'tr.year')
+            .data(chart.nested)
+            .join("tr").attr("class", chart.landscape ? 'month' : 'year')
+               .attr("title", d => d[0]);
+
+        tr.selectAll(chart.landscape ? 'td.year' : 'td.month')
+            .data(d => d[1])
+            .join("td").attr("class", chart.landscape ? 'year' : 'month')
+               .attr("title", d => d[0])
+               .text(d => d[1]);
+
+        tr.insert("th", "td:first-of-type")
+            .attr("class", chart.landscape ? "year-label" : "month-label")
+            .text(d => d[0]);
+
+        const header = table.insert("tr", "tr:first-of-type")
+            .attr("class", "header-row");
+
+        header.selectAll(chart.landscape ? "th.year-label" : "th.month-label")
+            .data(chart.nested[0][1])
+            .join("th").attr("class", chart.landscape ? "year-label" : "month-label")
+            .text(d => chart.landscape ? d[0] : fmt(new Date(2000, d[0]-1, 1)));
+
+        header.insert("td", "th:first-of-type");
+
+        d3.selectAll(chart.landscape ? "td.year" : "td.month")
+            .style("background-color", d => d3.interpolateYlGnBu(color(d[1])))
+            .style("color", d => color(d[1]) > .5 ? 'white' : 'black');
+    }
+</script>
+</body>
+</html>

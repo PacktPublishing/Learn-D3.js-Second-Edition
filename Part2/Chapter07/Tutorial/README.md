@@ -1,12 +1,12 @@
 <link href="./css/styles.css" rel="stylesheet">
 
-# Creating a heatmap table
+# Creating a Heatmap Table
 
-In this tutorial we will use grouping techniques to transform data so that it easily maps to an HTML table and use it to create a heatmap visualization.
+In this tutorial, we will use grouping techniques to transform data so that it easily maps to an HTML table and use it to create a heatmap visualization.
 
 Of course, instead of HTML cells, you could use SVG rectangles, circles, or even other symbols. This is suggested as an exercise. 
 
-The heatmap will highlight the average amount of rain for each month using a gradient of two hues. The goal is to practice grouping and binding to a hierarchical nested structure. This is a step-by-step tutorial, so you can code along, or view the files from each step in your browser. You will find them in the [`Chapter07/HeatmapTable/`](../Chapter07/HeatmapTable/) subdirectory.
+The heatmap will highlight the average amount of rain for each month using a gradient of two hues. The goal is to practice grouping and binding to a hierarchical nested structure. This is a step-by-step tutorial, so you can code along or view the files from each step in your browser. You will find them in the [`Chapter07/HeatmapTable/`](../Chapter07/HeatmapTable/) subdirectory.
 
 This is a small application, so we will use a single HTML file to contain the code. You can start with an empty HTML file, or use the template provided in [`HeatmapTable/0-empty.html`](../HeatmapTable/0-empty.html). It contains an HTML `<table/>` element, a CSS style sheet, and the following script block, which loads the D3 library and contains the URL of a CSV data source in tidy format:
 
@@ -17,9 +17,11 @@ This is a small application, so we will use a single HTML file to contain the co
 </script>
 ```
 
-Note that the URL is a relative path (you might have to adjust it, or move the file to another folder, if you are loading your file from somewhere else).
+Note that the URL is a relative path (you might have to adjust it, or move the file to another folder if you are loading your file from somewhere else).
 
 ## Table of contents
+
+The following sections are contained in this document:
 
 * [The data](#the-data)
 * [Step 1: Loading the CSV file](#step-1-loading-the-csv-file)
@@ -34,7 +36,7 @@ Note that the URL is a relative path (you might have to adjust it, or move the f
 
 ## The data
 
-The original CSV file that contains the data used in this tutorial is [`data/rain_sao_paulo_wide.csv`](../data/rain_sao_paulo_wide.csv), obtained from the Brazil's National Institute of Meteorology ([`bdmet.inmet.org.br`](https://bdmet.inmet.org.br)) and contains the average amount of rain in millimeters measured monthly in the city of São Paulo, from 1984 to 2017. Its 35 rows and 13 columns are structured in a wide format. Here is an excerpt:
+The original CSV file that contains the data used in this tutorial is [`data/rain_sao_paulo_wide.csv`](../data/rain_sao_paulo_wide.csv), obtained from Brazil's National Institute of Meteorology ([`bdmet.inmet.org.br`](https://bdmet.inmet.org.br)) and contains the average amount of rain in millimeters measured monthly in the city of São Paulo, from 1984 to 2017. Its 35 rows and 13 columns are structured in a wide format. Here is an excerpt:
 
 ```csv
 Year,Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec
@@ -45,7 +47,7 @@ Year,Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec
 2017,454,127.3,160.4,143.1,153.4,102.9,0.8,60.5,11.1,149.4,159.8,151.3
 ```
 
-In `Chapter 7`, we used the `d3.csv()` parser with a row function to reorganize the file into a tidy format, which is easier to group. This type of transformation, however, is usually better performed at the server side, so for this tutorial we will use a tidy CSV, which was saved in [`data/rain_sao_paulo_tidy.csv`](../data/rain_sao_paulo_tidy.csv). It has the following general structure.
+In `Chapter 7`, we used the `d3.csv()` parser with a row function to reorganize the file into a tidy format, which is easier to group. This type of transformation, however, is usually better performed at the server side, so for this tutorial, we will use a tidy CSV, which was saved in [`data/rain_sao_paulo_tidy.csv`](../data/rain_sao_paulo_tidy.csv). It has the following general structure:
 
 ```csv
 Month,Year,Rain
@@ -61,7 +63,7 @@ This is the file that we will load in the next section.
 
 ## Step 1: Loading and inspecting the CSV file
 
-The first step is to load and parse the file, obtaining an array of objects with the data. We shall use the `d3.csv()` parser with the `d3.autoType` row function to parse numeric strings into numbers, and then check to see if the data is in the desired format:
+The first step is to load and parse the file, obtaining an array of objects with the data. We shall use the `d3.csv()` parser with the `d3.autoType` row function to parse numeric strings into numbers, and then check to see whether the data is in the desired format:
 
 ```js
 const data = await d3.csv(dataFile, d3.autoType);
@@ -71,7 +73,7 @@ console.log(data); 	// inspect the data
 _Figure 1_ illustrates this process and compares the original CSV file structure with the resulting object structure after loading and parsing the file.
 
 ![Figure 1 – Loading a CSV file and parsing it into a JavaScript object.](images/figure-1.png)
-_Figure 1 – Loading a CSV file and parsing it into a JavaScript object. Code: [`HeatmapTable/1-load-parse.html`](../HeatmapTable/1-load-parse.html)._
+_Figure 1 – Loading a CSV file and parsing it into a JavaScript object. Code: [`HeatmapTable/1-load-parse.html`](../HeatmapTable/1-load-parse.html)_
 
 Note that although the data is in a tidy format, unlike the example we used in _Chapter 7_, the months here are numbers.
 
@@ -79,9 +81,9 @@ The next step is to reorganize the data in a format that is suitable for display
 
 ## Step 2: Transforming the data structure
 
-HTML tables are nested hierarchical structures. In a table, the `<td>` data cell is nested in a `<tr>` row, which is part of the `<table>`. Columns are formed by the `<td>` data cells inside the rows. It will be easier to bind the data if it has a similar structure. For example, to have years as columns and months as rows, you must reorganize the data so that the years are grouped by month first, then by year. This way you can bind months to `<tr>` elements, and years to `<td>` elements.
+HTML tables are nested hierarchical structures. In a table, the `<td>` data cell is nested in a `<tr>` row, which is part of `<table>`. Columns are formed by the `<td>` data cells inside the rows. It will be easier to bind the data if it has a similar structure. For example, to have years as columns and months as rows, you must reorganize the data so that the years are grouped by month first, then by year. This way, you can bind months to `<tr>` elements, and years to `<td>` elements.
 
-You can achieve this sort of nesting with `d3.rollup()`, which takes the data array, a reduce function and one or more functions that return the grouping keys, and generates an array of nested maps. We won’t be using the keys to retrieve any values, so it’s simpler to use `d3.rollups()`, as it returns nested arrays instead of maps.
+You can achieve this sort of nesting with `d3.rollup()`, which takes the data array, a reduce function, and one or more functions that return the grouping keys, and generates an array of nested maps. We won’t be using the keys to retrieve any values, so it’s simpler to use `d3.rollups()`, as it returns nested arrays instead of maps:
 
 ```js
 const nested = d3.rollups(data,
@@ -90,26 +92,26 @@ const nested = d3.rollups(data,
                           k => k.Year);      	// second key
 ```
 
-_Figure 2_ compares the nested structure and the original object dataset. Pay attention to the properties used in each function. `Month` and `Year` respectively become the major and the minor keys to access the data. The `Rain` property provides the values that we want to display. The reduce function (in green) transforms this data into the leaves of the tree.
+_Figure 2_ compares the nested structure and the original object dataset. Pay attention to the properties used in each function. `Month` and `Year`, respectively, become the major and the minor keys to access the data. The `Rain` property provides the values that we want to display. The reduce function (in green) transforms this data into the leaves of the tree.
 
 ![Figure 2 – Converting a flat tabular structure into a two-level-deep nested tree using d3.rollups().](images/figure-2.png)
-_Figure 2 – Converting a flat tabular structure into a two-level-deep nested tree using `d3.rollups()`. Code: [`HeatmapTable/2-nest-rollup.html`](../HeatmapTable/2-nest-rollup.html)_.
+_Figure 2 – Converting a flat tabular structure into a two-level-deep nested tree using `d3.rollups()`. Code: [`HeatmapTable/2-nest-rollup.html`](../HeatmapTable/2-nest-rollup.html)_
 
-The result is a 12-element array, where each element is a tuple representing a month. The first element (the major key) is the number of the month, and the second, a 34-element array of year tuples, where the first element (the minor key) is the year, and the second is the data: the amount of rain measured in millimeters.
+The result is a 12-element array, where each element is a tuple representing a month. The first element (the major key) is the number of the month, and the second, a 34-element array of year tuples, where the first element (the minor key) is the year and the second is the data: the amount of rain measured in millimeters.
 
-To select a value you would first choose a month (in black), and then a year (in red). In this application, we aren't selecting anything, but binding the data to visual elements that have a similar structure.
+To select a value, you would first choose a month (in black) and then a year (in red). In this application, we aren't selecting anything, but binding the data to visual elements that have a similar structure.
 
 Now that we finally have the data in its expected format, we can use it to populate and display an HTML table.
 
 ## Step 3: Binding the data to visual elements
 
-The data can be directly bound to nested `<tr>` and `<td>` selections by joining the dataset to a `<table>`. First, append (or select) the HTML table. Your HTML page already has an empty `<table/>` element. This will select it:
+The data can be directly bound to nested `<tr>` and `<td>` selections by joining the dataset to `<table>`. First, append (or select) the HTML table. Your HTML page already has an empty `<table/>` element. This will select it:
 
 ```js
 const table = d3.select("table");
 ```
 
-Then bind the dataset to the table rows, in the `<table>` context. The following code will create a new `<tr>` for each element from the 12-element `nested` array, that is, it will create 12 `<tr>` elements:
+Then bind the dataset to the table rows, in the `<table>` context. The following code will create a new `<tr>` for each element from the 12-element `nested` array — that is, it will create 12 `<tr>` elements:
 
 ```js
 const tr = table.selectAll("tr.month")
@@ -119,9 +121,9 @@ const tr = table.selectAll("tr.month")
                         .attr("title", m => m[0]);	// m = [month, Array(34)]
 ```
 
-After the join, the data bound to each `<tr>` has two elements (`[month,Array(34)]`). We will only use the first element, which is the month number (stored above in the title attribute). You can check if this code generated the `<tr>` elements as expected using your browser’s development tools.
+After the join, the data bound to each `<tr>` has two elements (`[month,Array(34)]`). We will only use the first element, which is the month number (stored previously in the `title` attribute). You can check whether this code generated the `<tr>` elements as expected using your browser’s development tools.
 
-Now, in the `<tr>` context, create a new selection for `<td>`, and bind (using `data()` again) the second element of the current data, which is the 34-element array that contains the years (in the format `[year, rain]`). The following code will create a new `<td>` for each year, that is, it will create 34 `<td>` elements inside each `<tr>`:
+Now, in the `<tr>` context, create a new selection for `<td>`, and bind (using `data()` again) the second element of the current data, which is the 34-element array that contains the years (in the format `[year, rain]`). The following code will create a new `<td>` for each year — that is, it will create 34 `<td>` elements inside each `<tr>`:
 
 ```js
 tr.selectAll("td.year")
@@ -131,25 +133,25 @@ tr.selectAll("td.year")
           .text(y => y[1]);
 ```
 
-After the join, the data bound to each `<td>` now has two elements: the first is the year (that we stored above in the `title` attribute), and the second is the amount of rain, which displayed as text.
+After the join, the data bound to each `<td>` now has two elements: the first is the year (that we stored previously in the `title` attribute), and the second is the amount of rain, which is displayed as text.
 
 _Figure 3_ compares the nested data structure to the nested HTML `<table>` elements.
 
 ![Figure 3 – Mapping the nested data to a nested HTML table selection.](images/figure-3.png)
-_Figure 3 – Mapping the nested data to a nested HTML table selection. Code: [`HeatmapTable/3-html-table.html`](../HeatmapTable/3-html-table.html)._
+_Figure 3 – Mapping the nested data to a nested HTML table selection. Code: [`HeatmapTable/3-html-table.html`](../HeatmapTable/3-html-table.html)_
 
-Now that the data was bound to graphical elements, you can launch the page and finally see the rendered result on your screen. The table should look like the screenshot in `Figure 4`. If it doesn’t, use your browser tools to inspect the generated HTML. It may give you some clues about what went wrong.
+Now that the data is bound to graphical elements, you can launch the page and finally see the rendered result on your screen. The table should look like the screenshot in `Figure 4`. If it doesn’t, use your browser tools to inspect the generated HTML. It may give you some clues about what went wrong.
 
 ![Figure 4 - An HTML table displaying nested data.](images/figure-4.png)
-_Figure 4 - An HTML table displaying nested data. Code: [`HeatmapTable/3-html-table.html`](../HeatmapTable/3-html-table.html)._
+_Figure 4 - An HTML table displaying nested data. Code: [`HeatmapTable/3-html-table.html`](../HeatmapTable/3-html-table.html)_
 
 We are done displaying the data, but the chart still needs some context so that the viewer knows what those numbers mean. Let’s add some informative headers.
 
 ## Step 4: Adding headers
 
-To add headers, we will need to insert an extra row above all other rows, for the years, and an extra column at left, for the months.
+To add headers, we will need to insert an extra row above all other rows, for the years, and an extra column on the left, for the months.
 
-We have month numbers (the `<tr>` keys), but not month names. You can create a formatting function that converts a date into 3-letter month name, compatible with your locale, with `d3.timeFormat()` (see the section on _Internationalization tools_ in _Chapter 7_):
+We have month numbers (the `<tr>` keys), but not month names. You can create a formatting function that converts a date into three-letter month name, compatible with your locale, with `d3.timeFormat()` (see the _Internationalization tools_ section in _Chapter 7_):
 
 ```js
 const fmt = d3.timeFormat("%b");
@@ -170,7 +172,7 @@ const header = table.insert("tr", "tr:first-of-type")
                     .attr("class", "header-row");
 ```
 
-You can get the year from any one of the 12 sub-arrays. Here we are getting it from the first row (`nested[0]`). The first element (`nested[0][0]`) is the month number (key), and the second (`nested[0][1]`) is the array with 34 sub-arrays, one per year. The year is the first element in each:
+You can get the year from any one of the 12 sub-arrays. Here, we are getting it from the first row (`nested[0]`). The first element (`nested[0][0]`) is the month number (key), and the second (`nested[0][1]`) is the array with 34 sub-arrays, one per year. The year is the first element in each:
 
 ```js
 header.selectAll("th.year-label")
@@ -185,7 +187,7 @@ Finally, insert an empty cell at table position (0,0), so that the table cells a
 header.insert("td", "th:first-of-type");
 ```
 
-A fragment of the generated HTML is listed below. You can see this in your browser’s inspector:
+A fragment of the generated HTML is listed next. You can see this in your browser’s inspector:
 
 ```html
 <table>
@@ -209,10 +211,10 @@ A fragment of the generated HTML is listed below. You can see this in your brows
 </table>
 ```
 
-The result is shown in `Figure 5`.
+The result is shown in _Figure 5_.
 
 ![Figure 5 - The table after adding headers.](images/figure-5.png)
-_Figure 5 - The table after adding headers. Code: [`HeatmapTable/4-headers.html`](../HeatmapTable/4-headers.html)._
+_Figure 5 - The table after adding headers. Code: [`HeatmapTable/4-headers.html`](../HeatmapTable/4-headers.html)_
 
 To turn the table into a heatmap, we need to add colors. This will be addressed in the next section.
 
@@ -230,43 +232,43 @@ The default range is 0 to 1. To configure the domain for this scale, we need to 
 color.domain(d3.extent(data, d => d.Rain));
 ```
 
-A color scheme interpolator from the _d3-scales-chromatic_ module (that we cover in `Chapter 10`) is used to generate the color strings. This interpolator receives a value between 0 and 1 and returns a color string ranging from light yellow (lower values) to dark blue (higher values). The following code applies the color to the background of each <td>:
+A color scheme interpolator from the _d3-scales-chromatic_ module (which we cover in _Chapter 10_) is used to generate the color strings. This interpolator receives a value between 0 and 1 and returns a color string ranging from light yellow (lower values) to dark blue (higher values). The following code applies the color to the background of each `<td>`:
 
 ```js
 d3.selectAll("td.year")
     .style("background-color", y => d3.interpolateYlGnBu(color(y[1])));
 ```
 
-The text inside each `<td>` must contrast with its background to be readable. This can be achieved by using the scaled color value to decide if the text will be white or black:
+The text inside each `<td>` must contrast with its background to be readable. This can be achieved by using the scaled color value to decide whether the text will be white or black:
 
 ```js
 d3.selectAll("td.year")
     .style("color", y => color(y[1]) > .5 ? 'white' : 'black');
 ```    
 
-The result is shown in `Figure 6` (with CSS styling, titles and footnote added in static HTML).
+The result is shown in _Figure 6_ (with CSS styling, titles, and footnote added in static HTML).
 
 ![Figure 6 – Heatmap created in HTML by grouping data in table format.](images/figure-6.png)
-_Figure 6 – Heatmap created in HTML by grouping data in table format. Code: [`Heatmap/5-heatmap.html`](../Heatmap/5-heatmap.html)._
+_Figure 6 – Heatmap created in HTML by grouping data in table format. Code: [`Heatmap/5-heatmap.html`](../Heatmap/5-heatmap.html)_
 
-The final code is available in [`HeatmapTable/5-heatmap.html`](../HeatmapTable/5-heatmap.html). If you want to continue improving this chart, try some of the exercises in the next sections.
+The code for this step is available in [`HeatmapTable/5-heatmap.html`](../HeatmapTable/5-heatmap.html). If you want to continue improving this chart, try some of the exercises in the next sections. They will be incorporated in the final version.
 
 ## Exercise 1: Refactor to display a vertical table
 
-Swap months and years in the heatmap visualization to display a vertical table, which should scroll vertically and display well in a mobile device.
+Swap months and years in the heatmap visualization to show a vertical table, which should scroll vertically and display well on a mobile device.
 
 ## Exercise 2: Make the chart responsive
 
-Create a responsive chart that displays the table horizontally if viewed in a screen that is wider than 700px, but vertically otherwise. _Hint_: get the device’s width using:
+Create a responsive chart that displays the table horizontally if viewed on a screen that is wider than 700px, but vertically otherwise. _Hint_: get the device’s width using the following:
 
 ```js
 window.matchMedia("screen and (max-width: 700px)")
 ```
 
-To test, open the file in a browser, and resize the window. The chart should change orientation when the width crosses the 700px threshold. Figure 7 shows how it would appear in a computer and a mobile phone.
+To test, open the file in a browser and resize the window. The chart should change orientation when the width crosses the 700px threshold. _Figure 7_ shows how it would appear on a computer and a mobile phone.
 
-![Figure 7 – Responsive heatmap table displayed in a desktop browser and mobile device browser.](images/figure-7.png)
-_Figure 7 – Responsive heatmap table displayed in a desktop browser and mobile device browser._
+![Figure 7 – Responsive heatmap table displayed on a desktop browser and mobile device browser.](images/figure-7.png)
+_Figure 7 – Responsive heatmap table displayed on a desktop browser and mobile device browser_
 
 You can then add a `'change'` event listener to it and redraw the chart when the width changes. See the template file for more hints.
 
@@ -274,10 +276,10 @@ You can then add a `'change'` event listener to it and redraw the chart when the
 
 Replace the HTML table with SVG.
 
-Since you are not bound to a strict hierarchical structure like an HTML table, you don't need to use `d3.insert()` or any complex selectors. The joins will be much simpler. You can also add rounded corners to the rectangles, as shown in _Figure 7_, or even use other shapes.
+Since you are not bound to a strict hierarchical structure like an HTML table, you don't need to use `d3.insert()` or any complex selectors. The joins will be much simpler. You can also add rounded corners to the rectangles, as shown in _Figure 8_, or even use other shapes.
 
 ![Figure 8 – Heatmap table implemented with SVG.](images/figure-8.png)
-_Figure 8 – Heatmap table implemented with SVG._
+_Figure 8 – Heatmap table implemented with SVG_
 
 ## Final application
 
