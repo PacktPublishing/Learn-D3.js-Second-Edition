@@ -1,6 +1,6 @@
 <link href="./css/styles.css" rel="stylesheet">
 
-# Creating an interactive data-driven visualization - Part 2
+# Creating an Interactive Data-Driven Visualization - Part 2
 
 In the first part of this tutorial, we created the static chart shown in `Figure 1`. Although static, you could display a different planet editing the code and assigning a different `app.current.id`.
 
@@ -9,7 +9,7 @@ _Figure 1 – The static visualization created in [the first part of this tutori
 
 In this second part, we will allow the viewer to select the planet they want to see via a control panel. Although this might seem trivial, it involves advanced concepts about joining and reusing graphical elements in a view that we covered in _Chapter 6_.
 
-As before, each step is described with code examples, and you can code along, or run the full code available in the [`StepByStep/`](../StepByStep) folder. Some additional exercises are suggested at the end. The final visualization incorporates all changes from the exercises. You can run it from the [`StepByStep/final`](../StepByStep/final) folder.
+As before, each step is described with code examples, and you can code along or run the full code available in the [`StepByStep/`](../StepByStep) folder. Some additional exercises are suggested at the end. The final visualization incorporates all changes from the exercises. You can run it from the [`StepByStep/final`](../StepByStep/final) folder.
 
 Start with the project you created in [part 1](../../Chapter05/Tutorial), or use the files in [`StepByStep/9-static-chart`](../StepByStep/9-static-chart), which contains all the changes made in part 1.
 
@@ -27,7 +27,7 @@ This tutorial includes the following sections:
 
 ## Step 10: Changing views
 
-Now that we successfully displayed one complete view, we can demonstrate the power of D3 by automatically updating the view with new datasets. For that, we need a user interface to trigger the changes, such as a panel with buttons where the viewer can select a view. We will set them up inside a new module called `js/page.js`, which will also set up the page. 
+Now that we have successfully displayed one complete view, we can demonstrate the power of D3 by automatically updating the view with new datasets. For that, we need a user interface to trigger the changes, such as a panel with buttons where the viewer can select a view. We will set them up inside a new module called `js/page.js`, which will also set up the page. 
 
 Create the `js/page.js` file and declare your imports as follows:
 
@@ -103,10 +103,10 @@ _Figure 2 — Multiple views, but not updating correctly (moons and planets are 
 
 Reload the page and click on different planets. Try clicking on **Saturn**. You will notice that some new moons were added, but the old ones are still there. Click on **Mars**. There are only two moons, but there are some overlapped labels. If you click on **Earth**, the Moon appears by itself but Mars is still there, behind the Earth. And now, if you change to other views, other satellites are displayed, but the Moon never disappears. Can you guess what is going on here?
 
-Let’s use the element inspector. It will give us a clue. Expand the `<div>`, the `<svg>` and the `<g>` plane, then click on one of the buttons a few times.
+Let’s use the element inspector. It will give us a clue. Expand the `<div>`, the `<svg>`, and the `<g>` plane, then click on one of the buttons a few times.
 
 ![Figure 3 – Inspector shows four planet circles after three clicks](./images/figure-3.png)
-_Figure 3 – Inspector shows five `<circle class="planet">` elements after clicking twice the current button (**Jupiter**), and then on two different buttons (**Mars** and **Earth**). Code: `StepByStep/10-change-views`._
+_Figure 3 – Inspector shows five `<circle class="planet">` elements after clicking the current button (**Jupiter**) twice, and then on two different buttons (**Mars** and **Earth**). Code: `StepByStep/10-change-views`._
 
 Look at that! After clicking twice on Jupiter, you have not one, but three identical `<circle class="planet">` elements! Click on other buttons, and more planet circles are added, but never removed. Moons are sometimes removed or not. We have several problems to fix. Let’s start with the duplicate planets.
 
@@ -135,7 +135,7 @@ Now let’s try to fix the overlapping planets. The element inspector showed us 
 </script>
 ```
 
-Here you just append the circle and set its class, so that it can be selected later. No data binding, dimensions, position or color are declared.
+Here, you just append the circle and set its class, so that it can be selected later. No data binding, dimensions, position, or color are declared.
 
 Now let’s go to the `js/view.js` module and edit the `drawPlanet()` function to _select_ the planet (that was previously appended) by its class name, like this:
 
@@ -164,13 +164,13 @@ The moons are still not being updated correctly. Let’s use the element inspect
 Note that each time you click on a button, some `<g>` elements are briefly highlighted in the Inspector. Reload the page, expand the `<div>`, `<svg>`, and `<g>` plane again, but now also expand one of the `<g class="moon">` elements. Click on a button. What happened?
 
 ![Figure 4 – Inspector showing generated elements](./images/figure-4.png)
-_Figure 4 – Inspector showing generated `<circle>`, `<image>` and `<text>` elements in the first `<g class="moon">` after loading the page (**Jupiter**), then clicking **Saturn**, and clicking **Mars**. Code: `StepByStep/11-update-views.html`_
+_Figure 4 – Inspector showing generated `<circle>`, `<image>`, and `<text>` elements in the first `<g class="moon">` after loading the page (**Jupiter**), then clicking **Saturn**, and clicking **Mars**. Code: `StepByStep/11-update-views.html`_
 
-_Figure 4_ shows the generated SVG elements inside the first `<g class="moon">` (Ganymede) after loading the page and two clicks. After clicking **Saturn**, the application updates the planet circle and adds more moons, but a second group of `<circle>`, `<image>`, `<text>` elements (Titan) appear in the first `<g class="moon">`. Finally, after clicking **Mars**, there are now only two `<g class="moon">` elements, which is correct, but the first `<g class="moon">` now contains a third set of `<circle>`, `<image>` and `<text>` elements (Phobos), renderd on top of the others!
+_Figure 4_ shows the generated SVG elements inside the first `<g class="moon">` (Ganymede) after loading the page and two clicks. After clicking **Saturn**, the application updates the planet circle and adds more moons, but a second group of `<circle>`, `<image>`, `<text>` elements (Titan) appear in the first `<g class="moon">`. Finally, after clicking **Mars**, there are now only two `<g class="moon">` elements, which is correct, but the first `<g class="moon">` now contains a third set of `<circle>`, `<image>`, and `<text>` elements (Phobos), rendered on top of the others!
 
-We are still creating and appending new elements every time. Not new `<g>` elements, since these are automatically appended, updated and removed by the `join()` method, but new `<circle>`, `<image>` and `<text>` child elements added to each `<g class="moon">` element, after every view change.
+We are still creating and appending new elements every time. Not new `<g>` elements, since these are automatically appended, updated, and removed by the `join()` method, but new `<circle>`, `<image>`, and `<text>` child elements, added to each `<g class="moon">` element, after every view change.
 
-So, let’s take a look at the code. After every view change, the `drawMoons()` function (`js/view.js`) is called. Its `join()` method automatically appends, removes and reuses the `<g>` elements, which contain the circles and text labels. This works as expected:
+So, let’s take a look at the code. After every view change, the `drawMoons()` function (`js/view.js`) is called. Its `join()` method automatically appends, removes, and reuses the `<g>` elements, which contain the circles and text labels. This works as expected:
 
 ```js
 function drawMoons(plane) {
@@ -210,11 +210,11 @@ function appendObjects(moon) {
 }
 ```
 
-We are appending new `<circle>`, `<image>`, and `<text>` elements to each `<g class="moon">` element every time the view is redrawn. This is why we see many overlapping circles, images and labels.
+We are appending new `<circle>`, `<image>`, and `<text>` elements to each `<g class="moon">` element every time the view is redrawn. This is why we see many overlapping circles, images, and labels.
 
-These elements aren’t removed automatically because they are appended explicitly, with `append()`, outside of the join. We should only create and append new circles, images, and text when a new `<g class="moon">` is appended to the `plane`. For example, when moving from Earth (one moon) to Mars (two moons). When there are sufficient `<g class="moon">` elements, for example, when moving from Mars to Earth, the `<circle>`, `<image>` and `<text>` objects of the first `<g class="moon">` element should be reused and updated with new data. To fix this, we will need to configure the separate _enter_, _update_ and _exit_ stages of the joining process (see the section _Advanced Data Joins_ in _Chapter 6_).
+These elements aren’t removed automatically because they are appended explicitly, with `append()`, outside of the join. We should only create and append new circles, images, and text when a new `<g class="moon">` is appended to the `plane` – for example, when moving from Earth (one moon) to Mars (two moons). When there are sufficient `<g class="moon">` elements — for example, when moving from Mars to Earth — the `<circle>`, `<image>`, and `<text>` objects of the first `<g class="moon">` element should be reused and updated with new data. To fix this, we will need to configure the separate _enter_, _update_, and _exit_ stages of the joining process (see the _Advanced data joins_ section in _Chapter 6_).
 
-Let’s edit the `join()` method in `drawMoons()` and configure its _enter_ stage. It should append the entire object tree when a new `<g class="moon">` is created. Since we remove the entire `<g class="moon">` element when changing to a view with less moons, we don’t have to configure the `update` or the `exit` stages, so only the first argument (the _enter_ function) is passed to `join()`:
+Let’s edit the `join()` method in `drawMoons()` and configure its _enter_ stage. It should append the entire object tree when a new `<g class="moon">` is created. Since we remove the entire `<g class="moon">` element when changing to a view with fewer moons, we don’t have to configure the `update` or the `exit` stages, so only the first argument (the _enter_ function) is passed to `join()`:
 
 ```js
 // ...
@@ -249,9 +249,9 @@ Then we can call it from the join, like this:
 .join(enter => createMoons(enter))
 ```
 
-Note that this code just appends `<circle>`, `<image>` and `<text>` elements to the `<g class="moon">` object but doesn’t set any attributes. This needs to be done after the new elements are merged with the existing elements and updated.
+Note that this code just appends `<circle>`, `<image>`, and `<text>` elements to the `<g class="moon">` object but doesn’t set any attributes. This needs to be done after the new elements are merged with the existing elements and updated.
 
-Let's return to the `appendObjects()` function (in `js/view.js`). It is called after the join to update the merged entered and existing elements selection. Because of our `join()`, we can be sure that all and just the necessary moons and labels were appended, so all we need to do now is select them and update their attributes with the new data. The following code replaces each `moon.append` with `moon.select`:
+Let's return to the `appendObjects()` function (in `js/view.js`). It is called after the join to update the merged entered and existing elements selection. Because of our `join()`, we can be sure that all, and just the necessary, moons and labels were appended, so all we need to do now is select them and update their attributes with the new data. The following code replaces each `moon.append` with `moon.select`:
 
 ```js
 function updateObjects(moon) {	// renamed from appendObjects()
@@ -273,7 +273,7 @@ function updateObjects(moon) {	// renamed from appendObjects()
 }
 ```
 
-We also renamed the function to `updateObjects()`, since it no longer appends anything. Now the refactored `drawMoons()` function, shown below, automatically appends and removes objects as necessary:
+We also renamed the function to `updateObjects()`, since it no longer appends anything. Now the refactored `drawMoons()` function, shown here, automatically appends and removes objects as necessary:
 
 ```js
 function drawMoons(plane) {
@@ -287,7 +287,7 @@ function drawMoons(plane) {
 }
 ```
 
-That’s it! The new code automatically reuses existing elements if they are available, creates any necessary elements and removes the ones that are not needed. Try it out. The transitions should now work perfectly. `Figure 5` shows what the chart looks like after selecting **Neptune**:
+That’s it! The new code automatically reuses existing elements if they are available, creates any necessary elements, and removes the ones that are not needed. Try it out. The transitions should now work perfectly. `Figure 5` shows what the chart looks like after selecting **Neptune**:
 
 ![Figure 5 — Multiple views updated correctly](./images/figure-5.png)
 _Figure 5 — Multiple views updated correctly. Code: `StepByStep/12-join`._
@@ -295,23 +295,23 @@ _Figure 5 — Multiple views updated correctly. Code: `StepByStep/12-join`._
 You can run the full code in `StepByStep/12-join`.
 
 We are done, but there are always small improvements you can make in this chart to improve the user’s experience. Here are some examples:
-* Each view shows a planet in scale with its satellites, but perhaps it would be interesting to have all the views in the same scale, to compare satellites of different planets.
+* Each view shows a planet to scale with its satellites, but perhaps it would be interesting to have all the views in the same scale, to compare satellites of different planets.
 * The data source contains a lot of interesting information about planets and moons, such as their diameters. It could be provided to the viewer using tooltips.
 
 These ideas are left as exercises, described in the following sections, but you can see the full solution in `StepByStep/final`, which incorporates all these changes.
 
 ## Exercise 1: Use a common scale
 
-Add a button to allow the viewer to toggle the scale used in the views:  either a separate scale for each planet (as it is currently) or a common scale for all views, that will allow satellites to be compared (_Figure 6_). 
+Add a button to allow the viewer to toggle the scale used in the views:  either a separate scale for each planet (as it is currently) or a common scale for all views, which will allow satellites to be compared (_Figure 6_). 
 
 ![Figure 6 - Using a common scale for all views](./images/figure-6.png)
 _Figure 6 - Using a common scale for all views (right) allows the viewer to compare diameters of satellites that orbit different planets, but makes small moons harder to see. Code: [`StepByStep/exercise1-common-scale/solution`](../StepByStep/exercise1-common-scale/solution)._
 
-To implement this:
+Here's how implement this:
 
-1. Add a Boolean variable to the `app` object in `js/common.js` to keep track of the current option; 
+1. Add a Boolean variable to the `app` object in `js/common.js` to keep track of the current option. 
 
-2. Add a button, checkbox or other control in `js/page.js` to allow the user to change the state, redrawing the chart after each change, and 
+2. Add a button, checkbox, or other control in `js/page.js` to allow the user to change the state, redrawing the chart after each change. 
 
 3. Refactor the `configScale()` function in `js/config.js` to configure the common scale to be used in all views when the user sets the variable to use it, rendering the planets and moons in scale for the entire application. 
 
