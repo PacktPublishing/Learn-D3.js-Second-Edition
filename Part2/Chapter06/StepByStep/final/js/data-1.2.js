@@ -28,7 +28,7 @@ export async function load() {
             name: p.name,
             diameterKm: p.diameterKm,
             satellites: p.satellites
-                .filter(s => s.diameterKm >= d3.max(p.satellites, s => s.diameterKm) / 25)
+                .filter(s => s.diameterKm >= d3.max(p.satellites, s => s.diameterKm) / 250)
                 .map(s => ({ name: s.name, diameterKm: s.diameterKm }))
         }));
 

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Changing attributes, styles and text content</title>
+    <style>
+        h1 {font-size: 24px}
+        div {width: 200px}
+        canvas {
+            height: 100px;
+            border: 1px solid lightgray;
+            margin-top: 10px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<h1>See console for more results</h1>
+<p id="n1">Before</p>
+<div class="abc">
+    <p id="n2">A</p>
+    <p id="n3">B</p>
+    <p id="n4">C</p>
+</div>
+<div class="xy">
+    <p id="n5">X</p>
+    <p id="n6">Y</p>
+</div>
+<p id="n7">After</p>
+<canvas></canvas>
+<svg>
+    <circle id="c1" cx="50" cy="50" r="40" fill="red" />
+    <circle id="c2" cx="150" cy="50" r="20" fill="orange" />
+</svg>
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    // Getting styles/attributes/text (returns value from the first element in the selection)
+    const h1Content = d3.select("h1").text();
+    console.log('d3.select("h1").text()\n', h1Content);
+
+    const color = d3.select("circle").style("fill");	// fill style of first circle
+    console.log('d3.select("circle").style("fill")\n', color);
+
+    const radius = d3.selectAll("circle").attr("r");	// r attribute of first circle
+    console.log('d3.selectAll("circle").attr("r")\n', radius);
+
+    // Applying styles/attributes/text to ALL selected elements. Each method is applied to the current context,
+    // which does not change (it is the same selection of <p> elements).
+    d3.selectAll("circle")              // CONTEXT: all <circle> elements
+        .attr("r", 50)                  //   set r attribute for all <circle> elements
+        .style("fill", "green");        //   set fill style for all <circle> elements
+
+    // Applying styles/attributes/text in a nested selection. Each method is applied to the current context.
+    // The border is applied to the <div> element (first selection), and the text and styles are applied to
+    // all <p> elements within the <div> (second selection).
+    d3.select("div")			    	// CONTEXT: the <div.abc> element
+        .style("border", "solid 1px")	//   style applied to the <div> element
+        .selectAll("p")			    	// NEW CONTEXT: all <p> in <div.abc>
+        .text("Greek grapes.")		    //   styles + text for all <p> in <div.abc>
+        .style("color", "purple")
+        .style("font-size", "24px");
+
+    // Since the styles above are static, and generate duplicated code (which is inefficient), you can
+    // comment out the style lines above and add CSS rules instead:
+    /*
+    <style>
+        div {
+            border: solid 1px;
+        }
+        div.abc p {
+            color: purple;
+        }
+    </style>
+    */
+
+    // Uncomment to allow access to the D3 functions via the console
+    window.d3 = d3;
+</script>
+
+</body>
+</html>

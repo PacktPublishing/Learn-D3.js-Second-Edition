@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Demonstrating data updates</title>
+    <style>
+        div {
+            margin: 2px 25px;
+            padding: 5px;
+            width: 300px;
+            border: solid 1px blue;
+        }
+        p {
+            border: solid 1px red;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+<h1>See results in console</h1>
+<div class="abc">
+    <p id="n2">A</p>
+    <p id="n3">B</p>
+    <p id="n4">C</p>
+</div>
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    // Obtaining an initial selection of existing <p> elements within the <div class="abc">
+    // and binding an array with equal-sized data
+    const sel = d3.select("div.abc")
+        .selectAll("p")
+        .data([33,18,24]);
+    console.log('>>> d3.select("div.abc").selectAll("p")', sel);
+    console.log('>>> sel.size()', sel.size());
+
+    // Binding more data
+    const updMore = sel.data([9,27,61,6,35]);
+    console.log('>>> sel.data([9,27,61,6,35])', updMore);
+    console.log('>>> updMore.size()', updMore.size());
+
+    // Getting the "enter" selection from the udpMore selection (should have 2 elements)
+    const enterMore = updMore.enter();
+    console.log('>>> updMore.enter()', enterMore);
+    console.log('>>> enterMore.size()', enterMore.size());
+
+    // Getting the "exit" selection from the updMore selection (should be empty)
+    const exitMore = updMore.exit();
+    console.log('>>> updMore.exit()', exitMore);
+    console.log('>>> exitMore.size()', exitMore.size());
+
+    // Getting the merged selection after joining updMore
+    const mergedMore = updMore.join("p").text("NEW");  // updates all
+    console.log('>>> updMore.join("p")', mergedMore);
+    console.log('>>> mergedMore.size()', mergedMore.size());
+
+    // Uncomment to allow access to the D3 functions via the console
+    window.d3 = d3;
+</script>
+
+</body>
+</html>

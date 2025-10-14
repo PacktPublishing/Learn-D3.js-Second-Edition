@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Using append in an enter selection</title>
+    <style>
+        div {
+            margin: 2px 25px;
+            padding: 5px;
+            width: 300px;
+            border: solid 1px blue;
+        }
+        p {
+            border: solid 1px red;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="abc">
+    <p id="n2">A</p>
+    <p id="n3">B</p>
+    <p id="n4">C</p>
+</div>
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    // Obtaining an initial selection of existing <p> elements within the <div class="abc">
+    const sel = d3.select("div.abc")
+                  .selectAll("p");
+    console.log('sel = d3.select("div.abc").selectAll("p")', sel)
+
+    // Creating an "update" selection by binding more data than existing elements
+    const u = sel.data([1,2,3,4,5]);
+    console.log('sel.data([1,2,3,4,5]', u)
+
+    // Getting the "enter" selection from the "update" selection
+    const enter = u.enter();
+    console.log('update1.enter()', enter)
+
+    // Appending the new elements for the data in the enter selection
+    enter.append("p")
+         .text(d => d)     // setting the text and style for the appended elements
+         .style("border", "solid 1px green");
+
+    // Uncomment to allow access to the D3 functions via the console
+    window.d3 = d3;
+</script>
+
+</body>
+</html>

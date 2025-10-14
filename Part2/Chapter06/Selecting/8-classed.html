@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Using classed</title>
+    <style>
+        h1 {font-size: 24px}
+        div {width: 200px}
+        canvas {
+            height: 100px;
+            border: 1px solid lightgray;
+            margin-top: 10px;
+            display: block;
+        }
+        .even {
+            background-color: yellow;
+        }
+    </style>
+</head>
+<body>
+<h1>See console for results</h1>
+<p>Changes data and updates class assignment after 2 and 4 seconds.</p>
+<p id="n1">Before</p>
+<div class="abc">
+    <p id="n2">A</p>
+    <p id="n3">B</p>
+    <p id="n4">C</p>
+</div>
+<div class="xy">
+    <p id="n5">X</p>
+    <p id="n6">Y</p>
+</div>
+<p id="n7">After</p>
+<canvas></canvas>
+<svg>
+    <circle id="c1" cx="50" cy="50" r="40" fill="red" />
+    <circle id="c2" cx="150" cy="50" r="20" fill="orange" />
+</svg>
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    d3.selectAll("p").data([77,33,18,24,55,63,10,42]);
+    update();
+
+    // After 2 seconds, update the data
+    setTimeout(() => {
+        d3.selectAll("p").data([12,32,27,45,56,63,72,81]);
+        update();
+    }, 2000);
+
+    // After 4 seconds, update the data again
+    setTimeout(() => {
+        d3.selectAll("p").data([5,10,15,20,25,30,35,40]);
+        update();
+    }, 4000);
+
+    function update() {
+        d3.selectAll("p").classed("even", d => d%2 === 0);
+    }
+
+    // Uncomment to allow access to the D3 functions via the console
+    windo.update = update;
+    window.d3 = d3;
+</script>
+
+</body>
+</html>

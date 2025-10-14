@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Creating detached selections</title>
+</head>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    // Detached subtree
+    const svg = d3.create("svg");
+    svg.append("circle")
+        .attr("r",20)
+        .attr("cx",200)
+        .attr("cy",100)
+        .style("fill","blue");;
+
+    // Detached  element
+    const circle = d3.create("svg:circle")
+                     .attr("r",30)
+                     .attr("cx",100)
+                     .attr("cy",100)
+                     .style("fill","red");
+
+    // Append the detached elements to the document
+    svg.append(() => circle.node())
+    d3.select("body").append(() => svg.node())
+
+    // Uncomment to allow access to the D3 functions via the console
+    window.d3 = d3;
+</script>
+</body>
+</html>

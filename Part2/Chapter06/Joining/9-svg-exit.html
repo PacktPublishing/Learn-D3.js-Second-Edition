@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The exit selection</title>
+    <style>
+        svg { border: solid gray 1px }
+    </style>
+</head>
+<body>
+
+<svg height="100" width="600"></svg>
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {update} from "./js/update.js";
+
+    // Initial selection and join
+    d3.select("svg").selectAll("circle")
+        .data([5,10,15,20,25])
+        .join("circle");
+    update();
+
+    // Step 2: a new join (with less data): it will remove 2 elements
+    d3.select("svg").selectAll("circle")
+        .data([19,15,26])
+        .join("circle");
+    update();
+
+    // This will allow update() to be called from the console.
+    window.update = update;
+
+    // This will allow D3 functions to be called from the console.
+    window.d3 = d3;
+</script>
+
+</body>
+</html>

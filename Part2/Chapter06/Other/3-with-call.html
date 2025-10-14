@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Calling a function once using selection.call()</title>
+</head>
+<body>
+
+<h1>Calling a function once in a selection using <code>call()</code></h1>
+<h3>Open JavaScript console for more details</h3>
+
+<svg height="150" width="600"></svg>
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    d3.select("svg")
+        .selectAll("g.one").data([1,2,4,7,12]).join("g").attr("id","one")
+        .call(f, 2, 0); // called once per selection
+
+    d3.select("svg")
+        .selectAll("g.two").data([3,5,9,15,24]).join("g").attr("id","two")
+        .call(f, 2, 180); // called once per selection
+
+    d3.select("svg")
+        .selectAll("g.three").data([3,5,9]).join("g").attr("id","three")
+        .call(f, 1, 500); // called once per selection
+
+    function f(selection,scale,position) {
+        console.log(selection);
+        selection.attr("transform", d => `translate(${position + d*scale*5}, 50)`)
+        selection.append("text").text(d => d).attr("y",70);
+        selection.append("circle").attr("r", d => d*scale);
+    }
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exercise 6.1</title>
+    <style>
+        svg {border: solid 1px}
+    </style>
+</head>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+    const size = 220;
+    const svg = d3.select("body")
+                  .append("svg")
+                    .attr("width", size)
+                    .attr("height", size)
+                    .attr("viewBox", `${-size} -${size} ${size*2} ${size*2}`);
+
+    // Ten corners of a decagon + closing point
+    const corners = [
+            [200,0],
+            [162,118],
+            [62,190],
+            [-62,190],
+            [-162,118],
+            [-200,0],
+            [-162,-118],
+            [-62,-190],
+            [62,-190],
+            [162,-118],
+            [200,0]
+        ];
+
+    // EXERCISE 6.1 - Draw a polygon with D3 from a data array
+    // Steps:
+    //       1. Append a polygon to the svg, set fill, stroke, stroke-width
+    //       2. Bind the data to the polygon (use datum() since it's a single element)
+    //       3. Set the `points` attribute using the bound data
+
+    // ADD CODE HERE
+    svg.append("polygon")           // appends the polygon
+        .attr("fill", "none")
+        .attr("stroke", "blue")
+        .attr("stroke-width", 2)
+        .datum(corners)             // this sets the data (automatically converts to string)
+        .attr("points", d => d);    // this uses the data to set the points attribute
+
+
+    // A bypass to use D3 functions at the console prompt
+    window.d3 = d3;
+</script>
+
+</body>
+</html>

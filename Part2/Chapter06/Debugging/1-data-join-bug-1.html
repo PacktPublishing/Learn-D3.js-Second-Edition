@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Common bugs 1: not setting required attributes when creating new elements in joins</title>
+    <style>
+        svg { border: solid gray 1px }
+    </style>
+</head>
+<body>
+<h1>Common bugs 1</h1>
+<h3>This code doesn't set required attributes when creating new elements (see code)</h3>
+<svg height="100" width="600"></svg>
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    // Step 1: initial enter operation - adds 5 elements in <svg>
+    d3.select("svg")
+        .selectAll(".dot")
+        .data([5,10,15,20,25])
+        .join("circle")
+        .attr("class", "dot");
+    update();
+
+    // Step 2: exit operation - removes 2 elements
+    setTimeout(apply, 2000, [19,15,26]);
+    // Step 3: new enter operation - adds +3 new elements
+    setTimeout(apply, 4000, [12,15,9,3,15,18]);
+
+    function update() {
+        d3.select("svg")
+          .selectAll(".dot")    // Selects .dot elements only (this is good, but see apply() below)
+            .attr("cy", 50)
+            .transition()
+            .attr("cx", (d,i) => i * 100 + 50)
+            .attr("r", d => d);
+    }
+
+    function apply(data) {
+        d3.select("svg")
+            .selectAll(".dot")   // Doesn't select new elements (created HERE) since they don't have class="dot"
+            .data(data)
+            .join("circle");     // BUG: you need to add class="dot" to new elements (or use an element selector)
+        update();
+    }
+
+    // This will allow update() and apply() to be called from the console.
+    window.update = update;
+    window.apply = apply;
+
+    // This will allow D3 functions to be called from the console.
+    window.d3 = d3;
+</script>
+
+</body>
+</html>

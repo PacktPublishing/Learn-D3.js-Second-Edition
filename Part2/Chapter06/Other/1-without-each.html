@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Adding child nodes without selection.each()</title>
+</head>
+<body>
+<h1>Appending child elements without using <code>each()</code></h1>
+<h3>Open JavaScript console for more details</h3>
+
+<svg height="150" width="600"></svg>
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    const selection = d3.select("svg")
+                        .selectAll("g")
+                           .data([3,5,9,15,24])
+                              .join("g")
+                                 .attr("transform", d => `translate(${d*10}, 50)`)
+
+    selection.append("circle").attr("r", d => d*2);
+    selection.append("text").attr("y",70).text(d => d);
+
+</script>
+
+</body>
+</html>

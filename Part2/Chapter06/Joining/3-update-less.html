@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Demonstrating data updates</title>
+    <style>
+        div {
+            margin: 2px 25px;
+            padding: 5px;
+            width: 300px;
+            border: solid 1px blue;
+        }
+        p {
+            border: solid 1px red;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+<h1>See results in console</h1>
+<div class="abc">
+    <p id="n2">A</p>
+    <p id="n3">B</p>
+    <p id="n4">C</p>
+</div>
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    // Obtaining an initial selection of existing <p> elements within the <div class="abc">
+    // and binding an array with equal-sized data
+    const sel = d3.select("div.abc")
+                  .selectAll("p")
+                  .data([33,18,24]);
+    console.log('>>> d3.select("div.abc").selectAll("p")', sel);
+    console.log('>>> sel.size()', sel.size());
+
+    // Binding less data
+    const updLess = sel.data([55]);
+    console.log('>>> sel.data([55])', updLess);
+    console.log('>>> updLess.size()', updLess.size());
+
+    // Getting the "enter" selection from the updLess selection (should be empty)
+    const enterLess = updLess.enter();
+    console.log('>>> updLess.enter()', enterLess);
+    console.log('>>> enterLess.size()', enterLess.size());
+
+    // Getting the "exit" selection from the updLess selection (should have 2 elements)
+    const exitLess = updLess.exit();
+    console.log('>>> updLess.exit()', exitLess);
+    console.log('>>> exitLess.size()', exitLess.size());
+
+    // Getting the merged selection after joining updMore
+    const mergedLess = updLess.join("p");
+    console.log('>>> updLess.join("p")', mergedLess);
+    console.log('>>> mergedLess.size()', mergedLess.size());
+
+    // Uncomment to allow access to the D3 functions via the console
+    window.d3 = d3;
+</script>
+
+</body>
+</html>

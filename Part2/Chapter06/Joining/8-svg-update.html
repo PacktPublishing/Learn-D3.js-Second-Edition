@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Initial update and join</title>
+    <style>
+        svg { border: solid gray 1px }
+    </style>
+</head>
+<body>
+
+<svg height="100" width="600"></svg>
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {update} from "./js/update.js";
+
+    // Binds data array and appends "circle" elements to match the data
+    d3.select("svg")
+      .selectAll("circle")      // avoid using element selectors in real code (prefer classes)
+        .data([5,10,15,20,25])
+          .join("circle");
+
+    // Initial update
+    update();   // see code in js/update.js
+
+    // This will allow update() to be called from the console.
+    window.update = update;
+
+    // This will allow D3 functions to be called from the console.
+    window.d3 = d3;
+</script>
+
+</body>
+</html>

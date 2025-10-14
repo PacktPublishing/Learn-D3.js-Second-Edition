@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Initial update and join - console view</title>
+    <style>
+        svg { border: solid gray 1px }
+    </style>
+</head>
+<body>
+<h1>Use JavaScript console to follow examples</h1>
+
+<svg height="100" width="600"></svg>
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {update} from "./js/update.js";
+
+    const sel = d3.select("svg").selectAll("circle");
+    console.log('sel = d3.select("svg").selectAll("circle")', sel);
+
+    const upd1 = sel.data([5,10,15,20,25]);
+    console.log('upd1 = sel.data([5,10,15,20,25])', upd1);
+
+    const merged1 = upd1.join("circle");
+    console.log('merged1 = upd1.join("circle")', merged1);
+
+    // call update() to see the effect.
+
+    // This will allow update() to be called from the console.
+    window.update = update;
+
+    // This will allow D3 functions to be called from the console.
+    window.d3 = d3;
+</script>
+
+</body>
+</html>

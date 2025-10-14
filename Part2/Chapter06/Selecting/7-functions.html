@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Selection functions</title>
+    <style>
+        h1 {font-size: 24px}
+        div {width: 200px}
+        canvas {
+            height: 100px;
+            border: 1px solid lightgray;
+            margin-top: 10px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<h1>See console for more results</h1>
+<p id="n1">Before</p>
+<div class="abc">
+    <p id="n2">A</p>
+    <p id="n3">B</p>
+    <p id="n4">C</p>
+</div>
+<div class="xy">
+    <p id="n5">X</p>
+    <p id="n6">Y</p>
+</div>
+<p id="n7">After</p>
+<canvas></canvas>
+<svg>
+    <circle id="c1" cx="50" cy="50" r="40" fill="red" />
+    <circle id="c2" cx="150" cy="50" r="20" fill="orange" />
+</svg>
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    // Inspecting the arguments of functions used in selections
+    const s = d3.select("div")
+                .selectAll("p");
+    console.log('s = d3.select("div").selectAll("p")', s);
+
+    console.log('Args of function(d,i,nodes) {}');
+    s.filter(function(d,i,nodes) {
+        console.log("d:",d,"i:",i,`nodes[${i}]:`,nodes[i],"this:",this);
+    });
+
+    // Inspecting the arguments of functions after using data()
+    const s2 = s.data([77,33,18]);
+    console.log('s.data([77,33,18])', s2);
+
+    console.log('Args of function(d,i,nodes) {}');
+    s2.filter(function(d,i,nodes) {
+        console.log("d:",d,"i:",i,`nodes[${i}]:`,nodes[i],"this:",this);
+    });
+
+    // Inspecting the arguments when using an arrow function
+    console.log('Args of (d,i,nodes) => {}');
+    s2.filter((d,i,nodes) => console.log("d:",d,"i:",i,`nodes[${i}]:`,nodes[i],"this:",this));
+
+    // Uncomment to allow access to the D3 functions via the console
+    window.d3 = d3;
+</script>
+
+</body>
+</html>

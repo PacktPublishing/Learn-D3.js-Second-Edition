@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Demonstrating data updates</title>
+    <style>
+        div {
+            margin: 2px 25px;
+            padding: 5px;
+            width: 300px;
+            border: solid 1px blue;
+        }
+        p {
+            border: solid 1px red;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+<h1>See results in console</h1>
+<div class="abc">
+    <p id="n2">A</p>
+    <p id="n3">B</p>
+    <p id="n4">C</p>
+</div>
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    // Obtaining an initial selection of existing <p> elements within the <div class="abc">
+    const sel = d3.select("div.abc")
+                  .selectAll("p");
+    console.log('>>> d3.select("div.abc").selectAll("p")', sel);
+    console.log('>>> sel.size()', sel.size());
+
+    // Binding an array with equal-sized data
+    const upd = sel.data([33,18,24]);
+    console.log('>>> sel.data([33,18,24])', upd);
+    console.log('>>> upd.size()', upd.size());
+
+    // Getting the "enter" selection from the "update" selection (should be empty)
+    const enterUpd = upd.enter();
+    console.log('>>> upd.enter()', enterUpd);
+    console.log('>>> enterUpd.size()', enterUpd.size());
+
+    // Getting the "exit" selection from the "update" selection (should have 2 elements)
+    const exitUpd = upd.exit();
+    console.log('>>> exitUpd.exit()', exitUpd)
+
+    // Uncomment to allow access to the D3 functions via the console
+    window.d3 = d3;
+</script>
+
+</body>
+</html>

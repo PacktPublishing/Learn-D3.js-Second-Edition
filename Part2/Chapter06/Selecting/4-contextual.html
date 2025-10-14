@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Contextual selections</title>
+    <style>
+        h1 {font-size: 24px}
+        div {width: 200px}
+        canvas {
+            height: 100px;
+            border: 1px solid lightgray;
+            margin-top: 10px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<h1>See console for results</h1>
+<p id="n1">Before</p>
+<div class="abc">
+    <p id="n2">A</p>
+    <p id="n3">B</p>
+    <p id="n4">C</p>
+</div>
+<div class="xy">
+    <p id="n5">X</p>
+    <p id="n6">Y</p>
+</div>
+<p id="n7">After</p>
+<canvas></canvas>
+<svg>
+    <circle id="c1" cx="50" cy="50" r="40" fill="red" />
+    <circle id="c2" cx="150" cy="50" r="20" fill="orange" />
+</svg>
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    // Using a combinator to select paragraphs in first div only (no grouping - _parents is [html])
+    const s1 = d3.selectAll("div.abc p");
+    console.log('d3.selectAll("div.abc p")', s1);
+
+    // Using nested selections (supports grouping - _parents is [div.abc])
+    const s2 = d3.select("div")
+                 .selectAll("p");
+    console.log('d3.select("div").selectAll("p")', s2);
+
+    // Using nested selectAll() to select first <p> in first <div>
+    // Groups into a selection, so _parents will contain: [div.abc]
+    const s3 = d3.select("div")
+                 .selectAll("p:first-child");   // _parents will contain: [div.abc]
+    console.log('d3.select("div").selectAll("p:first-child")', s3);
+
+    // Using nested select() instead of selectAll() to select first <p> in first <div>
+    // Does not group into a selection, so _parents will contain: [html]
+    const s4 = d3.select("div")
+                 .select("p");
+    console.log('d3.select("div").select("p")', s4);
+
+    // Uncomment to allow access to the D3 functions via the console
+    window.d3 = d3;
+</script>
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Using key functions</title>
+    <style>
+        svg { border: solid gray 1px }
+    </style>
+</head>
+<body>
+
+<svg height="100" width="600"></svg>
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    apply("Initial update", [5,10,15,20,25])
+    setTimeout(apply, 2000, "Removing update", [19,15,26])           // 15 is kept because of the key function
+    setTimeout(apply, 4000, "Adding update", [12,15,9,3,15,18])     // 15 is kept because of the key function
+
+    function apply(label, data) {
+        d3.select("svg")
+          .selectAll("circle")
+            .data(data, d => d) // key function: use the data value as the key
+               .join(
+                   enter => enter.append("circle").attr("fill", "green").attr("cy", 50),
+                   update => update.attr("fill", "blue"),
+                   exit => exit.transition().attr("fill", "red").transition().remove()
+               )
+               .transition()
+                  .attr("cx", (d,i) => i * 100 + 50)
+                  .attr("r", d => d);
+    }
+
+    // Uncomment to allow access to the D3 functions via the console
+    window.d3 = d3;
+</script>
+
+</body>
+</html>

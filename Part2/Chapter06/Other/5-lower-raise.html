@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Using selection.lower() and selection.raise()</title>
+</head>
+<body>
+
+<h1>Click on a circle</h1>
+
+<form>
+    <label><input type="radio" name="direction" value="back" checked> Move to back</label>
+    <label><input type="radio" name="direction" value="front"> Move to front</label>
+</form>
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    let toBack = true;
+    d3.selectAll("input[name='direction']")
+        .on("change", function() {
+            toBack = this.value === "back";
+        });
+
+    const svg = d3.select("body").append("svg")
+                                 .attr("width", 300)
+                                 .attr("height", 200);
+
+    svg.selectAll("circle")
+       .data(["red", "green", "blue", "orange", "purple"])
+         .join("circle")
+            .attr("cx", (d,i) => 50 + i*50).attr("cy", 100)
+            .attr("r", 40).attr("fill", d => d)
+            .on("click", function() {
+                const circle = d3.select(this);
+                toBack ? circle.lower() : circle.raise();
+            });
+
+    // Uncomment to allow access to the D3 functions via the console
+    window.d3 = d3;
+</script>
+</body>
+</html>

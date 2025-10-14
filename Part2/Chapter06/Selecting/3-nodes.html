@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Converting selections to nodes</title>
+    <style>
+        h1 {font-size: 24px}
+        div {width: 200px}
+        canvas {
+            height: 100px;
+            border: 1px solid lightgray;
+            margin-top: 10px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<h1>See console for results</h1>
+<p id="n1">Before</p>
+<div class="abc">
+    <p id="n2">A</p>
+    <p id="n3">B</p>
+    <p id="n4">C</p>
+</div>
+<div class="xy">
+    <p id="n5">X</p>
+    <p id="n6">Y</p>
+</div>
+<p id="n7">After</p>
+<canvas></canvas>
+<svg>
+    <circle id="c1" cx="50" cy="50" r="40" fill="red" />
+    <circle id="c2" cx="150" cy="50" r="20" fill="orange" />
+</svg>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    // Calling d3.select() with a DOM node to obtain a D3 selection
+    d3.selectAll("p")
+        .on("click", function(event) {
+            const p = event.target;     // a DOM node (same as 'this' in non-arrow function)
+            const sel = d3.select(p);   // convert to a D3 selection so we can use D3 methods
+            sel.text(d => d);           // using the text() method of the D3 selection
+        });
+
+    // Converting a D3 selection to DOM nodes
+    const oneP = d3.select("p").node();	// same as document.querySelector("p")
+    console.log('d3.select("p").node()', oneP);
+
+    const allP = d3.selectAll("p").nodes() 	// same as document.querySelectorAll("p")
+    console.log('d3.selectAll("p").nodes()', allP);
+
+    // Selecting the <canvas> element and obtaining its DOM node,
+    // so the getContext() method can be called, which is required to draw on the canvas
+    const canvas = d3.select("canvas").node();	// canvas is a HTMLCanvasElement object
+    const context = canvas.getContext("2d");
+    context.fillRect(10,10,100,100);            // draw 100x100 square at 10,10
+
+    // Uncomment to allow access to the D3 functions via the console
+    window.d3 = d3;
+</script>
+
+</body>
+</html>

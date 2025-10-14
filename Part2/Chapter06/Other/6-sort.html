@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Using selection.sort()</title>
+</head>
+<body>
+
+<h1>Using selection.sort()</h1>
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    const svg = d3.select("body").append("svg")
+        .attr("width", 300)
+        .attr("height", 200);
+
+    const data = [
+        {color: "red", r: 50},
+        {color: "green", r: 35},
+        {color: "blue", r: 25},
+        {color: "orange", r: 15},
+        {color: "purple", r: 40}
+    ];
+    const sel = svg.selectAll("circle")
+                   .data(data)
+                     .join("circle");
+    update();
+
+    sel.sort((a,b) => b.r - a.r); // descending order (smaller number puts on top)
+    update();
+
+    function update() {
+        svg.selectAll("circle")
+            .attr("cx", (d,i) => 50 + i*30)
+            .attr("cy", 100)
+            .attr("r", d => d.r)
+            .attr("fill", d => d.color);
+    }
+
+    // Uncomment to allow access to the D3 functions via the console
+    window.d3 = d3;
+</script>
+</body>
+</html>

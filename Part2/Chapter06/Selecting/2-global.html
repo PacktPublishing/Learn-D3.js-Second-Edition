@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Global selections</title>
+    <style>
+        h1 {font-size: 24px}
+        div {width: 200px}
+        canvas {
+            height: 100px;
+            border: 1px solid lightgray;
+            margin-top: 10px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<h1>See console for results</h1>
+<p id="n1">Before</p>
+<div class="abc">
+    <p id="n2">A</p>
+    <p id="n3">B</p>
+    <p id="n4">C</p>
+</div>
+<div class="xy">
+    <p id="n5">X</p>
+    <p id="n6">Y</p>
+</div>
+<p id="n7">After</p>
+<canvas></canvas>
+<svg>
+    <circle id="c1" cx="50" cy="50" r="40" fill="red" />
+    <circle id="c2" cx="150" cy="50" r="20" fill="orange" />
+</svg>
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    const allp = d3.selectAll("p");
+    console.log('d3.selectAll("p")', allp);
+
+    const none = d3.selectAll("div.klm");   // selects nothing, as there are no divs with class "klm" (see below)
+    console.log('d3.selectAll("div.klm")', none);
+
+    const pOne = d3.select("p")		   // selects the first <p> [p#n1]
+    console.log('d3.select("p")', pOne);
+
+    const divAll = d3.selectAll("div");             // selects both <div> elements [div.abc, div.xy]
+    console.log('d3.selectAll("div")', divAll);
+
+    const divOne = d3.select("div");                // selects the first <div> element [div.abc]
+    console.log('d3.select("div")', divOne);
+
+    const divTwo = d3.select("div:last-of-type")    // selects the second <div> [div.xy]
+    console.log('d3.select("div:last-of-type")', divTwo);
+
+    const divAbc = d3.select("div.abc")	   	   // selects the first <div> [div.abc]
+    console.log('d3.select("div.abc")', divAbc);
+
+    const pClass = d3.selectAll(".abc p");
+    console.log('d3.selectAll(".abc p")', pClass);
+
+    // Appending to an (initially) empty selection via data binding
+    const updated = none.data([42]).join("div").attr("class","klm").text("New div");
+    console.log('d3.selectAll("div.klm").data([1]).join("div").attr("class","klm")', updated);
+
+
+    // Uncomment to allow access to the D3 functions via the console
+    window.d3 = d3;
+</script>
+
+</body>
+</html>

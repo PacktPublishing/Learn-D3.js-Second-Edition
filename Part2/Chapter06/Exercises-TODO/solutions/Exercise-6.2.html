@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exercise 6.2</title>
+    <style>
+        svg {border: solid 1px}
+    </style>
+</head>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+    const size = 220;
+    const svg = d3.select("body")
+        .append("svg")
+        .attr("width", size)
+        .attr("height", size)
+        .attr("viewBox", `${-size} -${size} ${size*2} ${size*2}`);
+
+    // Ten corners of a decagon + closing point
+    const corners = [
+        [200,0],
+        [162,118],
+        [62,190],
+        [-62,190],
+        [-162,118],
+        [-200,0],
+        [-162,-118],
+        [-62,-190],
+        [62,-190],
+        [162,-118],
+        [200,0]
+    ];
+
+    svg.selectAll("circle")
+        .data(corners)
+        .join("circle")
+        .attr("cx", d => d[0])
+        .attr("cy", d => d[1])
+        .attr("r", 5)
+
+    // Add a bypass to use D3 functions at the console prompt
+    window.d3 = d3;
+</script>
+
+</body>
+</html>

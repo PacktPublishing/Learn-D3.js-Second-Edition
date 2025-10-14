@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Using remove in an exit selection</title>
+    <style>
+        div {
+            margin: 2px 25px;
+            padding: 5px;
+            width: 300px;
+            border: solid 1px blue;
+        }
+        p {
+            border: solid 1px red;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="abc">
+    <p id="n2">A</p>
+    <p id="n3">B</p>
+    <p id="n4">C</p>
+</div>
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    // Obtaining an initial selection of existing <p> elements within the <div class="abc">
+    // and binding a data array with less data
+    const update1 = d3.select("div.abc")
+                      .selectAll("p")
+                      .data([1]);
+
+    // Getting the "enter" selection from the "update" selection (should be empty)
+    const enter = update1.enter();
+    console.log('update1.enter()', enter)
+
+    // Getting the "exit" selection from the "update" selection (should have 2 elements)
+    const exit = update1.exit();
+    console.log('update1.exit()', exit)
+
+    // Marking the elements in the exit selection for removal
+    exit.text("To Remove")     // setting the text and style for the elements
+        .style("border", "solid 1px black");
+
+    // Waiting 5 seconds before removing the elements in the exit selection
+    //setTimeout(() => exit.remove(), 5000);
+
+    // Uncomment to allow access to the D3 functions via the console
+    window.d3 = d3;
+</script>
+
+</body>
+</html>
