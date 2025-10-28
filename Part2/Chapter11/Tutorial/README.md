@@ -7,7 +7,7 @@ NASA’s Goddard Institute for Space Studies (GISS) is a laboratory in New York 
 
 The charts that will be created are shown in _Figure 1_. The first is a multi-series line chart comparing the temperature variations for each year from 1880 to 2024. The second is a polar line chart (spiral) showing the same data in a radial layout.
 
-![Global warming visualizations](images/figure-1.png)
+![Global warming visualizations](images2/figure-1.png)
 _Figure 1 – Global warming visualizations: (left) multi-series line chart; (right) polar line chart (spiral). Data source: [https://data.giss.nasa.gov/gistemp](https://data.giss.nasa.gov/gistemp). 
 
 At the end of the tutorial, two exercises are provided to explore alternative line chart styles for the same dataset.
@@ -466,7 +466,7 @@ This code could be improved. Instead of adding and removing the year label on ea
 
 The screenshot in `Figure 2` shows the effect when the user hovers over the line for 2023.
 
-![A multi-series line chart showing global temperature variation from 1880 to 2025.](./images/figure-2.png)
+![A multi-series line chart showing global temperature variation from 1880 to 2025.](images2/figure-2.png)
 _Figure 2 – A multi-series line chart showing global temperature variation from 1880 to 2025.
 Data source: [https://data.giss.nasa.gov/gistemp](https://data.giss.nasa.gov/gistemp). Code: [`StepByStep1/Cartesian/final/`](../StepByStep1/Cartesian/final/)._
 
@@ -500,7 +500,7 @@ export async function load() {
 
 With the change, each entry should have 13 points, as `data.years` in the console.
 
-![The data after repeating the next year's first value as this year's last value.](./images/figure-3.png)
+![The data after repeating the next year's first value as this year's last value.](images2/figure-3.png)
 Figure 3 – The data after repeating the next year's first value as this year's last value. Code: `StepByStep/Radial/1-data/`.
 
 The scales also need to be updated, since we are now using a radial layout.
@@ -589,7 +589,7 @@ utils.radialAxes().container(chart)
 
 The rest of the code is identical to the Cartesian version, since all the magic is already performed by the line function.  You can also reuse all the event handling code without changing anything. After rendering the axis, you should have a chart like the one shown in _Figure 4_.
 
-![A radial line chart showing increasing relative global temperatures.](./images/figure-4.png)
+![A radial line chart showing increasing relative global temperatures.](images2/figure-4.png)
 Figure 4 – Radial line chart showing increasing relative global temperatures. Source: NASA Godard Institute for Space Studies (data.giss.nasa.gov/gistemp). Code: `StepByStep/Radial/4-interactive/`.
 
 If you would like to experiment further, try the exercises below, which show the data using other line chart styles.
@@ -602,14 +602,14 @@ The following exercises explore the global warming dataset with different line v
 
 Create a Cartesian visualization for the GISS temperatures plotting a single line for all years. Use a full date (instead of a month) and a timescale for the _x_-axis. Each point should be an ISO Date in the format year-month-day. This means over 1700 points for the _x_-axis. The result should look like the screenshot in _Figure 5_. You can start with the [template folder](../StepByStep/exercise1/template), which contains comments and boilerplate code.
 
-![Line chart created in Exercise 1.](./images/figure-5.png)
+![Line chart created in Exercise 1.](images2/figure-5.png)
 _Figure 5 – Line chart created in Exercise 1. Code: [`/StepByStep/exercise1/solution`](../StepByStep/exercise1/solution)._
 
 ### Exercise 2: plot the data as an area chart with a median line
 
 Plotting 1700 points in a single line may be too dense to see the temperature variations for each year. Instead of using monthly data points, compute the median, minimum, and maximum temperature for each year, then plot a shaded area between a topline and a baseline to show the temperature range, and a line for the median temperature. Use curves. The result should look like the screenshot in _Figure 6_. You can start with the [template folder](../StepByStep/exercise2/template), which contains comments and boilerplate code.
 
-![Line chart created in Exercise 2.](./images/figure-6.png)
+![Line chart created in Exercise 2.](images2/figure-6.png)
 _Figure 6 – Line chart created in Exercise 2. Code: [`/StepByStep/exercise2/solution`](../StepByStep/exercise2/solution)._
 
 
