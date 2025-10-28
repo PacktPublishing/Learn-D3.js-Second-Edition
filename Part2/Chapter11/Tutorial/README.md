@@ -118,7 +118,7 @@ Year,Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec
 2025,1.37,1.25,1.36,1.23,1.07,1.05,1.01,1.14,,,,
 ```
 
-To avoid unnecessary duplication, all completed steps in `StepByStep/Cartesian` reference the original file from a common `StepByStep/data/` folder, using the following URL (from `js/data.js`):
+To avoid unnecessary duplication, all completed steps in `StepByStep/cartesian` reference the original file from a common `StepByStep/data/` folder, using the following URL (from `js/data.js`):
 
 ```js
 const file = "../data/GLB.Ts.1880.2025.csv";
@@ -175,7 +175,7 @@ The data for the _y_-axis can be grouped by year in an array where the first ele
 data.years = csv.map(obj => [obj.Year, data.months.map(d => [d, obj[d]])]);
 ```
 
-This will be stored in the `data.years` array. Each entry will have the format `[year,Array(12)]`, where `Array(12)` contains the month-value pairs for that year.
+This will be stored in the `data.years` array. Each entry will have the format `[year, Array(12)]`, where `Array(12)` contains the month-value pairs for that year.
 
 Place this code in the `load()` function, which now looks like this:
 
@@ -204,11 +204,13 @@ The structure of the `data` object is now as follows:
 }
 ```
 
-Open the `index.html` file in your browser (using a local web server) and check the console to verify that the data has been loaded and parsed correctly, and has the structure shown above.
+Open the `index.html` file in your browser (using a local web server) and check the console to verify that the data has the structure shown above.
+
+We can now set up the scales.
 
 ### Step 3: Configuring the scales
 
-We will now configure the scales to map the data to screen coordinates. Open the `js/common.js` module to add and export two more objects: `dim` and `app`:
+The scales will map the data to screen coordinates. Open the `js/common.js` module to add and export two more objects: `dim` and `app`:
 
 ```js
 import * as d3 from "https://cdn.skypack.dev/d3@7";
@@ -240,7 +242,7 @@ const app = {
     }
 };
 ```
-We will use a point scale for the months (_x_-axis) and a linear scale for the temperatures (_y_-axis). At this point, we can set up the ranges for the scales, but not the domains yet, since they depend on the data. The
+We will use a point scale for the months (_x_-axis) and a linear scale for the temperatures (_y_-axis). At this point, we can set up the ranges for the scales, but not the domains yet, since they depend on the data.
 
 Open the `js/data.js` module again and export a new `config()` function:
 
@@ -278,7 +280,7 @@ To understand how the data above was obtained, let's take a look at the structur
 * We are selecting the second element `d[1]`, which is a 12-element array. 
 * Each element in that 12-element array has the format `[month, temperature]`.
 * We are again selecting the second element `v[1]`, which is the temperature. 
-* The result is an array with the format `[Array(12),Array(12),…]` where each 12-element array contains only the temperature values for each year.
+* The result is an array with the format `[Array(12), Array(12), …]` where each 12-element array contains only the temperature values for each year.
 
 Log the `series` array to the console to verify its structure. It should look like this:
 
@@ -292,7 +294,7 @@ Log the `series` array to the console to verify its structure. It should look li
 ]
 ```
 
-A flattened version of this array to `d3.extent()` will return what we need to compute the extent and set up the domain for `app.scale.temp`. Add the following code to the `config()` function:
+Passing a flattened version of this array to `d3.extent()` will return what we need to compute the extent and set up the domain for `app.scale.temp`. Add the following code to the `config()` function:
 
 ```js
 app.scale.temp.domain(d3.extent(series.flat()));
