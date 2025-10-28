@@ -51,7 +51,7 @@ app/
     └── index.html
 ```
 
-To code as you read, you can create either a similar project structure or start with the template files provided for step 1 in [`Chapter11/StepByStep/Cartesian/1-start/`](../StepByStep/cartesian/2-start/). 
+To code as you read, you can create either a similar project structure or start with the template files provided for step 1 in [`Chapter11/StepByStep/cartesian/1-start/`](../StepByStep/cartesian/2-start/). 
 
 Follow each completed step using the app folders in [`Chapter11/StepByStep/`](../StepByStep/). The modified files in each step are versioned as `main-1.0.js`, `main-1.1.js`, etc., so you can compare them with the original files before each change. The steps use a common data file located in the chapter's `StepByStep/data/` folder.
 
@@ -59,7 +59,7 @@ To view the results after each step, launch its `index.html` file in a local web
 
 ### Step 1: Initial setup
 
-This step describes the initial file structure for the project, as shown above. Two files won't be modified throughout the tutorial: `index.html` and `css/main.css`. The [`index.html`](../StepByStep/1-start/index.html) file is a normal HTML file used as the entry point for the data visualization, and the [`CSS file`](../StepByStep/1-start/css/main.css) contains basic styles for the body and SVG elements, that won't be used until step 5.
+This step describes the initial file structure for the project, as shown above. Two files won't be modified throughout the tutorial: `index.html` and `css/main.css`. The [`index.html`](../StepByStep/cartesian/1-start/index.html) file is a normal HTML file used as the entry point for the data visualization, and the [`CSS file`](../StepByStep/cartesian/1-start/css/main.css) contains basic styles for the body and SVG elements, that won't be used until step 5.
 
 Most of the code in the JavaScript modules (located in the `js/` folder) will use D3, so they should import it:
 
