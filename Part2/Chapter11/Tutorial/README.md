@@ -16,7 +16,7 @@ At the end of the tutorial, two exercises are provided to explore alternative li
 The following sections are contained in this tutorial:
 - [144 years in a multi-series line chart](#144-years-in-a-multi-series-line-chart)
   - [Step 1: Initial setup](#step-1-initial-setup)
-  - [Step 2: The data](#step-2-getting-the-data)
+  - [Step 2: Getting the data](#step-2-getting-the-data)
   - [Step 3: Configuring the scales](#step-3-configuring-the-scales)
   - [Step 4: Writing the line function](#step-4-writing-the-line-function)
   - [Step 5: Rendering the chart](#step-5-rendering-the-chart)
