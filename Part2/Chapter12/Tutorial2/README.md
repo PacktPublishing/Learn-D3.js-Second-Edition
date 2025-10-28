@@ -118,10 +118,10 @@ import {load} from "./data.js";
 load().then(raw => console.log(raw));   // Logs the raw data returned by `load()`
 ```
 
-Create the `js/data.js` module to load the CSV file, import D3 and declare the path to the data file:
+Create the `js/data.js` module to load the CSV file, import D3 and declare the path to the data file (assuming you have the file in a local `data/` folder):
 
 ```js
-const file = "../../data/slave-trade-data.csv";
+const file = "../data/slave-trade-data.csv";
 ```
 
 Create and export an asynchronous `load()` function in `data.js` and use `d3.csv()` to parse the data. A row function is used to transform the values in the `Decade` column (a string like `'1511-1520'`) into a year that represents that decade, and to convert the other values to numbers. For now, we will just return the parsed data for inspection:
@@ -148,7 +148,7 @@ Reload the page and inspect the data it in your browser’s console. Now it’s 
     /* … +34 objects … */                                                   ]
 ```
 
-Now we can configure a stacking function.
+The next step is to configure a stacking function.
 
 ## Step 3: Creating the stacked data
 
@@ -162,7 +162,7 @@ import {data} from "./common.js";
 load().then(() => console.log(data));   // Now logs the `data` object
 ```
 
-Return to `data.js` to complete the `load()` function. After loading the data, it will create the stacked dataset and set up the scales, area functions and a color function. We will do this in separate functions, local to the module:
+Return to `data.js` to complete the `load()` function. After loading the data, it creates the stacked dataset and sets up the scales, area functions and a color function. We do this in separate functions, local to the module:
 
 ```js
 export async function load(file) {
