@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exercise 1: a multi-series line chart showing points</title>
+    <style>
+        .dataset path {
+            stroke-width: 3px;
+            fill: none;
+        }
+    </style>
+</head>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as utils from "../../js/chart-utils.js";
+
+    const dim = { width: 800, height: 400, margin: 75 };
+    const scale = {
+        x: d3.scaleLinear().range([dim.margin, dim.width - dim.margin]),
+        y: d3.scaleLinear().range([dim.height - dim.margin, dim.margin])
+    }
+    const svg = d3.select("body").append("svg").attr("height", dim.height).attr("width", dim.width);
+
+    // Change this to add more data series
+    const series = 5;
+
+    // The data is an array of series, each with 5 points and random y-values
+    const datasets = [];
+
+    // There are 5 x-values in each series
+    const steps = d3.range(0,21,5); // [0,5,10,15,20]
+
+    // The y-values are random numbers between 0 and 50
+    for (let i = 0; i < series; i++) {
+        datasets.push(steps.map(d => [d, Math.random() * 50]));
+    }
+
+    // Scales
+    scale.x.domain(d3.extent(d3.merge(datasets), d => d[0]));
+    scale.y.domain(d3.extent(d3.merge(datasets), d => d[1]));
+
+    // Generates a color for each data series
+    const colorScale = d3.scaleOrdinal(d3.schemeCategory10)
+                         .domain([0,datasets.length]);
+
+    // line function for all lines
+    const line = d3.line()
+                   .x(d => scale.x(d[0]))
+                   .y(d => scale.y(d[1]));
+
+    // Bind the data array to a container of <g> element.
+    // Each child <path> will render a line from the data series (inherited datum)
+    // Each <circle> will render a point from each series.
+    svg.selectAll("g.dataset")
+       .data(datasets)
+         .join("g")
+            .attr("class", "dataset")
+            .each(function(d,i) {
+                d3.select(this)
+                    .append("path")
+                    .attr("d", line)
+                    .style("stroke", colorScale(i));
+                d3.select(this)
+                  .selectAll("circle.point")
+                    .data(d)
+                      .join("circle")
+                        .attr("class", "point")
+                        .attr("cx", p => scale.x(p[0]))
+                        .attr("cy", p => scale.y(p[1]))
+                        .attr("r", 5)
+                        .style("fill", colorScale(i));
+            });
+
+    // Draw the axes (we are using a utility function from cartesian-chart-utils.js)
+    utils.cartesianAxes()
+        .container(svg)
+        .xScale(scale.x)
+        .yScale(scale.y)()
+
+    // Display a legend at right (we are using a utility function from cartesian-chart-utils.js)
+    const legend = svg.append("g")
+                      .attr("transform", `translate(${[dim.width - dim.margin + 20, dim.margin]})`);
+    utils.legend()
+        .container(legend)
+        .data(datasets.map((d,i) => `Series ${i+1}`))
+        .color(colorScale)();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+path.median, path.months {
+    stroke-width: 1.2px;
+    fill: none;
+}
+path.median {
+    stroke: black;
+    stroke-width: 2px;
+}
+path.extents {
+    fill: gray;
+    opacity: 0.5;
+}
+h1, p {
+    font-family: sans-serif;
+}

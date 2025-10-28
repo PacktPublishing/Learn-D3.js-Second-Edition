@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>A multi-series line chart</title>
+    <title>A multi-series line chart from an array of objects</title>
     <style>
         .dataset {
             stroke-width: 3px;
@@ -35,22 +35,23 @@
     const steps = d3.range(0,21,5); // [0,5,10,15,20]
 
     // The y-values are random numbers between 0 and 50
+    // In this example, each data series is an array of objects
     for (let i = 0; i < series; i++) {
-        datasets.push(steps.map(d => [d, d3.randomInt(50)()]));
+        datasets.push(steps.map( (d,i) => ({step: d, value: d3.randomInt(50)(), index: i})));
     }
 
-    // Scales
-    scale.x.domain(d3.extent(d3.merge(datasets), d => d[0]));
-    scale.y.domain(d3.extent(d3.merge(datasets), d => d[1]));
+    // Scales -
+    scale.x.domain(d3.extent(datasets.flat(), d => d.step));
+    scale.y.domain(d3.extent(datasets.flat(), d => d.value));
 
     // Generates a color for each data series
-    const colorScale = d3.scaleOrdinal(d3.schemeCategory10)
-                         .domain([0,datasets.length]);
+    const color = d3.scaleOrdinal(d3.schemeCategory10)
+                    .domain([0,datasets.length]);
 
     // line function for all lines
     const line = d3.line()
-                   .x(d => scale.x(d[0]))
-                   .y(d => scale.y(d[1]));
+                   .x(d => scale.x(d.step))
+                   .y(d => scale.y(d.value));
 
 
     // Bind the data array to a selection of <path> elements. Each <path> will receive a data series.
@@ -59,7 +60,7 @@
          .join("path")
            .attr("class", "dataset")
            .attr("d", line)
-           .style("stroke", colorScale);
+           .style("stroke", color);
 
     // Draw the axes (we are using a utility function from chart-utils.js)
     utils.cartesianAxes()

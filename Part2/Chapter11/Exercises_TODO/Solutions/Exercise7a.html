@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exercise 7: Average monthly temperature in selected cities</title>
+    <style>
+        path.months {
+            stroke-width: 3px;
+            fill: none;
+            opacity: .75;
+        }
+        h1, p, text {
+            font-family: sans-serif;
+        }
+        p {font-size: 10pt}
+        h1 {font-size: 16pt}
+
+        .chart line, .chart path {
+            stroke: darkslategray;
+            opacity: .5;
+            stroke-width: 1px;
+        }
+        text.label {
+            text-transform: capitalize;
+        }
+        .legend text {
+            font-size: 11px;
+            text-anchor: start;
+        }
+    </style>
+</head>
+<body>
+<h1>Average monthly temperature (ºC) in selected cities</h1>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as utils from "../../js/chart-utils.js";
+
+
+    const dim = {width: 500, height: 500, margin: {x: 150, y: 30}};
+    const scale = {
+        angle: d3.scaleLinear().range([0, 2*Math.PI]),
+        radius: d3.scaleLinear().range([0, dim.width/2 - dim.margin.y])
+    }
+    const svg = d3.select("body").append("svg").attr("height", dim.height).attr("width", dim.width + dim.margin.x);
+
+  // Temperature data (Source: Wikipedia)
+  const file = "../../data/temperatures.csv";
+
+  // Load, parse and prepare data
+  d3.text(file)
+    .then(text => {
+        // Each array in set contains city and average temperature for each month [[city, t1, t2, ..., t12], ...]
+        const rawData = d3.csvParseRows(text, d3.autoType);
+
+        const valueRows = rawData.filter((d,i) => i > 0) // all except first row
+        const months = rawData.filter((d,i) => i === 0)  // get first row
+                              .map(d => d.slice(1))[0]   // just the month names
+
+        // Each array in set contains city and array of temperature in ºC [[city, [t1, t2, ..., t12, t1]], ... ]
+        const dataByCity = valueRows.map(d => [d[0], d.slice(1).concat(d[1])]);
+
+        // Plots a graph of temperatures in ºC per city
+        plot(dataByCity, months);
+
+  });
+
+  function plot(data, months) { console.log(data)
+
+      scale.angle.domain([0, months.length]);
+
+      const values = d3.merge(data.map(d => d[1]));
+      scale.radius.domain([d3.min(values) - 10, d3.max(values) + 10]);
+
+      const color = d3.scaleOrdinal(d3.schemeTableau10);
+
+      // Line functions
+      const tempLine = d3.lineRadial()
+                         .angle((d,i) => d ? scale.angle(i) : scale.angle(i-1))
+                         .radius(d => scale.radius(d))
+                         .curve(d3.curveCatmullRom);
+
+      const container = svg.append("g")
+                            .attr("transform", `translate(${dim.width/2},${dim.height/2})`);
+
+      // Render temperature lines
+      container
+        .selectAll("g.line")
+          .data(data)
+            .join("g")
+              .attr("class", "line")
+              .append("path")
+                .datum(d => d[1])
+                  .attr("class", "months")
+                  .attr("d", tempLine)
+                  .style("stroke", (d,i) => color(i));
+
+      // Draw radial axes
+      utils.radialAxes()
+          .container(container)
+          .aScale(scale.angle)
+          .rScale(scale.radius)
+          .angularData(months)
+          .numTicks(12)
+          .useGrid(false)
+          .backdropOpacity(.9)();
+
+      // Display a legend
+      const legend = svg.append("g")
+          .attr("transform", `translate(${[dim.width, dim.margin.y]})`);
+      utils.legend()
+          .container(legend)
+          .data(data.map(d => d[0]))
+          .color(color)();
+  }
+
+</script>
+
+</body>
+</html>

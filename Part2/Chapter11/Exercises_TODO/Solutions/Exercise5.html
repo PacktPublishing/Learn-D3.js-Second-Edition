@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exercise 5: A step chart</title>
+    <style>
+        path {fill: none}
+        path.line {
+            stroke: red;
+            stroke-width: 2px;
+        }
+        h1, p, text {
+            font-family: sans-serif;
+        }
+        p {font-size: 10pt}
+        h1 {font-size: 16pt}
+    </style>
+</head>
+<body>
+<h1>Number of earthquakes with magnitude >= 6</h1>
+<p>Source: Wikipedia</p>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as utils from "../../js/chart-utils.js";
+
+    // Constants
+    const data = {};
+    const app = {};
+    const dim = {
+        width: 800, height: 500, margin: 50
+    };
+    const scale = {
+        x: d3.scalePoint().range([dim.margin, dim.width - dim.margin]),
+        y: d3.scaleLinear().range([dim.height - dim.margin, dim.margin])
+    }
+    const svg = d3.select("body").append("svg").attr("height", dim.height).attr("width", dim.width);
+
+    const file = "../../data/earthquakes-6-plus.csv";
+
+    // Run the app
+    load(file).then(draw);
+
+
+    // Functions
+    async function load(file) {
+        const csv = await d3.csv(file, d3.autoType);
+        console.log('csv', csv[0]);
+
+        // Convert data to standard format [[year, value], [year,value], ...]
+        const stdData = Object.entries(csv[0]).map(d => [d[0], d[1]]);
+        console.log('data', stdData);
+
+        // Plot the chart - repeating last value as 2024 to extend the line and use step-after
+        const lastValue = stdData[stdData.length-1][1];
+        data.quakes = stdData.concat([['2024', lastValue]]);
+
+        config();
+    }
+
+    function config() {
+        scale.x.domain(data.quakes.map(d => d[0]));
+        scale.y.domain([100, d3.max(data.quakes, d => d[1])]);
+
+        app.line = d3.line()
+            .x(d => scale.x(d[0]))
+            .y(d => scale.y(d[1]))
+            .curve(d3.curveStepAfter);
+    }
+
+    function draw() {
+        svg.append("path")
+            .datum(data.quakes)
+            .attr("class", "line")
+            .attr("d", app.line);
+
+        utils.cartesianAxes()
+            .container(svg)
+            .xScale(scale.x)
+            .yScale(scale.y)
+            .xLabel("Month")
+            .yLabel("Temperature (°C)")
+            .showHorizontalGrid(true)();
+    }
+
+</script>
+</body>
+</html>
