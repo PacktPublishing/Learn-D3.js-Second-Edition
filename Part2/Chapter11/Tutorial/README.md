@@ -98,7 +98,7 @@ You can now open `index.html` in your browser (using a local web server) to veri
 
 The modules will be progressively modified in the following steps to create the complete application. In the next step, we will write the `load()` function in `js/data.js` to load and parse the data.
 
-### Step 2: The data
+### Step 2: Getting the data
 
 This application uses a public domain CSV file obtained from the Goddard Institute for Space Studies [website](https://data.giss.nasa.gov/gistemp). The CSV file, called `GLB.Ts+dSST.csv`, includes measured and estimated temperature anomalies in degrees Celsius between 1880 and 2024. Temperature anomalies indicate how much higher or lower an average temperature is compared to a reference period. By plotting lines for each year in a Cartesian system we can view how the Earth's temperature has changed throughout these years.
 
