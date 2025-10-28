@@ -1,0 +1,25 @@
+* {
+    color: black !important;
+}
+body {
+    font-family: 'Source Serif 4', sans-serif;
+    line-height: 1.6;
+    background-color: white;
+    margin: 20px;
+    width: 800px;
+}
+h1, h2, h3 {
+    color: #333;
+}
+code {
+    font-family: 'NK57 Monospace Cd Lt', serif;
+    background-color: #f4f4f4;
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+pre {
+    background-color: #f4f4f4;
+    padding: 10px;
+    border-radius: 4px;
+    overflow-x: auto;
+}

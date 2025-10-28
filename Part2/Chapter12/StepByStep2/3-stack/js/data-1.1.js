@@ -1,7 +1,9 @@
 import * as d3 from "https://cdn.skypack.dev/d3@7";
 import {app, data} from "./common-1.0.js";
 
-export async function load(file) {
+const file = "../../data/slave-trade-data.csv";
+
+export async function load() {
     const rawData = await d3.csv(file, row => {
         row.Decade = +row.Decade.split("-")[0] - 1;  // Parse decade as a number
         Object.entries(row).forEach(([k,v]) => {

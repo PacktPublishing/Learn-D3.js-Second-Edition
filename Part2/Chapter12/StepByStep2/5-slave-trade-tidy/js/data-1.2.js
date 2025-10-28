@@ -1,9 +1,11 @@
 import * as d3 from "https://cdn.skypack.dev/d3@7";
 import {app, data} from "./common-1.0.js";
 
+const file = "../../data/slave-trade-data.csv";
+
 const endsIn = 1870; // last year of the dataset
 
-export async function load(file) {
+export async function load() {
     const rows = await d3.csv(file, row => {
         const rowArray = [];
         const decade = +row.Decade.split('-')[0] - 1; // get first year of decade
@@ -19,15 +21,16 @@ export async function load(file) {
         });
         return rowArray;
     });
-    console.log(rows)
 
+    // This creates a tidy representation of the data
     const tidyData = rows.flat().sort((a,b) => d3.ascending(a.Decade, b.Decade));
+
+    // Inspect the tidy data
+    console.log(tidyData);
 
     makeStack(tidyData);
     config(tidyData);
 }
-
-
 
 function makeStack(rawData) {
     // Keys are the flags (this is a Set)
