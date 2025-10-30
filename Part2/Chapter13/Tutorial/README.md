@@ -5,8 +5,8 @@ In this tutorial, you will create a racing bar chart – a horizontal bar chart 
 The chart compares the gross GDP of different countries from 1970 to 2022. A static screenshot of the final application is shown in _Figure 1_. Open [`Examples/Bar-chart-race-GDP`](../Examples/Bar-chart-race-GDP/index.html) to see it in action.
 
 
-[![Static screenshot of a racing bars animation](./images/figure-1.png)](../Examples/Bar-chart-race-GDP/index.html)
-_Figure 1 – Static screenshot of a racing bars animation. Click to see it animated. Code: [`Examples/Bar-chart-race-GDP`](../Examples/Bar-chart-race-GDP)._
+![Static screenshot of a racing bars animation](./images/figure-1.png)
+_Figure 1 – Static screenshot of a racing bars animation. Code: [`Examples/Bar-chart-race-GDP`](../Examples/Bar-chart-race-GDP)._
 
 The project folder for this tutorial follows the same structure as previous examples, with separate folders for data, CSS stylesheets, and JavaScript modules. This project has an additional module for the animation code:
 
@@ -348,7 +348,8 @@ function drawBars(data) {
 The text formatter represents billions with a `'G'` suffix (for Giga). We replaced it for a `'B'` (Billions). Launch the `index.html` file, and you should see the screenshot in _Figure 4_, which also shows the generated code.
 
 ![A static bar chart created from a single data frame](./images/figure-4.png)
-Figure 4 – A static bar chart created from a single data frame, showing generated SVG code. Code: [`StepByStep/step-3-bars/`](../StepByStep/step-3-bars/).
+
+_Figure 4 – A static bar chart created from a single data frame, showing generated SVG code. Code: [`StepByStep/step-3-bars/`](../StepByStep/step-3-bars/)._
 
 To inspect the bar chart for another year, call `show()` (in the `draw()` function) with any index between 0 and 52:
 
@@ -490,6 +491,7 @@ function joinExit(exit) {
 Now you should see bars switching positions as their values become larger or smaller than their neighbors, while other bars slowly enter and leave the chart at each click (_Figure 5_).
 
 ![The user can now update the chart clicking on it](./images/figure-5.png)
+
 _Figure 5 – The user can now update the chart clicking on it. Code: [`StepByStep/4-update`](../StepByStep/4-update)._
 
 This step involved many changes, so make sure you understand each function and how they interact. If necessary, refer to the complete code in the [`StepByStep/4-update`](../StepByStep/4-update) folder.
@@ -856,6 +858,7 @@ export function show(dataFrame) {
 Reload the page to see an animated version of `Figure 7`. Now, as the axis moves, you can perceive that the bars are getting bigger even though the largest one does not move.
 
 ![A screenshot of the bar chart with animated axes](./images/figure-7.png)
+
 _Figure 7 – A screenshot of the bar chart race with animated axes. Code: [`StepByStep/8-axes/`](../StepByStep/8-axes/)._
 
 This animation is finished, but it would be much cooler if we could show the flags of each country on each bar. Let’s do this in the next step.
@@ -865,6 +868,7 @@ This animation is finished, but it would be much cooler if we could show the fla
 In this step, we will add flag images to each bar. These images will be clipped to fit the bar’s height and aligned to the right of each bar. Figure 8 shows a sketch of how it should work and the SVG code that will be generated.
 
 ![A plan for adding images to the bars and the generated SVG code](images/figure-8.png)
+
 _Figure 8 – A plan for adding images to the bars and the generated SVG code._
 
 A collection of royalty-free flag PNG thumbnails is available in `Chapter13/data/flags`. To use them, copy the `flags/` directory to your project's `data/` folder and add the following constant to your `common.js` module:
@@ -885,7 +889,7 @@ File names use the three-letter code for each country (e.g. `USA.png`, `CHN.png`
 chart.icons = new Map(rawData.map(d => [d.country, d.code]));
 ```
 
-The flag will be placed over the bar and right-aligned. If the bar is smaller than the image, it needs to be clipped. A clipping mask can be created in SVG with the `<clipPath>` element (see example in `SVG/5-svg-clipPath.html`), which should contain a shape to be used as the mask. This shape is the bar. We can’t place the bar in `<clipPath>` but we can reference it using `<use>` if each bar has an ID.
+The flag will be placed over the bar and right-aligned. If the bar is smaller than the image, it needs to be clipped. A clipping mask can be created in SVG with the `<clipPath>` element (see example in [`SVG/5-svg-clipPath.html`](../SVG/5-svg-clipPath.html)), which should contain a shape to be used as the mask. This shape is the bar. We can’t place the bar in `<clipPath>` but we can reference it using `<use>` if each bar has an ID.
 
 We are using country names as keys, which sometimes have spaces in their names (e.g. “United Kingdom”). To use them in SVG we need to remove these spaces. The `makeID()` function below will replace spaces with underlines, creating valid IDs that can be used in SVG:
 
@@ -982,6 +986,7 @@ function resizeBars(group, barWidth, value) {
 Now you can reload the page and see the complete animation with images (_Figure 9_). Notice how the flags are clipped correctly, when necessary, to fit each bar.
 
 ![The bar chart race with country flags](./images/figure-9.png)
+
 _Figure 9 – The bar chart race with country flags. Code: [`StepByStep/step-9-images/`](../StepByStep/step-9-images/)._
 
 Our animation is complete. It runs continuously and smoothly. What else could you want? Perhaps we could pause it at a certain point. Let’s add this feature in the final step.
@@ -1061,7 +1066,7 @@ function showLegend() {
 The expected result is shown in _Figure 10_. The commented solution is in [`StepByStep/step-11-continents/`](../StepByStep/step-11-continents/).
 
 ![The bar chart race using continent colors](images/figure-10.png)
-_Figure 10 – The bar chart race using continent colors. Code: [`StepByStep/step-11-continents/`](../StepByStep/step-11-continents/)._
 
+_Figure 10 – The bar chart race using continent colors. Code: [`StepByStep/step-11-continents/`](../StepByStep/step-11-continents/)._
 
 This ends the tutorial. You will find the code for each step in the [`StepByStep/`](../StepByStep/) folder, including an extra step that adds continent information for the chart. The final application, with some additional improvements (including the exercise), and other examples using the same racing bar chart code are available in the [`Examples/`](../Examples/) folder.
