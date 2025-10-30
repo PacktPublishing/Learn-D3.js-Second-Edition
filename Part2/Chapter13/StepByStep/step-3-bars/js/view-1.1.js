@@ -22,10 +22,11 @@ export function draw() {
         .attr("y", dim.height - dim.margin.bottom)
         .text("YEAR");
 
-    // 2) A container for the chart entries (bars + labels + icons)
+    // 3) A container for the chart entries (bars + labels + icons)
     svg.append("g")
         .attr("class", "entries");
 
+    // 4) Show a single year
     show(chart.data[0]);
 }
 

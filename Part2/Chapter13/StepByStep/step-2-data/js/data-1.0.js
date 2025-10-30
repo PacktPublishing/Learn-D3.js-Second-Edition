@@ -19,7 +19,7 @@ function prepare(rawData) {
     // 2) Create a nested map of values per date and then name, convert to array and sort by date
     const byYearMap = d3.rollup(rawData, v => v[0].value,
                                          d => d.year,
-                                            d => d.country);
+                                         d => d.country);
     const byYearArray = [...byYearMap].sort((a,b) => d3.ascending(a[0],b[0]));
 
     // 3) Set the data for the chart.
