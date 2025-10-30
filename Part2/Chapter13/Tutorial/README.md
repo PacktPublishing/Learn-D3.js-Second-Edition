@@ -4,8 +4,9 @@ In this tutorial, you will create a racing bar chart – a horizontal bar chart 
 
 The chart compares the gross GDP of different countries from 1970 to 2022. A static screenshot of the final application is shown in _Figure 1_. Open [`Examples/Bar-chart-race-GDP`](../Examples/Bar-chart-race-GDP/index.html) to see it in action.
 
-![Static screenshot of a racing bars animation](./images/figure-1.png)
-_Figure 1 – Static screenshot of a racing bars animation. Code: [`Examples/Bar-chart-race-GDP`](../Examples/Bar-chart-race-GDP)._
+
+[![Static screenshot of a racing bars animation](./images/figure-1.png)](../Examples/Bar-chart-race-GDP/index.html)
+_Figure 1 – Static screenshot of a racing bars animation. Click to see it animated. Code: [`Examples/Bar-chart-race-GDP`](../Examples/Bar-chart-race-GDP)._
 
 The project folder for this tutorial follows the same structure as previous examples, with separate folders for data, CSS stylesheets, and JavaScript modules. This project has an additional module for the animation code:
 
