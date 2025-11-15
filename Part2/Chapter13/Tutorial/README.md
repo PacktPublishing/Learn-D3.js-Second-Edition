@@ -1,12 +1,12 @@
-# The GDP race
+# The GDP Race
 
-In this tutorial, you will create a racing bar chart – a horizontal bar chart where each bar grows and shrinks and moves up and down as the time elapses. This exercise explores several concepts discussed in this chapter, including controlling, interrupting and resuming transitions, using interpolated frames, tweening, and managing complex data updates.
+In this tutorial, you will create a racing bar chart – a horizontal bar chart where each bar grows and shrinks and moves up and down as time elapses. This exercise explores several concepts discussed in this chapter, including controlling, interrupting, and resuming transitions, using interpolated frames, tweening, and managing complex data updates.
 
 The chart compares the gross GDP of different countries from 1970 to 2022. A static screenshot of the final application is shown in _Figure 1_. Open [`Examples/Bar-chart-race-GDP`](../Examples/Bar-chart-race-GDP/index.html) to see it in action.
 
 
 ![Static screenshot of a racing bars animation](./images/figure-1.png)
-_Figure 1 – Static screenshot of a racing bars animation. Code: [`Examples/Bar-chart-race-GDP`](../Examples/Bar-chart-race-GDP)._
+_Figure 1 – Static screenshot of a racing bars animation. Code: [`Examples/Bar-chart-race-GDP`](../Examples/Bar-chart-race-GDP)_
 
 The project folder for this tutorial follows the same structure as previous examples, with separate folders for data, CSS stylesheets, and JavaScript modules. This project has an additional module for the animation code:
 
@@ -25,11 +25,11 @@ app/
 └── index.html
 ```
 
-The [data file](../StepByStep/data/un_gdp.csv) was generated from the [United Nations open database](https://data.un.org/), slightly altered to include continents and country codes. It’s available in the `StepByStep/data/` folder for this chapter. In the `StepByStep/` subfolders it is accessed directly via a relative URL, but you should copy it to a local `data/` folder in your application project folder, as shown above.
+The [data file](../StepByStep/data/un_gdp.csv) was generated from the [United Nations open database](https://data.un.org/), slightly altered to include continents and country codes. It’s available in the `StepByStep/data/` folder for this chapter. In the `StepByStep/` subfolders, it is accessed directly via a relative URL, but you should copy it to a local `data/` folder in your application project folder, as shown above.
 
-This file contains the same data we used for the pie chart created in _Chapter 11_. Although it was generated from the same source, the file was processed to remove empty fields, edited to deal with countries that appeared, disappeared, or merged from 1970 to 2024 (e.g. Soviet Union, East Germany) and provide the data in _tidy_ format which is easier to use.
+This file contains the same data we used for the pie chart created in _Chapter 11_. Although it was generated from the same source, the file was processed to remove empty fields and edited to deal with countries that appeared, disappeared, or merged from 1970 to 2024 (e.g. the Soviet Union, East Germany), and provide the data in a _tidy_ format, which is easier to use.
 
-Open the file and inspect it. It’s a CSV with five columns 11k+ rows and the following structure:
+Open the file and inspect it. It’s a CSV with five columns, 11k+ rows and the following structure:
 
 ```csv
 country,year,value,continent,code
@@ -58,14 +58,14 @@ This tutorial is divided into the following steps:
 - [Step 10: Pausing the animation](#step-10-pausing-the-animation)
 - [Exercise: Classifying bars by continent](#exercise-classifying-bars-by-continent)
 
-Each completed step is a subfolder in the `StepByStep/` folder. Each step modifies some script files, and may make small changes in the `index.html` and `main.css` files. Modified files in each step are numbered with a version suffix (e.g. `main-1.1,js`, `main-1.2.js`, etc.). As in previous tutorials, you can start with the first module and code along or run the code provided for each step.
+Each completed step is a subfolder in the `StepByStep/` folder. Each step modifies some script files, and may make small changes in the `index.html` and `main.css` files. Modified files in each step are numbered with a version suffix (e.g., `main-1.1,js`, `main-1.2.js`, etc.). As in previous tutorials, you can start with the first module and code along or run the code provided for each step.
 
 ## Step 1: Planning and initial setup
 
 We will use the same structure as the horizontal bar charts we created in _Chapter 4_. The generated SVG should place the entire chart in a `<g>.entries` block containing a fixed number of child `<g>.entry` elements that represent bar groups, each containing a `<rect>.bar`, for the bar, and two `<text>` elements, for the labels. Name labels are placed left, at a fixed right-aligned _x_ position, and value labels go right, at a fixed distance from the bar, relative to the bar’s width (_Figure 2_).
 
 ![Layout plan for the animated bar chart](./images/figure-2.png)
-_Figure 2  – Planning the layout for the animated bar chart._
+_Figure 2  – Planning the layout for the animated bar chart_
 
 Since this is a horizontal bar chart, the _x_-scale is a linear scale configured to occupy most of the chart's width. As bars are updated at each animation frame, the domain will be recomputed for each frame so that the size of the top (longest) bar never changes. We reserved 100 pixels on the left side for the names (and flags) of the countries. The _y_-scale is a band scale. Its domain fits an extra offscreen bar used to configure the animation so that bars leave and enter the chart from the bottom (instead of from the default top-left).
 
@@ -153,7 +153,7 @@ function prepare(rawData) { /* ... */ }
 
 Remember to use `d3.autoType` in the parser to automatically convert the fields that contain numbers into JavaScript numbers (see _Chapter 5_), since the default is to load them as strings.
 
-The `prepare()` function adds two properties to the global `chart` object: a set of keys to retrieve country-related data, and the ranked data to be displayed . The keys, stored in `chart.keys`, are obtained from country names using a `Set` (or `d3.union`) to guarantee that they are unique:
+The `prepare()` function adds two properties to the global `chart` object: a set of keys to retrieve country-related data, and the ranked data to be displayed. The keys, stored in `chart.keys`, are obtained from country names using a `Set` (or `d3.union`) to guarantee that they are unique:
 
 ```js
 function prepare(rawData) {
@@ -164,7 +164,7 @@ function prepare(rawData) {
 
 Preparing the data, which will be stored in `chart.data`, requires several additional steps.
 
-First group the data by year, and then by country. Each data frame compares countries in the same year. With this grouping, we can retrieve a country's data within that year to draw the bar. Using `d3.rollup()` returns the data as nested maps. Add the following line to `prepare()`:
+First, group the data by year, and then by country. Each data frame compares countries in the same year. With this grouping, we can retrieve a country's data within that year to draw the bar. Using `d3.rollup()` returns the data as nested maps. Add the following line to `prepare()`:
 
 ```js
     const byYearMap = d3.rollup(rawData, v => v[0].value,
@@ -213,9 +213,9 @@ function rank(dataMap) {
 }
 ```
 
-This will assign a different rank number to the _visible_ bars (countries) in each year. The others bars (not visible in that year) will have the same rank of `app.numBars`, placing them offscreen at the bottom of the chart. This is important so that bars enter and leave the chart from the bottom, whenever their rank is updated.
+This will assign a different rank number to the _visible_ bars (countries) in each year. The other bars (not visible in that year) will have the same rank of `app.numBars`, placing them offscreen at the bottom of the chart. This is important so that bars enter and leave the chart from the bottom whenever their rank is updated.
 
-We can now use this code to prepare the data. Update the `main.js` module with the location of the data file and pass it to the `load()` function. After loading and parsing, it will draw the view and print the contents of the chart object to the console.
+We can now use this code to prepare the data. Update the `main.js` module with the location of the data file and pass it to the `load()` function. After loading and parsing, it will draw the view and print the contents of the `chart` object to the console.
 
 ```js
 import * as view from "./view.js";
@@ -281,7 +281,7 @@ export function draw() {
 }
 ```
 
-The `show()` function is called to display each animation data frame. In the code above it is called once to display the first one. Each data frame contains a `year` and a `data` object. Before drawing the bars, the horizontal scale is set so the longest bar occupies the available space (here we added 10% more space). The year is added to the placeholder at bottom-right:
+The `show()` function is called to display each animation data frame. In the preceding code, it is called once to display the first one. Each data frame contains a `year` and a `data` object. Before drawing the bars, the horizontal scale is set so the longest bar occupies the available space (here we added 10% more space). The year is added to the placeholder at the bottom right:
 
 ```js
 function show(dataFrame) {
@@ -301,7 +301,7 @@ const initWidth = d => app.scale.x(d.value) - app.scale.x(0);
 const initRank = d => `translate(${[app.scale.x(0), app.scale.y(d.rank)]})`;
 ```
 
-This step will draw bars for a single year. The `drawBars()` function should be familiar, since you created similar code in _Chapter 4_. The functions above are used to resize and place bars and labels. The data consists of the visible bars representing the first 10 (`app.numBars`) countries:
+This step will draw bars for a single year. The `drawBars()` function should be familiar, since you created similar code in _Chapter 4_. The preceding functions are used to resize and place bars and labels. The data consists of the visible bars representing the first 10 (`app.numBars`) countries:
 
 ```js
 function drawBars(data) {
@@ -345,11 +345,11 @@ function drawBars(data) {
 }
 ```
 
-The text formatter represents billions with a `'G'` suffix (for Giga). We replaced it for a `'B'` (Billions). Launch the `index.html` file, and you should see the screenshot in _Figure 4_, which also shows the generated code.
+The text formatter represents billions with a `'G'` suffix (for Giga). We replaced it with a `'B'` (Billions). Launch the `index.html` file, and you should see the screenshot in _Figure 4_, which also shows the generated code.
 
 ![A static bar chart created from a single data frame](./images/figure-4.png)
 
-_Figure 4 – A static bar chart created from a single data frame, showing generated SVG code. Code: [`StepByStep/step-3-bars/`](../StepByStep/step-3-bars/)._
+_Figure 4 – A static bar chart created from a single data frame, showing generated SVG code. Code: [`StepByStep/step-3-bars/`](../StepByStep/step-3-bars/)_
 
 To inspect the bar chart for another year, call `show()` (in the `draw()` function) with any index between 0 and 52:
 
@@ -398,7 +398,7 @@ data.load(file)
     });
 ```
 
-The chart’s dynamics require that _enter_, _exit_ and _update_ selections be treated separately, as we have learned in _Chapter 6_ using the `join()` method. Here, we will create separate functions `joinEnter()`, `joinExit()` and `joinUpdate()` for each case to modify and return each selection.
+The chart’s dynamics require that _enter_, _exit_, and _update_ selections be treated separately, as we learned in _Chapter 6_, using the `join()` method. Here, we will create separate functions, `joinEnter()`, `joinExit()`, and `joinUpdate()`, for each case to modify and return each selection.
 
 The new `drawBars()` function was refactored to contain just the main code for the data join (the code that creates bars and labels was moved to `joinEnter()`). It selects the `'entries'` group (added in the `draw()` function) and binds a new `'entry'` selection of `<g>` elements to the visible dataset (but doesn’t append anything):
 
@@ -420,7 +420,7 @@ function drawBars(data) {
 
 Saving a reference to the merged selection is necessary to update its elements after the join. Inside the join, we will configure the _enter_ and _exit_ selections.
 
-The `visible` array is the data, which filters the countries to display (selected from the dataset of over 200 countries). Note that the `data()` method is configured with the key function `d => d.country`. This is critical to guarantee that each bar group is bound to a country, and not to the default sequential index. If you forget it, new countries will never enter the chart, since existing bars will be reused (see `Chapter 6` for more about data key functions).
+The `visible` array is the data, which filters the countries to display (selected from the dataset of over 200 countries). Note that the `data()` method is configured with the key function, `d => d.country`. This is critical to guarantee that each bar group is bound to a country, and not to the default sequential index. If you forget it, new countries will never enter the chart, since existing bars will be reused (see `Chapter 6` for more about data key functions).
 
 The _enter_ selection is used when a country enters the `visible` array for the first time. It is passed to the `joinEnter()` function (which contains the rest of the code that was previously in `drawBars()`) and appends a new `<g>` element for each entry, adding bars and labels to it. The modified selection is saved in the `enterGrp` constant, which must be returned:
 
@@ -492,11 +492,11 @@ Now you should see bars switching positions as their values become larger or sma
 
 ![The user can now update the chart clicking on it](./images/figure-5.png)
 
-_Figure 5 – The user can now update the chart clicking on it. Code: [`StepByStep/4-update`](../StepByStep/4-update)._
+_Figure 5 – The user can now update the chart by clicking on it. Code: [`StepByStep/4-update`](../StepByStep/4-update)_
 
 This step involved many changes, so make sure you understand each function and how they interact. If necessary, refer to the complete code in the [`StepByStep/4-update`](../StepByStep/4-update) folder.
 
-Although the transitions are smooth, they still behave strangely. Entering bars appear out of nowhere and exiting bars that are not in the last position vanish in the middle of the chart. Exiting bars also don’t shrink and value labels don’t change during the transitions. We will address all these issues and refine the transitions in the next step.
+Although the transitions are smooth, they still behave strangely. Entering bars appear out of nowhere, and exiting bars that are not in the last position vanish in the middle of the chart. Exiting bars also don’t shrink, and value labels don’t change during the transitions. We will address all these issues and refine the transitions in the next step.
 
 ## Step 5: Directing the updates
 
@@ -505,7 +505,7 @@ Most of the changes in this step involve data manipulation, so they will happen 
 To transition the entering bars correctly, we need to know their _previous_ rank and values. For exits, we need information about the country’s _next_ rank and value. Previous values will permit text tweening to the _current_ value during the transition. _Figure 6_ illustrates the problem we need to solve.
 
 ![Animation frames need to know previous and next values to direct transitions correctly](./images/figure-6.png)
-_Figure 6 - Animation frames need to know previous and next values to direct transitions correctly._
+_Figure 6 - Animation frames need to know the previous and next values to direct transitions correctly_
 
 To help with these transitions, we will create a pair of maps that return the data object for the previous year and for the next year. This requires a few steps of data manipulation and will be placed in a new function:
 
@@ -515,7 +515,7 @@ function createNavigationMaps() {
 }
 ```
 
-First create an array where each entry is a 2-element array containing the country and an array of `{country,value,rank}` objects for that country. This can be done extracting the data objects from `chart.data` (which groups by year), flattening the array, and then regrouping by country:
+First, create an array where each entry is a 2-element array containing the country and an array of `{country,value,rank}` objects for that country. This can be done by extracting the data objects from `chart.data` (which groups by year), flattening the array, and then regrouping by country:
 
 ```js
 const allObjects = chart.data.flatMap(([,data]) => data);
@@ -555,7 +555,7 @@ chart.nxt = d => nextMap.get(d) || d;	// get next or current
 chart.prv = d => prevMap.get(d) || d;	// get previous or current
 ```
 
-To set this up, place all the code above inside the `createNavigationMaps()` function and call it from `prepare()`, in the `data.js` module:
+To set this up, place all the preceding code inside the `createNavigationMaps()` function and call it from `prepare()`, in the `data.js` module:
 
 ```js
 function createNavigationMaps() { /*...*/ }
@@ -638,7 +638,7 @@ function animate(index) { 			// version 1 – using d3.interval()
 }
 ```
 
-Replace the code in `start()` function with `animate(1)` to start the animation with the second frame, since the first frame is already shown (`show(chart.data[0])` was called in `view.draw()`):
+Replace the code in the `start()` function with `animate(1)` to start the animation with the second frame, since the first frame is already shown (`show(chart.data[0])` was called in `view.draw()`):
 
 ```js
 export function start() {
@@ -663,7 +663,7 @@ function animate(index) {			// version 2 – using a new transition
 }
 ```
 
-This recursive implementation configures a transition for the root SVG which calls `view.show()` when the transition ends, and then calls `animate()` again after incrementing the `index`.
+This recursive implementation configures a transition for the root SVG, which calls `view.show()` when the transition ends, and then calls `animate()` again after incrementing the `index`.
 
 The problem with both these implementations is that they may interrupt the other transitions that run at the same time (updates and exits). If this happens with the _exit_ transition, objects that leave the chart may not be removed. We can avoid this using _a single transition_ for all animations, which will also make it more efficient, easier to configure and control.
 
@@ -710,7 +710,7 @@ function joinExit(exit) {
 }
 ```
 
-The code above also set a final `opacity` style to be applied at the end of the transition. This will make entering objects become gradually visible and exiting objects gradually fade.
+The preceding code also sets a final `opacity` style to be applied at the end of the transition. This will make entering objects gradually visible and exiting objects gradually fade.
 
 For new objects to become visible as they are updated, they must be transparent when entering, but not when the bars are created in the first frame (when the previous value is the same as the current value). The following code implements this requirement in the `joinEnter()` function:
 
@@ -729,7 +729,7 @@ The animation runs continuously, but sometimes several bars quickly leave or ent
 
 ## Step 7: Using interpolated frames
 
-A country’s GDP is measured annually, but actual changes occur gradually. If we had monthly data, we would probably see these changes happening more slowly. We don’t have that data, but, by interpolating additional frames for each year, we can simulate it! This will eliminate abrupt changes and make the animation run much smoother.
+A country’s GDP is measured annually, but actual changes occur gradually. If we had monthly data, we would probably see these changes happening more slowly. We don’t have that data, but by interpolating additional frames for each year, we can simulate it! This will eliminate abrupt changes and make the animation run much smoother.
 
 In this step, we will use interpolation to generate 12 frames for each year. We may need to adjust this number later, so let’s store it in a variable (in `common.js`):
 
@@ -743,7 +743,7 @@ We need to lower the duration of the transitions, since we now have 12 times mor
 app.duration = 250;
 ```
 
-In `data.js`, replace (or comment out) the code that creates `chart.data` with a call to `interpolateDataFrames()`, as shown below. We will write it to compute and add the intermediate frames:
+In `data.js`, replace (or comment out) the code that creates `chart.data` with a call to `interpolateDataFrames()`, as shown next. We will write it to compute and add the intermediate frames:
 
 ```js
 // chart.data = byYearArray.map(([year,dataMap]) => [year, rank(dataMap)]);
@@ -765,7 +765,7 @@ function interpolateDataFrames(data) {
 }
 ```
 
-In the following for loop, a value of `t` with values in the [0,1] domain is obtained for each frame. It is used to get an interpolated year (such as `1970.0833`, `1970.1666`, etc.) and to create an interpolator function for the data values, since these depend on each country.
+In the following `for` loop, a value of `t` with values in the [0,1] domain is obtained for each frame. It is used to get an interpolated year (such as `1970.0833`, `1970.1666`, etc.) and to create an interpolator function for the data values, since these depend on each country.
 
 ```js
 for (let i = 0; i < app.numFrames; ++i) {
@@ -846,7 +846,7 @@ export function draw() {
 }
 ```
 
-Since the only fixed object is the largest bar, the axis should be resized after each data change. Setting the domain configures the axis, but the axis function still needs to be called again for the selection. Add the following code anywhere in `show()` after the scale’s domain is set:
+Since the only fixed object is the largest bar, the axis should be resized after each data change. Setting the domain configures the axis, but the `axis` function still needs to be called again for the selection. Add the following code anywhere in `show()` after the scale’s domain is set:
 
 ```js
 export function show(dataFrame) {
@@ -859,17 +859,17 @@ Reload the page to see an animated version of `Figure 7`. Now, as the axis moves
 
 ![A screenshot of the bar chart with animated axes](./images/figure-7.png)
 
-_Figure 7 – A screenshot of the bar chart race with animated axes. Code: [`StepByStep/8-axes/`](../StepByStep/8-axes/)._
+_Figure 7 – A screenshot of the bar chart race with animated axes Code: [`StepByStep/8-axes/`](../StepByStep/8-axes/)._
 
 This animation is finished, but it would be much cooler if we could show the flags of each country on each bar. Let’s do this in the next step.
 
 ## Step 9: Adding images
 
-In this step, we will add flag images to each bar. These images will be clipped to fit the bar’s height and aligned to the right of each bar. Figure 8 shows a sketch of how it should work and the SVG code that will be generated.
+In this step, we will add flag images to each bar. These images will be clipped to fit the bar’s height and aligned to the right of each bar. _Figure 8_ shows a sketch of how it should work and the SVG code that will be generated.
 
 ![A plan for adding images to the bars and the generated SVG code](images/figure-8.png)
 
-_Figure 8 – A plan for adding images to the bars and the generated SVG code._
+_Figure 8 – A plan for adding images to the bars and the generated SVG code_
 
 A collection of royalty-free flag PNG thumbnails is available in `Chapter13/data/flags`. To use them, copy the `flags/` directory to your project's `data/` folder and add the following constant to your `common.js` module:
 
@@ -877,21 +877,21 @@ A collection of royalty-free flag PNG thumbnails is available in `Chapter13/data
 app.imgDir = "../../data/flags/";		// adjust path if necessary
 ```
 
-The above path works for examples in the `StepByStep/` folder and will load the files from their original location. If you copied the `flags/` folder to your local `data/` directory, use:
+The preceding path works for examples in the `StepByStep/` folder and will load the files from their original location. If you copied the `flags/` folder to your local `data/` directory, use the following:
 
 ```js
 app.imgDir = "../data/flags/";		// adjust path if necessary
 ```
 
-File names use the three-letter code for each country (e.g. `USA.png`, `CHN.png`, `JPN.png`, etc.), available in the code property from the raw data file. Add the following line to `prepare()` (`data.js`). It will create a globally accessible map to retrieve a country’s code from its name.
+File names use the three-letter code for each country (e.g., `USA.png`, `CHN.png`, `JPN.png`, etc.), available in the code property from the raw data file. Add the following line to `prepare()` (`data.js`). It will create a globally accessible map to retrieve a country’s code from its name.
 
 ```js
 chart.icons = new Map(rawData.map(d => [d.country, d.code]));
 ```
 
-The flag will be placed over the bar and right-aligned. If the bar is smaller than the image, it needs to be clipped. A clipping mask can be created in SVG with the `<clipPath>` element (see example in [`SVG/5-svg-clipPath.html`](../SVG/5-svg-clipPath.html)), which should contain a shape to be used as the mask. This shape is the bar. We can’t place the bar in `<clipPath>` but we can reference it using `<use>` if each bar has an ID.
+The flag will be placed over the bar and right-aligned. If the bar is smaller than the image, it needs to be clipped. A clipping mask can be created in SVG with the `<clipPath>` element (see the example in [`SVG/5-svg-clipPath.html`](../SVG/5-svg-clipPath.html)), which should contain a shape to be used as the mask. This shape is the bar. We can’t place the bar in `<clipPath>`, but we can reference it using `<use>` if each bar has an ID.
 
-We are using country names as keys, which sometimes have spaces in their names (e.g. “United Kingdom”). To use them in SVG we need to remove these spaces. The `makeID()` function below will replace spaces with underlines, creating valid IDs that can be used in SVG:
+We are using country names as keys, which sometimes have spaces in their names (e.g., “United Kingdom”). To use them in SVG we need to remove these spaces. The following `makeID()` function will replace spaces with underlines, creating valid IDs that can be used in SVG:
 
 ```js
 function makeID(country) {
@@ -908,7 +908,7 @@ function createClipping() {
             .data(chart.keys)
                 .join("clipPath").attr("id", d => `clip-${makeID(d)}`)
                     .append("use")
-                    .attr("xlink:href", d => `#bar-${makeID(d)}`);
+                    .attr("href", d => `#bar-${makeID(d)}`);
 }
 ```
 
@@ -921,11 +921,11 @@ export function draw() {
 }
 ```
 
-This will add a `<defs>` block to the SVG with a list of `<clipPath>` elements, one clip for each country. Inspect the generated code. An example `<clipPath>` is shown below:
+This will add a `<defs>` block to the SVG with a list of `<clipPath>` elements, one clip for each country. Inspect the generated code. An example `<clipPath>` is shown here:
 
 ```html
 <clipPath id="clip-United_Kingdom">
-    <use xlink:href="#bar-United_Kingdom "></use>
+    <use href="#bar-United_Kingdom "></use>
 </clipPath>
 ```
 
@@ -946,7 +946,7 @@ Each bar can now be referenced by a corresponding `<clipPath>` and will be used 
 <rect class="bar" id="bar-United_Kingdom" ...></rect>
 ```
 
-Finally, an `<image>` element is added to draw the image. It uses the `icon()` function to get the complete path to the thumbnail, and references its clipping path via the `clip-path` attribute, as shown below:
+Finally, an `<image>` element is added to draw the image. It uses the `icon()` function to get the complete path to the thumbnail, and references its clipping path via the `clip-path` attribute, as shown here:
 
 ```js
 function joinEnter(enter) {
@@ -954,7 +954,7 @@ function joinEnter(enter) {
     const icon = (key) => app.imgDir + chart.icons.get(key) + '.png';
     enterGrp.append("image")
             .attr("class", "bar").attr("preserveAspectRatio", "none")
-            .attr("xlink:href", d => icon(d.country)) 	// uses path to icon file
+            .attr("href", d => icon(d.country)) 	// uses path to icon file
             .attr("height", app.scale.y.bandwidth())
             .attr("width", app.scale.y.bandwidth() * (1 + 2/3))
             .attr("x", d => barWidth(d) - app.scale.y.bandwidth() * (1 + 2/3))
@@ -987,13 +987,13 @@ Now you can reload the page and see the complete animation with images (_Figure 
 
 ![The bar chart race with country flags](./images/figure-9.png)
 
-_Figure 9 – The bar chart race with country flags. Code: [`StepByStep/step-9-images/`](../StepByStep/step-9-images/)._
+_Figure 9 – The bar chart race with country flags. Code: [`StepByStep/step-9-images/`](../StepByStep/step-9-images/)_
 
 Our animation is complete. It runs continuously and smoothly. What else could you want? Perhaps we could pause it at a certain point. Let’s add this feature in the final step.
 
 ## Step 10: Pausing the animation
 
-The chart will be paused by interrupting the transition. Since most of the code is in the promise callback after the transition ends, handling it in a `catch()` block is more reliable than using `on("interrupt")`. The following code adds two constants to the chart object: `chart.state`, with the current frame number, and `chart.paused` indicating if the animation is paused or not:
+The chart will be paused by interrupting the transition. Since most of the code is in the promise callback after the transition ends, handling it in a `catch()` block is more reliable than using `on("interrupt")`. The following code adds two constants to the chart object: `chart.state`, with the current frame number, and `chart.paused`, indicating whether the animation is paused or not:
 
 ```js
 function animate(index) {
@@ -1026,7 +1026,7 @@ export function pause() {
 }
 ```
 
-The code above also updates a `<span>` block (added to `index.html`) when the state changes:
+The preceding code also updates a `<span>` block (added to `index.html`) when the state changes:
 
 ```html
 <p>Click anywhere in the chart to <span id="pause">pause</span> animation.</p>
@@ -1067,6 +1067,6 @@ The expected result is shown in _Figure 10_. The commented solution is in [`Step
 
 ![The bar chart race using continent colors](images/figure-10.png)
 
-_Figure 10 – The bar chart race using continent colors. Code: [`StepByStep/step-11-continents/`](../StepByStep/step-11-continents/)._
+_Figure 10 – The bar chart race using continent colors. Code: [`StepByStep/step-11-continents/`](../StepByStep/step-11-continents/)_
 
 This ends the tutorial. You will find the code for each step in the [`StepByStep/`](../StepByStep/) folder, including an extra step that adds continent information for the chart. The final application, with some additional improvements (including the exercise), and other examples using the same racing bar chart code are available in the [`Examples/`](../Examples/) folder.
