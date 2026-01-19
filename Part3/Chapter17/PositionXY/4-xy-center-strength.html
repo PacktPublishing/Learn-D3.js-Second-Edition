@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>forceY+forceX with strength</title>
+    <link rel="stylesheet" href="../css/force-examples.css">
+</head>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+    import {drawReferenceBackgroundGrid, updateChart, drawChart, drawCrossline} from "../js/force-examples.js";
+
+    export const nodes = [
+        {node: 'A', value: 79},
+        {node: 'B', value: 15},
+        {node: 'C', value: 24},
+        {node: 'D', value: 44},
+        {node: 'E', value: 125},
+        {node: 'F', value: 22},
+        {node: 'G', value: 20},
+        {node: 'H', value: 64},
+        {node: 'I', value: 69},
+    ];
+
+    drawReferenceBackgroundGrid(nodes);
+    drawCrossline(50,50);
+
+    // SIMULATION
+    const sim = d3.forceSimulation(nodes);
+    sim.force("x", d3.forceX(50).strength(.02)); // default strength is 0.1 (use values from 0 to 1)
+    sim.force("y", d3.forceY(50).strength(.02));
+
+    // Update on ticks
+    sim.on("tick", updateChart);
+
+    // Results
+    drawChart(nodes);
+</script>
+</body>
+</html>

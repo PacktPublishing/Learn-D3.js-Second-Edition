@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Multiple forces: link+collide+positionRadial</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+    import {nodes, links, draw, redraw} from "./js/combinations.js";
+
+    // Keep only sequential links and add a link from last to first node to create a circle
+    links.splice(links.length - 4, 4);
+    links.splice(0, 4);
+    links.push({source: 25, target: 0, value: 1});
+
+    d3.forceSimulation(nodes)
+        .force("center", d3.forceCenter())
+        .force("link", d3.forceLink(links).iterations(5).distance(1))
+        .force("collide", d3.forceCollide(15))
+        .force("radial", d3.forceRadial(200).strength(.1))
+        .force("y", d3.forceY().strength(.05))
+        .on("tick", redraw);
+
+    draw(nodes);
+</script>
+</body>
+</html>

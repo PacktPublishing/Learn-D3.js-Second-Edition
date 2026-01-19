@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Multiple forces: manybody+compress+center</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+    import {nodes, links, draw, redraw} from "./js/combinations.js";
+
+    const radius = d3.scaleLinear()
+                     .range([10,50])
+                     .domain(d3.extent(nodes, d => d.value));
+
+    const sim = d3.forceSimulation(nodes);
+    const manyBody = d3.forceManyBody(); // -30
+    sim.force("manybody", manyBody);
+    for(let i = 0; i < 45; i++) {
+        sim.tick();
+    } // spread the nodes
+    sim.stop();
+
+    manyBody.strength(60);
+    sim.force("center", d3.forceCenter(200,-100))
+    sim.restart();
+    sim.on("tick", redraw);
+    
+    draw(nodes);
+</script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The Seven Bridges of Königsberg</title>
+    <style>
+        text {
+            font-family: 'Arial Narrow', sans-serif;
+            font-size: 35px;
+            alignment-baseline: central;
+            text-anchor: middle;
+            font-weight: bold;
+            fill: white;
+        }
+    </style>
+</head>
+<body>
+<h1>The Seven Bridges of Königsberg</h1>
+<p>This chart consists of an SVG grid rendered over an image. The grid (for placing the nodes) and graph
+    (for connecting the nodes) are is created with a custom layout generator available in the
+    <code>js/network-utils.js</code> module.</p>
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+    import * as nwu from "../../js/network-utils.js";
+
+    const imageFile = "../../data/images/euler.png";
+
+    const dim = {width: 800, height: 600, margin: 200};
+    const svg = d3.select("body").append("svg").attr("width", dim.width).attr("height", dim.height);
+    svg.append("image")
+        .attr("href", imageFile)
+        .attr("width", 671)
+        .attr("height", 327)
+        .attr("transform",`translate(${[dim.margin/2, dim.margin/2]})`);
+    const chart = svg.append("g").attr("transform", `translate(${[dim.margin * 1.3, dim.margin * .55]})`);
+
+    const nodes = [
+        {node: 'A'},
+        {node: 'C'},
+        {node: 'B'},
+        {node: 'D'},
+    ];
+
+    const edges = [
+        {source: 'A', target: 'B', value: 'a'},
+        {source: 'B', target: 'A', value: 'b'},
+        {source: 'A', target: 'C', value: 'c'},
+        {source: 'C', target: 'A', value: "d"},
+        {source: 'A', target: 'D', value: 'e'},
+        {source: 'C', target: 'D', value: 'f'},
+        {source: 'D', target: 'B', value: "g"},
+    ];
+
+    // Create a square grid layout generator function for the graph
+    const grid  = nwu.squareGrid()
+                     .gridSize([3,3])
+                     .size([dim.width - dim.margin * 2.5, dim.height - dim.margin * 1.3])
+                     .step(2)
+                     .offset(1);
+    const data = grid(nodes, edges);
+
+    // Create a curve generator function for the graph
+    const curve = nwu.graphLink()
+                     .size([dim.width - dim.margin, dim.height - dim.margin])
+                     .curvature(.8)
+                     .symmetric(true); // default
+
+    chart.selectAll("path")
+         .data(data.edges())
+            .join("path")
+                .attr("d", curve)
+                .style("stroke", 'blue')
+                .style("fill", 'none')
+                .style("stroke-width", 10)
+                .style("stroke-opacity", .5);
+
+    chart.selectAll("circle")
+         .data(data.nodes())
+            .join("circle")
+                .attr("cx", d => d.x)
+                .attr("cy", d => d.y)
+                .style("fill", 'red')
+                .attr("r", 30);
+
+    chart.selectAll("text")
+         .data(data.nodes())
+            .join("text")
+                .attr("x", d => d.x)
+                .attr("y", d => d.y)
+                .text(d => d.node);
+</script>
+</body>
+</html>

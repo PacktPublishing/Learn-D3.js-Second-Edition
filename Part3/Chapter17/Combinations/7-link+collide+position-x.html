@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Multiple forces: link+collide+positionX</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+    import {nodes, links, draw, redraw} from "./js/combinations.js";
+
+    links.splice(links.length - 4, 4);
+    links.filter((d, i) => i < 4).forEach(d => d.value = 2);
+    console.log(links)
+
+    d3.forceSimulation(nodes)
+      .force("link", d3.forceLink(links).iterations(2))
+      .force("collide", d3.forceCollide(15).iterations(25))
+       .force("x", d3.forceX().strength(.5))
+        .on("tick", redraw);
+
+    draw(nodes);
+</script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+
+const width = 800;
+const height = 600;
+const margin = 100;
+
+const svg = d3.select("body").append("svg").attr("width",width).attr("height",height);
+const chart = svg.append("g").attr("transform", `translate(${[margin/2 + width/2,margin/2 + height/2]})`);
+
+export const links = [
+    {source: 0, target: 4, value: 3},
+    {source: 4, target: 8, value: 3},
+    {source: 8, target: 14, value: 3},
+    {source: 14, target: 20, value: 3},
+    {source: 0, target: 1, value: 1},
+    {source: 1, target: 2, value: 1},
+    {source: 2, target: 3, value: 1},
+    {source: 3, target: 4, value: 1},
+    {source: 4, target: 5, value: 1},
+    {source: 5, target: 6, value: 1},
+    {source: 6, target: 7, value: 1},
+    {source: 7, target: 8, value: 1},
+    {source: 8, target: 9, value: 1},
+    {source: 9, target: 10, value: 1},
+    {source: 10, target: 11, value: 1},
+    {source: 11, target: 12, value: 1},
+    {source: 12, target: 13, value: 1},
+    {source: 13, target: 14, value: 1},
+    {source: 14, target: 15, value: 1},
+    {source: 15, target: 16, value: 1},
+    {source: 16, target: 17, value: 1},
+    {source: 17, target: 18, value: 1},
+    {source: 18, target: 19, value: 1},
+    {source: 19, target: 20, value: 1},
+    {source: 20, target: 21, value: 1},
+    {source: 21, target: 22, value: 1},
+    {source: 22, target: 23, value: 1},
+    {source: 23, target: 24, value: 1},
+    {source: 24, target: 25, value: 1},
+    {source: 16, target: 15, value: 2},
+    {source: 17, target: 16, value: 2},
+    {source: 18, target: 17, value: 2},
+    {source: 19, target: 18, value: 2}
+];
+
+export const nodes = [
+    {node: 'A', value: 79},
+    {node: 'B', value: 15},
+    {node: 'C', value: 24},
+    {node: 'D', value: 44},
+    {node: 'E', value: 125},
+    {node: 'F', value: 22},
+    {node: 'G', value: 20},
+    {node: 'H', value: 64},
+    {node: 'I', value: 69},
+    {node: 'J', value: 2},
+    {node: 'K', value: 8},
+    {node: 'L', value: 40},
+    {node: 'M', value: 26},
+    {node: 'N', value: 69},
+    {node: 'O', value: 77},
+    {node: 'P', value: 17},
+    {node: 'Q', value: 1},
+    {node: 'R', value: 58},
+    {node: 'S', value: 63},
+    {node: 'T', value: 91},
+    {node: 'U', value: 29},
+    {node: 'V', value: 10},
+    {node: 'W', value: 23},
+    {node: 'X', value: 2},
+    {node: 'Y', value: 20},
+    {node: 'Z', value: 1},
+];
+
+const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+export function draw(nodes, links, radius = 15) {
+    color.domain([0,nodes.length]);
+    chart.selectAll("circle")
+        .data(nodes).join("circle")
+        .attr("r", radius)
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y)
+        .style("fill", (d,i) => d3.rgb(color(i)).darker())
+        .style("stroke", 'black')
+        .style("fill-opacity",.5)
+
+    chart.selectAll("text")
+        .data(nodes).join("text")
+        .text(d => d.node)
+        .attr("x", d => d.x)
+        .attr("y", d => d.y)
+        .style("font-size", radius)
+}
+
+export function redraw() {
+    chart.selectAll("circle")
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y);
+
+    chart.selectAll("text")
+        .attr("x", d => d.x)
+        .attr("y", d => d.y);
+}
+

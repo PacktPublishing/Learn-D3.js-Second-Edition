@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sao Paulo Subway in 2019</title>
+    <style>
+        text, p {
+            font-family: 'Arial Narrow', sans-serif;
+            font-size: 17px;
+            alignment-baseline: middle;
+            text-anchor: middle;
+        }
+    </style>
+</head>
+<body>
+<h1>Sao Paulo subway (2019) - Cross-line connections</h1>
+<p>Example using an adjacency table visualization showing only stations with connections.</p>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+    import * as nwu from "../../js/network-utils.js";
+
+    // Page setup
+    const dim = {width: 600, height: 600, margin: 200};
+
+    const svg = d3.select("body").append("svg").attr("width", dim.width).attr("height", dim.height);
+    const chart = svg.append("g").attr("transform", `translate(${[dim.margin/2, dim.margin/2]})`);
+    chart.width = dim.width - dim.margin;
+    chart.height = dim.height - dim.margin;
+
+    const colors = ['blue', 'green', 'red', 'gold', 'purple', 'silver'];
+    const lines  = [1,2,3,4,5,15];
+    const colorScale = d3.scaleOrdinal().domain(lines).range(colors);
+
+    const data = await d3.json('../../data/metrosp_2018.json');
+
+    data.nodes = data.nodes.map(n => ({node: n.station+':'+n.line}));
+    data.links = data.links.map(n => ({source: n.source+':'+n.lines[0], target: n.target+':'+n.lines[1], lines: n.lines, value: 1}));
+
+    const filteredLinks = data.links.filter(d => d.lines[0] !== d.lines[1]);
+    const connectionNodes = data.nodes.filter(d => filteredLinks.map(k => k.source).indexOf(d.node) >= 0)
+
+    filteredLinks.forEach(function(edge) {
+        edge.source = connectionNodes.map(n => n.node).indexOf(edge.source);
+        edge.target = connectionNodes.map(n => n.node).indexOf(edge.target);
+    });
+
+    const matrixLayout = nwu.adjacencyMatrix().size([chart.width, chart.height]);
+    const matrix = nwu.linksToMatrix(connectionNodes, filteredLinks);
+    const result = matrixLayout(connectionNodes, matrix);
+    draw(connectionNodes, result);
+
+    function draw(nodes, data) {
+        chart.selectAll("rect")
+             .data(data.filter(d => d.x > d.y && d.value))
+                .join("rect")
+                    .attr("x", d => d.value ? d.x : d.x + d.w/4)
+                    .attr("y", d => d.value ? d.y : d.y + d.h/4)
+                    .attr("height", d => d.value ? d.h : d.h / 2)
+                    .attr("width", d => d.value ? d.w : d.w / 2)
+                    .attr("rx",d => d.value ? d.w/4 : 0)
+                    .attr("ry", d => d.value ? d.h/4 : 0)
+                    .style("fill", d => d.value ? 'black' : '#eee');
+
+        chart.selectAll('line'.horizontal)
+             .data(data.filter(d => d.x > d.y && d.value))
+                .join("line").attr("class",'horizontal')
+                    .attr("x1", d => d.y + d.w)
+                    .attr("y1", d => d.y + d.h/2)
+                    .attr("x2", d => d.x + d.w/2)
+                    .attr("y2", d => d.y + d.h/2)
+                    .style("stroke-width", d => d.w/2)
+                    .style("stroke-opacity", .3)
+                    .style("stroke", 'black');
+
+        chart.selectAll('line'.vertical)
+             .data(data.filter(d => d.x > d.y && d.value))
+                .join("line").attr("class",'vertical')
+                    .attr("x1", d => d.x + d.w/2)
+                    .attr("x2", d => d.x + d.w/2)
+                    .attr("y2", d => d.y + d.h/2)
+                    .style("stroke-width", d => d.w/2)
+                    .style("stroke-opacity", .3)
+                    .style("stroke", 'black');
+
+        chart.selectAll('text.source')
+             .data(data.filter(d => d.x > d.y && d.value))
+                .join("text").attr("class",'source')
+                    .attr("y", d => d.x + d.w/2)
+                    .attr("x", 5)
+                    .attr("transform",`rotate(-90) `)
+                    .text(d => d.source.node)
+                    .style("text-anchor", 'start')
+                    .style("fill", (d,i) => d3.rgb(colorScale(d.source.node.split(':')[1])).darker(.5));
+
+        chart.selectAll('text.target')
+             .data(data.filter(d => d.x > d.y && d.value))
+                .join("text").attr("class",'target')
+                    .attr("y", d => d.y + d.h/2)
+                    .attr("x", d => d.y + d.w - 10)
+                    .text(d => d.target.node)
+                    .style("text-anchor", 'end')
+                    .style("fill", d => d3.rgb(colorScale(d.target.node.split(':')[1])).darker(.5));
+    }
+
+    function contrast(color) {
+        if (!color) return '#333';
+        const c = d3.hsl(color);
+        return c.l > 0.6 ? '#333' : 'lightyellow';
+    }
+
+    function highlight(evt, d) {
+        d3.selectAll("rect").classed('faded', k => !(k.x === d.x || k.y === d.y))
+        d3.selectAll("rect").classed('highlight', k => k.x === d.x || k.y === d.y)
+        d3.selectAll("text.source").classed('highlight', k => k.x === d.x)
+        d3.selectAll("text.target").classed('highlight', k => k.y === d.y)
+    }
+</script>
+</body>
+</html>

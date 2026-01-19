@@ -1,0 +1,30 @@
+text, span, p, button {
+    font-family: 'Yanone Kaffeesatz', sans-serif;
+    alignment-baseline: middle;
+    text-anchor: middle;
+    fill: white;
+}
+button,p {
+    font-size: 12pt;
+}
+.container {
+    position: absolute;
+}
+.form {
+    width: 190px;
+    padding: 10px;
+    position: absolute;
+    top: 0px;
+}
+.svg {
+    border: solid 1px lightgray;
+    width: 800px;
+    position: absolute;
+    left: 220px;
+}
+span {
+    font-size: 10pt;
+}
+line {
+    opacity: 0;
+}

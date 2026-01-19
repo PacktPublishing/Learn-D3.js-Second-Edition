@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Multiple forces: manybody+attract+collide</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+    import {nodes, links, draw, redraw} from "./js/combinations.js";
+
+    const radius = d3.scaleLinear()
+                     .range([10,50])
+                     .domain(d3.extent(nodes, d => d.value));
+
+    // static part
+    const sim = d3.forceSimulation(nodes).stop();
+
+    const manyBody = d3.forceManyBody();
+    sim.force("manybody", manyBody);
+    sim.force("center", d3.forceCenter());
+
+    for(let i = 0; i < 45; i++) {
+        sim.tick();
+    } // start separated
+
+    manyBody.strength(100);
+    sim.force("collide", d3.forceCollide(d => radius(d.value)).iterations(10));
+
+    // dynamic part
+    sim.alpha(1);
+    sim.restart();
+    sim.on("tick", redraw);
+    
+    draw(nodes, null, d => radius(d.value));
+</script>
+</body>
+</html>

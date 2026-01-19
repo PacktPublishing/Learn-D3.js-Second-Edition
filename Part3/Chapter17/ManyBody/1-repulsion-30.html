@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>forceManyBody - Repulsion</title>
+    <link rel="stylesheet" href="../css/force-examples.css">
+</head>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+    import {drawReferenceBackgroundGrid, updateChart, drawChart} from "../js/force-examples.js";
+
+    export const nodes = [
+        {node: 'A', value: 79},
+        {node: 'B', value: 15},
+        {node: 'C', value: 24},
+        {node: 'D', value: 44},
+        {node: 'E', value: 125},
+        {node: 'F', value: 22},
+        {node: 'G', value: 20},
+        {node: 'H', value: 64},
+        {node: 'I', value: 69},
+    ];
+
+    drawReferenceBackgroundGrid(nodes);
+
+    // SIMULATION
+    const sim = d3.forceSimulation(nodes);
+    sim.force("manybody", d3.forceManyBody()); // using default -30 (repulsion)
+
+    // Update on ticks
+    sim.on("tick", updateChart);
+
+    // Results
+    drawChart(nodes);
+</script>
+</body>
+</html>

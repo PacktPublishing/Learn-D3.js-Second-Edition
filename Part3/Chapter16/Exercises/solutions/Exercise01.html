@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Migrations (UN data, 2024)</title>
+    <style>
+        text {
+            font-family: 'Arial Narrow', sans-serif;
+            font-size: 12px;
+            alignment-baseline: middle;
+            text-anchor: middle;
+        }
+        .faded {
+            opacity: .3;
+        }
+        .highlight {
+            font-weight: bold;
+            font-size: 150%;
+        }
+        .highlight rect {
+            stroke-width: 1px;
+        }
+        text.node {
+            pointer-events: none;
+        }
+        .tooltip text {
+            font-size: 110%;
+        }
+    </style>
+</head>
+<body>
+<h1>Migrations (25 largest populations, in millions)</h1>
+<p>Move mouse over a cell for details. Source: United Nations Data (2024)</p>
+
+<!-- Roll the code below for the Exercise -->
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+    import * as nwu from "../../js/network-utils.js";   // Utility with layout functions
+    import {draw} from "./js/migration-diagrams.js";    // Inspect this file - it contains D3 drawing code
+
+    // Data file
+    const migrationsFile = "../../data/migrations_2024.csv"; // inspect this file!
+
+    // How many nodes to show (too many makes the chart hard to read)
+    const MAX_NODES = 25;
+
+    // Setup SVG and chart groups
+    const dim = {width: 900, height: 900, margin: 250};
+    const svg = d3.select("body").append("svg").attr("width", dim.width).attr("height", dim.height);
+    export const chart = svg.append("g").attr("transform", `translate(${[dim.margin/2, dim.margin/2]})`);
+    chart.width = dim.width - dim.margin;
+    chart.height = dim.height - dim.margin;
+
+    // A) LOAD and PREPARE the DATA
+    // Load migration data and filter by continent
+   const allEdges = await d3.csv(migrationsFile, function(row) {
+        const link = {          // link format = {source, target, value}
+            value: +row.Immigrants,
+            target: row.Destination,
+            source: row.Origin,
+        }
+        return link;
+    });
+
+    // Create the nodes array from edges {node: country, totalIn: total_immigrants, totalOut: total_emigrants}
+    const allNodes = [... new Set(allEdges.map(edge => edge.target))]
+                  .map(n => ({node: n,
+                              totalIn: allEdges.filter(e => e.target === n)
+                                               .reduce((sum, e) => sum + e.value, 0),
+                              totalOut: allEdges.filter(e => e.source === n)
+                                                .reduce((sum, e) => sum + e.value, 0)}));
+
+
+    // B) REDUCE the DATA considering only the top MAX_NODES countries
+
+    // Limit to maxNodes total based on total immigrants or emigrants
+    // This is tricky: too little may hide important information, too much will clutter the chart with irrelevant data
+    // Using other data (obtained from other sources) to filter the nodes, such as country population, may be a better approach.
+    const nodes  = allNodes.sort((a,b) => d3.descending(Math.max(a.totalIn, a.totalOut), Math.max(b.totalIn, b.totalOut)))
+                                           .filter((d,i) => i < MAX_NODES);
+
+    // Keep only edges that connect to filtered nodes
+    const edges = allEdges.filter(edge => nodes.find(n => n.node === edge.target))
+                          .filter(edge => nodes.find(n => n.node === edge.source));
+
+    // C) Prepare the matrix data to be used by adjacency matrix layout
+
+    // Alternative 1) Replace node names with their indices
+    /*
+    edges.forEach(edge => {
+        edge.source = nodes.map(n => n.node).indexOf(edge.source);
+        edge.target = nodes.map(n => n.node).indexOf(edge.target);
+    });
+    const matrix = nwu.linksToMatrix(nodes, edges); // uses indices (default: objectIds = false)
+    */
+
+    // Alternative 2) Replace node names with node objects (using objects as IDs)
+    edges.forEach(edge => {
+        edge.source = nodes[nodes.map(n => n.node).indexOf(edge.source)];
+        edge.target = nodes[nodes.map(n => n.node).indexOf(edge.target)];
+    });
+    const matrix = nwu.linksToMatrix(nodes, edges, true); // Alternative: using objects as IDs (true)
+
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    // D) EXERCISE 1 - Create an adjacency matrix heatmap starting from an array of nodes and a matrix of edges
+    // a) Create adjacency matrix layout generator with proper size (use the adjacencyMatrix function from network-utils.js)
+    const matrixLayout = nwu.adjacencyMatrix().size([chart.width, chart.height]);
+
+    // b) Generate the matrix layout (call the layout with nodes and matrix) and store it in a `result` constant
+    const result = matrixLayout(nodes, matrix);
+
+    // c) Create a color scale for the values (e.g., d3.scaleSqrt with range from lightyellow to red)
+    const color = d3.scaleSqrt().range(['lightyellow','red'])
+                    .domain([0,d3.max(result, d => d.value)]);
+
+    // d) Add a "color" property to each item in the result array based on its value (use white if no value)
+    //    and call color(value) to get a color from the scale
+    result.forEach(item => item.color = item.value ? color(item.value) : 'white');
+
+    // e) Call the draw(dim, chart, nodes, result) function imported from the adjacency-countries.js module
+    // with proper parameters:
+    //    * dim (contains width, height, margin),
+    //    * chart (the chart group),
+    //    * nodes (array of nodes),
+    //    * result (matrix layout data)
+    draw(dim, chart, nodes, result);
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+
+</script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Multiple forces: manybody+collide+positionY</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+    import {nodes, links, draw} from "./js/combinations.js";
+
+    links.splice(links.length - 4, 4);
+    links.filter((d, i) => i < 4).forEach(d => d.value = 2);
+    console.log(links)
+
+    const sim = d3.forceSimulation(nodes)
+        .force("center", d3.forceCenter())
+        .force("manybody", d3.forceManyBody().strength(30))
+        .force("collide", d3.forceCollide(15).iterations(50))
+        .force("y", d3.forceY(0).strength(.9));
+
+    for(let i = 0; i < 300; i++) {
+        sim.tick(); // run 300 ticks
+    }
+    sim.stop(); // stop the simulation
+
+    draw(nodes);
+</script>
+</body>
+</html>

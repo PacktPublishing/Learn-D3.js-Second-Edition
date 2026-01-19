@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Europe from 1990 to 2013</title>
+    <style>
+        text {
+            font-family: 'Arial Narrow', sans-serif;
+            font-size: 10px;
+            alignment-baseline: central;
+            text-anchor: middle;
+            fill: black;
+            pointer-events: none;
+        }
+        .faded {
+            opacity: .5;
+        }
+    </style>
+</head>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+    import * as d3x from "https://cdn.skypack.dev/d3-sankey@0.12.3";
+    import * as ui from "./js/sankey-interactive.js";
+
+    const width = 1400;
+    const height = 800;
+    const margin = 50;
+
+    //const color = d3.scaleOrdinal(d3.schemeCategory10);
+    const color = d3.scaleSequential(d3.interpolateSinebow);
+
+    const svg = d3.select("body").append("svg")
+                                 .attr("width", width)
+                                 .attr("height", height)
+                                 .attr("viewBox", `0 0 ${width} ${height}`);
+    const chart = svg.append("g");
+
+    // The links array will be populated while reading the nodes
+    const links = [];
+
+    // The nodes array
+    const nodes = await d3.csv("../../data/EuropeUSSR_1990_2010_nodes.csv", function(row) {
+        if(row.Containers.length > 0 &&  row.Id !== 'WB') { // don' include West berlin
+            const groups = row.Containers.split('|');
+            groups.forEach(function(group) {
+                const link = {}
+                if(group === 'DEU' || group.indexOf('EU') === 0) { // join EU and West Germany
+                    link.target = group;
+                    link.source = row.Id;
+                } else { // split
+                    link.target = row.Id;
+                    link.source = group;
+                }
+                if(+row.Unit === 1) { // Is a single country
+                    link.value = 1;
+                }
+                links.push(link);
+            });
+        } else if(+row.Unit === 1) {
+            return undefined;
+        }
+        return row;
+    });
+
+    // Compute link values for links based on the number of units if not defined
+    links.forEach(link => link.value  = computeValue(links, link));
+
+    // Set up the color scale domain
+    color.domain([0, nodes.length]);
+
+    // Create the sankey layout (use ui.sankey, which is declared in the sankey-interactive.js file)
+    ui.sankey.nodePadding(19)
+             .nodeWidth(90)
+             .extent([[margin/2, margin/2], [width-margin, height-margin]])
+             .nodeAlign(d3x.sankeyJustify)
+             .nodeId(d => d.Id)
+             .iterations(100);
+
+    // Generate the sankey graph and store it in ui.sankey.graph (from the sankey-interactive.js file)
+    ui.sankey.graph = ui.sankey({nodes: nodes, links: links});
+
+    // Call the draw function to render the diagram
+    draw();
+
+    // Implement the draw() function
+    function draw() {
+
+        // Draw the links (use d3x.sankeyLinkHorizontal() to generate the path and ui.sankey.graph to access the nodes and links)
+        chart.selectAll('path.link')
+             .data(ui.sankey.graph.links)
+                .join("path").attr("class", "link")
+                    .attr("d", d3x.sankeyLinkHorizontal())
+                    .style("stroke-opacity", .5)
+                    .style("stroke-width", d => d.width)
+                    .style("stroke", d => d.target.Id.indexOf('EU') === 0 || d.target.Id === 'DEU' ? color(d.source.index) : color(d.target.index))
+                    .style("fill", 'none')
+                    .on("mouseover", ui.highlightPath)
+                    .on("mouseout", ui.fade);
+
+        // Draw the nodes (use ui.sankey.graph to access the nodes)
+        chart.selectAll('g.node')
+            .data(ui.sankey.graph.nodes)
+            .join("g").attr("class", 'node')
+                .attr("transform", d => `translate(${[d.x0, d.y0]})`)
+                .each(function(d,i) {
+                    d3.select(this).append("rect")
+                        .attr("y", () => (d.y1 - d.y0 < 12) ? (d.y1 - d.y0)/2 - 5 : 0)
+                        .attr("width", d.x1 - d.x0)
+                        .attr("height", () => (d.y1 - d.y0 < 12) ? 12 : d.y1 - d.y0)
+                        .style("fill", d3.rgb(color(i)).darker(.5))
+                        .style('fill-opacity', .8)
+
+                d3.select(this).append("text")
+                        .attr("x", (d.x1 - d.x0)/2)
+                        .attr("y", (d.y1 - d.y0)/2)
+                        .text(d.Country)
+                        .style("fill", contrast(d3.rgb(color(i)).darker(.5)));
+            })
+            .on("mouseover", ui.highlightNode)      // Implement highlighting (from sankey-interactive.js)
+            .on("mouseout", ui.fade)
+            .call(d3.drag()
+                    .on('start', ui.dragStart)      // Implement dragging (from sankey-interactive.js)
+                    .on('drag', ui.dragging)
+                    .on('end', ui.dragEnd)
+            );
+    }
+
+    // Function to compute a contrasting color (black or lightyellow) based on the input color brightness
+    function contrast(color) {
+        const c = d3.rgb(color);
+        return (c.r * 0.299 + c.g * 0.587 + c.b * 0.114) > 120 ? '#333' : 'lightyellow';
+    }
+
+    // Recursive function to compute link values based on the number of units an object represents.
+    // A country is a single unit (value = 1). A group has no value, so its value is the sum of the values of its members.
+    function computeValue(links, link) {
+        if (link.value > 0) {
+            return link.value;
+        } else {
+            const children = links.filter(k => k.target === link.source || k.source === link.target);
+            let total = 0;
+            children.forEach(function(d) {
+                total += computeValue(children, d);
+            });
+            return total;
+        }
+    }
+ </script>
+
+</body>
+</html>

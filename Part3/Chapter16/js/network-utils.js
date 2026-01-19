@@ -1,24 +1,36 @@
-import * as d3 from "https://cdn.skypack.dev/d3@7";
+import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 
-/** TODO: REVIEW THIS FUNCTION
+/**
  * Converts a square matrix to a list of links in the form of {source: i, target: j, value: matrix[i,j]}
  * @param nodes - List of objects with node identification information (ex: list of strings)
  * @param matrix - Square matrix with adjacency data
+ * @param {boolean} objectID - If true, uses node objects as source and target, otherwise uses their index
  * @returns {{nodes: Array of {node: name}, links: Array of {source: i, target: j, value: matrix[i,j]}}
  */
 export function matrixToLinks(nodes, matrix, objectID = false) {
 
-    const links = [];
+    if (!Array.isArray(matrix)) {
+        throw new TypeError('matrix must be an array of rows');
+    }
 
-    for(let s = 0; s < matrix.length; s++) {
-        for(let t = 0; t < matrix.length; t++) {
-            const v = matrix[s][t];
-            if(v !== 0) {
-                if(!objectID) {
-                    links.push({source: s, target: t, value: v});
-                } else {
-                    links.push({source: nodes[s], target: nodes[t], value: v});
+    const links = [];
+    const rows = matrix.length;
+
+    for (let s = 0; s < rows; s++) {
+        const row = matrix[s];
+        if (!Array.isArray(row)) continue; // skip invalid rows
+
+        for (let t = 0; t < row.length; t++) {
+            const v = row[t];
+            if (typeof v === 'number' && v > 0) {
+                const source = objectID ? nodes?.[s] : s;
+                const target = objectID ? nodes?.[t] : t;
+
+                if (objectID && (source === undefined || target === undefined)) {
+                    throw new RangeError('`nodes` must contain entries for all matrix indices when `objectID` is true');
                 }
+
+                links.push({ source, target, value: v });
             }
         }
     }
@@ -30,16 +42,20 @@ export function matrixToLinks(nodes, matrix, objectID = false) {
  * @param nodes - Must contain a list of objects with node identification information (ex: list of strings)
  * @param links - Must contain a list of objects with `source`, `target`, and `value` properties.
  * @param {boolean} objectIds - If true, uses node objects as source and target, otherwise uses their index
- * @param {boolean} copyOnZero - If true, copies value from forward link if no reverse link exists.
+ * @param {boolean} copyOnZero - If true, copies value from forward link if no reverse link exists - used for symmetric datasets.
+ * @param {string} source - Property name for source in links - default is "source"
+ * @param {string} target - Property name for target in links - default is "target"
+ * @param {string} value - Property name for value in links - default is "value"
+ * @returns {Array} Square matrix representing adjacency data
  */
-export function linksToMatrix (nodes, links, objectIds = false, copyOnZero = false) {
+export function linksToMatrix (nodes, links, objectIds = false, copyOnZero = false, source = "source", target = "target", value  = "value") {
 
     const matrix = [];
 
     if(copyOnZero) {
         links.forEach(link => {
-            if(!links.some(l => l.source === link.target && l.target === link.source)) {
-                links.push({source: link.target, target: link.source, value: link.value});
+            if(!links.some(l => l[source] === link[target] && l[target] === link[source])) {
+                links.push({ [source]: link[target], [target]: link[source], [value]: link[value] });
             }
         });
     }
@@ -47,11 +63,11 @@ export function linksToMatrix (nodes, links, objectIds = false, copyOnZero = fal
     for(let s = 0; s < nodes.length; s++) { // For each target node
         const line = [];
         for(let t = 0; t < nodes.length; t++) { // For each target node
-            const link = !objectIds ? links.filter(k => k.source === s && k.target === t) :
-                                      links.filter(k => k.source === nodes[s] && k.target === nodes[t]);
+            const link = !objectIds ? links.filter(k => k[source] === s && k[target] === t) :
+                                      links.filter(k => k[source] === nodes[s] && k[target] === nodes[t]);
 
             if(link.length !== 0) {
-                line.push(link[0].value);
+                line.push(link[0][value]);
             } else {
                 line.push(0);
             }
@@ -99,12 +115,7 @@ export function adjacencyMatrix() {
 
         return sourceMatrix.flatMap((row, rowIndex) =>
             row.map((value, colIndex) => {
-                const rect = {
-                    x: colIndex * cellWidth,
-                    y: rowIndex * cellHeight,
-                    w: cellWidth,
-                    h: cellHeight
-                };
+                const rect = { x: colIndex * cellWidth, y: rowIndex * cellHeight, w: cellWidth, h: cellHeight };
                 return value > 0
                     ? { ...rect, source: nodes[rowIndex], target: nodes[colIndex], value }
                     : rect;

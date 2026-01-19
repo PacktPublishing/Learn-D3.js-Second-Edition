@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>forceLink - Weight</title>
+    <link rel="stylesheet" href="../css/force-examples.css">
+</head>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+    import {drawReferenceBackgroundGrid, updateChart, drawChart} from "../js/force-examples.js";
+
+    const nodes = [
+        {node: 'A', value: 1},
+        {node: 'B', value: 1},
+        {node: 'C', value: 2},
+        {node: 'D', value: 3},
+        {node: 'E', value: 5},
+        {node: 'F', value: 8},
+        {node: 'G', value: 13},
+        {node: 'H', value: 21},
+        {node: 'I', value: 34},
+    ];
+
+    const links = [
+        {source: 0, target: 4, value: 1},
+        {source: 1, target: 4, value: 1},
+        {source: 2, target: 4, value: 1},
+        {source: 3, target: 4, value: 1},
+        {source: 4, target: 4, value: 1},
+        {source: 5, target: 4, value: 1},
+        {source: 6, target: 4, value: 1},
+        {source: 7, target: 4, value: 1},
+        {source: 8, target: 4, value: 1},
+        {source: 2, target: 1, value: 1},
+        {source: 2, target: 5, value: 1}
+    ];
+
+    // use average of node values as weight
+    const weight = link => (link.source.value + link.target.value)/2;
+
+    // SIMULATION
+    const sim = d3.forceSimulation(nodes);
+    sim.force("link", d3.forceLink(links).strength(.005));
+
+    // Setup reference grid
+    drawReferenceBackgroundGrid(nodes, links);
+
+    // Update on ticks
+    sim.on("tick", updateChart);
+
+    // Results
+    drawChart(nodes, links, 15, d => d.node, weight);
+</script>
+</body>
+</html>

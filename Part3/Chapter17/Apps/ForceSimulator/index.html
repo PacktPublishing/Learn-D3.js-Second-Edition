@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Interactive force simulator</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        h1 {
+            font-family: sans-serif;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+<h1>Interactive force simulator</h1>
+<div class="container">
+    <div class="form"><form>
+        <p>Current alpha: <span id="alpha">0.0000</span>
+            <input id="c_alpha" type='range' min='0' max='1000' value="1000">
+        <br>alphaMin: <span id="alphaMin">0.0000</span><br>
+            <input id="c_alphaMin" type='range' min='1' max='1000' value="10">
+        <br>alphaTarget: <span id="alphaTarget">0.0000</span><br>
+            <input id="c_alphaTarget" type='range' min='0' max='1000' value="0">
+        <br>alphaDecay: <span id="alphaDecay">0.0000</span><br>
+            <input id="c_alphaDecay" type='range' min='1' max='1000' value="22.76277904418933">
+        <br>velocityDecay: <span id="velocityDecay">0.0000</span><br>
+            <input id="c_velocityDecay" type='range' min='1' max='1000' value="400">
+        <p>Forces:<br>
+            <input type="checkbox" id="ck_manybody"> ManyBody
+            <input type="number" id="inout" value="-30" min="-10000" max="10000"><br>
+            <input type="checkbox" id="ck_collide"> Collide<br>
+            <input type="checkbox" id="ck_link"> Link<br>
+            <input type="checkbox" id="ck_center"> Center
+            <input type="number" value="0" min="-1" max="1" step=".1" id="cx">,
+            <input type="number" value="0" min="-1" max="1" step=".1" id="cy"><br>
+            <input type="checkbox" id="ck_x"> X
+            <input type="number" value="0" min="-1" max="1" step=".1" id="x"><br>
+            <input type="checkbox" id="ck_y"> Y
+            <input type="number" value="0" min="-1" max="1" step=".1" id="y">
+        </p>
+        <p><input type="checkbox" id="show_lines" disabled>Show link lines</p>
+
+        <p>Automatic simulation<br>
+            <button id="restart" type="button" style="background: hsl(100,100%,80%)">Start</button>
+            <button id="stop" type="button" style="background: hsl(0,100%,80%)">Stop</button></p>
+        <p>Static simulation<br>
+            <button id="tick" type="button" style="background: hsl(240,100%,90%)">Tick</button>
+            <button id="reset" type="button" style="background: hsl(60,100%,80%)">Reset</button></p>
+
+    </form></div>
+    <div class="svg"></div>
+</div>
+<script type="module">
+    import {setupPanel, init}    from "./js/force-simulator.js";
+    setupPanel();
+    init();
+</script>
+</body>
+</html>

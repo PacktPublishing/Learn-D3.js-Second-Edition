@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>forceLink - Using ID</title>
+    <link rel="stylesheet" href="../css/force-examples.css">
+</head>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+    import {drawReferenceBackgroundGrid, updateChart, drawChart} from "../js/force-examples.js";
+
+    const nodes = [
+        {node: 'A', value: 79},
+        {node: 'B', value: 15},
+        {node: 'C', value: 24},
+        {node: 'D', value: 44},
+        {node: 'E', value: 125},
+        {node: 'F', value: 22},
+        {node: 'G', value: 20},
+        {node: 'H', value: 64},
+        {node: 'I', value: 69},
+    ];
+
+    const links = [ // where the ID is a string
+        {source: 'A', target: 'F', value: 1},
+        {source: 'F', target: 'G', value: 1},
+        {source: 'G', target: 'A', value: 1},
+        {source: 'I', target: 'D', value: 1},
+        {source: 'D', target: 'C', value: 1},
+        {source: 'C', target: 'I', value: 1},
+        {source: 'B', target: 'E', value: 1},
+        {source: 'E', target: 'H', value: 1}
+    ];
+
+    // SIMULATION
+    const sim = d3.forceSimulation(nodes);
+    sim.force("link", d3.forceLink(links).strength(.1).id(d => d.node)); // using string IDs
+
+    // Setup reference grid
+    drawReferenceBackgroundGrid(nodes, links);
+
+    // Update on ticks
+    sim.on("tick", updateChart);
+
+    // Results
+    const chart = drawChart(nodes, links);
+
+    // DRAGGING LOGIC
+    const nodeDragged = d3.drag()
+        .on('drag', function(evt, d) {
+            d.x = evt.x;
+            d.y = evt.y;
+            console.log(sim.alpha())
+        })
+        .on('start', function() {
+            if(sim.alpha() <= sim.alphaMin()) {
+                sim.restart();
+            }
+            sim.alphaTarget(sim.alphaMin() + .1)
+        })
+        .on('end', () => sim.alphaTarget(0));
+
+    chart.selectAll("g.simulation")
+         .call(nodeDragged);
+
+</script>
+</body>
+</html>

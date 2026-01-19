@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ticks - without forces</title>
+    <link rel="stylesheet" href="css/force.css">
+</head>
+<body>
+<div id="label">Ticks</div>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+    import {nodes, draw, redraw} from "./js/force.js";
+
+    const width = 400, height = 400;
+    const svg = d3.select("body").append("svg").attr("width",width).attr("height",height);
+    const chart = svg.append("g").attr("transform", `translate(${[width/2,height/2]})`);
+
+    const nodes = [
+        {node: 'A', value: 79},
+        {node: 'B', value: 15},
+        {node: 'C', value: 24},
+        {node: 'D', value: 44},
+        {node: 'E', value: 125},
+        {node: 'F', value: 22},
+        {node: 'G', value: 20},
+        {node: 'H', value: 64},
+    ];
+
+    const color = d3.scaleOrdinal(d3.schemeCategory10)
+                    .domain([0,nodes.length]);
+
+
+    // SIMULATION
+    const sim = d3.forceSimulation(nodes);
+    sim.on("tick", ticked);
+    draw();
+
+    // FUNCTIONS
+    let ticks = 0;
+    function ticked() {
+        d3.select("#label").text('Tick: ' + ++ticks);
+        redraw();
+    }
+
+    function draw() {
+        chart.selectAll("circle")
+             .data(nodes).join("circle")
+                .attr("r", 15)
+                .attr("cx", d => d.x)
+                .attr("cy", d => d.y)
+                .style("fill", (d,i) => color(i));
+    }
+
+    function redraw() {
+        chart.selectAll("circle")
+                .attr("cx", d => d.x)
+                .attr("cy", d => d.y);
+    }
+
+</script>
+</body>
+</html>

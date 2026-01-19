@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>forceLink - Highlighting</title>
+    <link rel="stylesheet" href="../css/force-examples.css">
+</head>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+    import {drawReferenceBackgroundGrid, updateChart, drawChart} from "../js/force-examples.js";
+
+    const nodes = [
+        {node: 'A', value: 1},
+        {node: 'B', value: 1},
+        {node: 'C', value: 2},
+        {node: 'D', value: 3},
+        {node: 'E', value: 5},
+        {node: 'F', value: 8},
+        {node: 'G', value: 13},
+        {node: 'H', value: 21},
+        {node: 'I', value: 34},
+    ];
+
+    const links = [
+        {source: 0, target: 4, value: 1},
+        {source: 1, target: 4, value: 1},
+        {source: 2, target: 4, value: 1},
+        {source: 3, target: 4, value: 1},
+        {source: 4, target: 4, value: 1},
+        {source: 5, target: 4, value: 1},
+        {source: 6, target: 4, value: 1},
+        {source: 7, target: 4, value: 1},
+        {source: 8, target: 4, value: 1},
+        {source: 2, target: 1, value: 1},
+        {source: 2, target: 5, value: 1}
+    ];
+
+    // SIMULATION
+    const sim = d3.forceSimulation(nodes);
+    sim.force("link", d3.forceLink(links).strength(.005));
+
+    // Setup reference grid
+    drawReferenceBackgroundGrid(nodes, links);
+
+    // Update on ticks
+    sim.on("tick", updateChart);
+
+    // Results
+    const chart = drawChart(nodes, links);
+
+    chart.selectAll("g.simulation")
+         .on("mouseover", highlight)
+         .on("mouseout", () => d3.selectAll('.simulation').classed('highlight show fade', false));
+
+
+    // HIGHLIGHTING LOGIC
+    const targetLinks = node => links.filter(link => link.source === node);
+    const sourceLinks = node => links.filter(link => link.target === node);
+
+    // direct nodes connected by adjacent links
+    const connected = (a, b) => targetLinks(a).filter(p => p.target === b).length > 0
+                             || sourceLinks(a).filter(p => p.source === b).length > 0;
+
+    // links connected to node
+    const adjacentLinks = node => d3.merge([targetLinks(node), sourceLinks(node)]);
+
+    function highlight(evt, node) {
+        const nodes = d3.selectAll('g.simulation'); // bound to nodes
+        nodes.classed('highlight', d => d === node); // highlight selected node
+
+        nodes.classed('show', d => connected(node, d)); // show connected nodes
+        nodes.classed('fade', d => !(d === node || connected(node, d)));  // fade unconnected nodes
+
+        const links = d3.selectAll('line.simulation'); // bound to links
+        links.classed('fade', d => adjacentLinks(node).filter(link => link === d).length === 0); // fade other links
+        links.classed('highlight', d => adjacentLinks(node).filter(link => link === d).length !== 0); // highlight adjacent links
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+text {
+    font-family: 'Arial Narrow', sans-serif;
+    font-size: 14px;
+    alignment-baseline: middle;
+    text-anchor: middle;
+    fill: white;
+}
+svg {
+    border: solid 1px #eaeaea;
+}
+.margin {
+    stroke: blue;
+    opacity: .1;
+}
+.reflink {
+    opacity: .2;
+}
+
+.highlight text {
+    font-size: 150%;
+}
+.show text {
+    font-size: 120%;
+}
+.highlight circle, line.highlight {
+    stroke-width: 3px;
+}
+.fade {
+    opacity: .3;
+}

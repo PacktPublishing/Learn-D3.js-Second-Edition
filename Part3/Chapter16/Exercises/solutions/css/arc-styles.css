@@ -1,0 +1,15 @@
+text {
+    font-family: 'Arial Narrow', sans-serif;
+    font-size: 11px;
+    alignment-baseline: central;
+    font-weight: bold;
+    text-anchor: middle;
+    fill: white;
+    pointer-events: none;
+}
+.faded {
+    opacity: .3;
+}
+.active {
+    opacity: 1;
+}

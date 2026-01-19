@@ -39,7 +39,7 @@
 
     const nodes = [];
 
-    d3.csv("../Data/migrations_2017_continent.csv", function(row) {
+    d3.csv("../../data/migrations_2017_continent.csv", function(row) {
         nodes.push({node: row.Destination, total: +row.Total, code: row.Code, pop: +row.Population, continent: row.Continent});
 
         const line = [];

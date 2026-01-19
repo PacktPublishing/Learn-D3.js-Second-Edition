@@ -2,7 +2,7 @@
  * Repeated code from chord examples in the draw function.
  */
 
-import * as d3 from "https://cdn.skypack.dev/d3@7";
+import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 
 export const dim = {width: 800, height: 800, margin: 100};
 export const chart = d3.select("body").append("svg").attr("width", dim.width).attr("height", dim.height)

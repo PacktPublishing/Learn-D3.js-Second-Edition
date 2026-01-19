@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Alpha animation</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        h1 {
+            font-family: sans-serif;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+<h1>Alpha decay simulator</h1>
+<div class="container">
+    <div class="form"><form>
+        <p>Current alpha: <span id="alpha">0.0000</span>
+            <input id="c_alpha"         type='range' min='0' max='1000' aria-label="current alpha">
+            <br>alphaMin: <span id="alphaMin">0.0000</span><br>
+            <input id="c_alphaMin"      type='range' min='0' max='1000' aria-label="alpha minimum">
+            <br>alphaTarget: <span id="alphaTarget">0.0000</span><br>
+            <input id="c_alphaTarget"   type='range' min='0' max='1000' aria-label="alpha target">
+            <br>alphaDecay: <span id="alphaDecay">0.0000</span><br>
+            <input id="c_alphaDecay"    type='range' min='0' max='1000' aria-label="alpha decay">
+            <br>iterations: <span id="iterations">0.0000</span><br>
+            <input id="c_iterations"    type='range' min='0' max='6904' aria-label="iterations">
+
+        <!-- Scale selection: allow user to choose between log and linear -->
+        <p>Y scale:
+            <label><input type="radio" name="scaleType" value="log" checked> Log</label>
+            <label><input type="radio" name="scaleType" value="linear"> Linear</label>
+        </p>
+
+        <p>Automatic simulation<br>
+            <button id="restart" type="button" style="background: hsl(100,100%,80%)">Start</button>
+            <button id="stop" type="button" style="background: hsl(0,100%,80%)">Stop</button></p>
+        <p>Static simulation<br>
+            <button id="tick" type="button" style="background: hsl(240,100%,90%)">Tick</button>
+            <button id="reset" type="button" style="background: hsl(60,100%,80%)">Reset</button></p>
+    </form></div>
+    <div class="svg"></div>
+</div>
+
+<script type="module">
+    import {setupPanel, drawReferences, init} from "./js/alpha-animation.js";
+
+    setupPanel();
+    drawReferences();
+    init();
+
+</script>
+</body>
+</html>
