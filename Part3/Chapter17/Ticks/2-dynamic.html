@@ -7,6 +7,7 @@
 </head>
 <body>
 <div id="label">Ticks</div>
+<p>Open your console and inspect the <code>nodes</code> array to see the added properties.</p>
 <script type="module">
     import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
     import {nodes, draw, redraw} from "./js/force.js";
@@ -25,6 +26,8 @@
         redraw();
     }
 
+    // For access in the console
+    window.nodes = nodes;
 </script>
 </body>
 </html>

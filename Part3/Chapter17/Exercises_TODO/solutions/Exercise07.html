@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EXERCISE: add links between existing nodes</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+         svg {border: solid 1px red}
+         .highlight circle {
+             stroke-width: 5;
+             stroke: pink;
+             fill: black;
+             r: 25px;
+         }
+        .highlight text {
+            font-size: 150%;
+        }
+    </style>
+</head>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+    import {links, nodes, chart, dim, draw, redraw} from "./js/alphabet.js";
+
+    // 1) Create a variable to store the currently selected node (e.g. selectedNode) initially set to null.
+    let selectedNode = null;
+
+    const offsetX = dim.margin/2 + dim.width/2;
+    const offsetY = dim.margin/2 + dim.height/2;
+    chart.attr("transform", `translate(${[offsetX,offsetY]})`);
+
+    // Simulation setup
+    const sim = d3.forceSimulation(nodes)
+                  .force("center", d3.forceCenter())
+                  .force("link", d3.forceLink(links).iterations(15))
+                  .force("manybody", d3.forceManyBody().strength(-30))
+                  .force("collide", d3.forceCollide(30));
+    sim.on("tick", redraw);
+
+    // EXERCISE - Add links between existing nodes
+    // 2) Modify this code to distinguish between adding a new node and selecting and
+    //    existing node to link to. Using shift+click should call the addLink(evt) function (to be implemented),
+    //    while a normal click should add a new node as before, clearing any selected node.
+    // 3) SEE BELOW for addLink(evt) function to implement.
+    d3.select("svg").on('click', function(evt) {
+        if (evt.shiftKey || selectedNode) {
+            addLink.call(this, evt);
+        } else {
+            clearSelection();
+            addNode.call(this, evt);
+        }
+    });
+
+    // Render the initial graph
+    draw();
+
+    // Handle click events on nodes to REMOVE NODES
+    chart.selectAll("g.node").on('click', removeNode);
+
+    // Add dragging behavior to nodes
+    const nodeDragged = d3.drag()
+        .on('drag', function(evt, d) {
+            d.fx = evt.x;
+            d.fy = evt.y;
+        })
+        .on('start', function() {
+            if(sim.alpha() <= sim.alphaMin()) {
+                sim.restart();
+            }
+            sim.alphaTarget(sim.alphaMin() + .1)
+        })
+        .on('end', () => sim.alphaTarget(0));
+    chart.selectAll('g.node').call(nodeDragged);
+
+    // Zooming behavior
+    const zoom = d3.zoom()
+        .on('zoom', evt => chart.attr("transform", evt.transform.translate(offsetX, offsetY)));
+    d3.select("svg").call(zoom);
+
+
+    // UTILITY FUNCTIONS
+    // Find the node nearest to the mouse event
+    function findNearestNode(evt) {
+        const [px, py] = d3.pointer(evt);
+        const t = d3.zoomTransform(d3.select("svg").node());
+        const [lx, ly] = t.invert([px, py]);
+        return sim.find(lx - offsetX, ly - offsetY);
+    }
+
+    // USE THIS FUNCTION TO HIGHLIGHT THE NEAREST NODE
+    // Highlight the nearest node to the mouse event
+    function highlightNearestNode(evt) {
+        const nearest = findNearestNode(evt);
+        chart.selectAll('g.node').classed('highlight', d => d === nearest);
+        return nearest;
+    }
+
+    // USE THIS FUNCTION TO CLEAR ANY SELECTED NODE AND REMOVE HIGHLIGHTS
+    // Clear any selected node and remove highlights
+    function clearSelection() {
+        selectedNode = null;
+        chart.selectAll('g.node').classed('highlight', false);
+    }
+
+    // Reheat the simulation if it's cooled down
+    function reheatSimulation() {
+        if (sim.alpha() < .05) {
+            sim.alpha(.05);
+            sim.restart();
+        }
+    }
+
+    // EXERCISE
+    // 3) Implement the addLink(evt) function to add or bump links between nodes. This function should
+    //    highlight the nearest node to the mouse event.
+    //    a) If there is a stored selectedNode already and this selectedNode is not the same node as the nearest node,
+    //       it should create and add a new link object {source: selectedNode.index, target: nearest.index, value: 1}
+    //       between the selectedNode and the nearest node (if they are different). If a link already exists between
+    //       these two nodes, it should increment the value property of that link instead of adding a new link.
+    //       After adding or updating the link, it should update the simulation's link force with the new links array,
+    //       call draw() to update the DOM, reheat the simulation (reheatSimulation), and clear the selectedNode
+    //       (clearSelection).
+    //    b) If there is a stored selectedNode and the nearest node is the same as the selectedNode, it should
+    //       clear the selection (clearSelection).
+    //    c) If there is no stored selectedNode, it should store the nearest node as the selectedNode and highlight it.
+    function addLink(evt) {
+        const nearest = highlightNearestNode(evt);
+        if (!nearest) return;
+
+        if (selectedNode && nearest !== selectedNode) { // create or bump a link
+            const newLink = {
+                source: selectedNode.index,
+                target: nearest.index,
+                value: 1
+            };
+
+            // Check if link already exists between these nodes
+            const existingLink = links.find(link =>
+                (link.source.index === selectedNode.index && link.target.index === nearest.index) ||
+                (link.source.index === nearest.index && link.target.index === selectedNode.index)
+            );
+
+            // If the link already exists, increment its value; otherwise, add the new link
+            if (existingLink) {
+                existingLink.value = ++existingLink.value;
+            } else {
+                links.push(newLink);
+            }
+
+            // Update simulation
+            sim.force("link").links(links).initialize(nodes);
+
+            draw();
+            reheatSimulation();
+            clearSelection();
+
+        } else if (selectedNode) { // Deselect if clicked the same node
+            clearSelection();
+        } else { // Select nearest
+            selectedNode = nearest;
+            chart.selectAll('g.node').classed('highlight', d => d === selectedNode);
+        }
+    }
+
+    // Remove a node and its associated links
+    function removeNode(evt, d) {
+        evt.stopPropagation();
+
+        const idx = nodes.indexOf(d);
+        if (idx === -1) return;
+        nodes.splice(idx, 1); // Remove node from data
+
+        // Remove associated links
+        for (let i = links.length - 1; i >= 0; i--) {
+            if (links[i].source.index === idx || links[i].target.index === idx) {
+                links.splice(i, 1);
+            }
+        }
+
+        // Update simulation
+        sim.nodes(nodes);
+        sim.force("link").links(links).initialize(nodes);
+
+        // Update DOM and reheat simulation
+        draw();
+        reheatSimulation();
+    }
+
+    // Add a new node connected to the nearest existing node
+    function addNode(evt) {
+        const nearest = findNearestNode(evt);
+        if (!nearest) return;
+
+        // Node name = source node's name + count of existing links from it + 1
+        const newNode = { node: nearest.node + (links.filter(n => n.source === nearest).length + 1)};
+        nodes.push(newNode);
+
+        // create link connecting the newly added node
+        const newLink = { source: nearest.index, target: nodes.length-1, value: 1 };
+        links.push(newLink);
+
+        sim.nodes(nodes);
+        sim.force("link").links(links).initialize(nodes);
+
+        draw();  // update DOM
+
+        // Add dragging and node removal behavior to new node
+        d3.select(`#${newNode.node}`)
+            .on('click', removeNode)
+            .call(nodeDragged);
+
+        reheatSimulation();
+    }
+
+</script>
+</body>
+</html>

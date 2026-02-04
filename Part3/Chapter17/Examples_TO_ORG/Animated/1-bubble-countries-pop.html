@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        text {
+            font-family: 'Arial Narrow', sans-serif;
+            alignment-baseline: middle;
+            font-weight: bold;
+            text-anchor: middle;
+            fill: white;
+        }
+    </style>
+</head>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+
+    const dataFile = '../../data/un_regions.csv';
+
+    const width = 1300;
+    const height = 700;
+    const margin = 100;
+
+    const color = d3.scaleSequential(d3.interpolateCool);
+    const radius = d3.scaleSqrt().range([5,145])
+    const nodeDragged = d3.drag();
+
+    d3.csv(dataFile, function(row) {
+        return {Country: row.Country, Population: +row.Pop_2016};
+    }).then(function(data) {
+
+        const nodes = data
+
+        color.domain([0,nodes.length]);
+        radius.domain(d3.extent(nodes, d => d.Population));
+
+        const svg = d3.select("body").append("svg").attr("width",width).attr("height",height);
+        const chart = svg.append("g").attr("transform", `translate(${[width/2, margin/4 + height/2]})`);
+
+        const sim = d3.forceSimulation(nodes)
+                        .force("manybody", d3.forceManyBody().strength(50))
+                        .force("center", d3.forceCenter())
+                        .force("y", d3.forceY().strength(.1))
+                        .force("collide", d3.forceCollide(d => radius(d.Population) + 1)
+                                            .strength(2)
+                                            .iterations(10));
+
+        // dynamic chart
+        sim.on("tick", redraw);
+
+        // Dragging behavior
+        nodeDragged.on('drag', function(evt, d) {
+            d.x = evt.x;
+            d.y = evt.y;
+        }).on('start', function() {
+            if(sim.alpha() <= sim.alphaMin()) {
+                sim.restart();
+            }
+            sim.alphaTarget(sim.alphaMin() + .1)
+        })
+        .on('end', () => sim.alphaTarget(0));
+
+        draw(chart, nodes);
+    });
+
+    function draw(chart, nodes) {
+        const bubbles = chart.selectAll('g.bubble')
+                .data(nodes).join("g")
+                .append("g").attr("class", 'bubble')
+                .attr("transform", d => `translate(${[d.x, d.y]})`)
+                .call(nodeDragged);
+
+        bubbles.append("circle")
+                .attr("r", d => radius(d.Population))
+                .style("fill", (d,i) => d3.rgb(color(i)).darker(.75))
+                .style("fill-opacity",.8)
+
+        bubbles.append("text")
+                .text(d => d.Country)
+                .attr("y", d => radius(d.Population)/9)
+                .attr("font-size", function(d) {
+                    const size = Math.min(3*radius(d.Population), (3*radius(d.Population) - 8) / this.getComputedTextLength() * 9);
+                    if(size > 7) {
+                        return size + "px";
+                    }
+                    return 0;
+                })
+    }
+
+    function redraw() {
+        d3.selectAll('.bubble').attr("transform", d => `translate(${[d.x, d.y]})`);
+    }
+
+</script>
+</body>
+</html>

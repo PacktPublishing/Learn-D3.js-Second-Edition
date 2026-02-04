@@ -1,0 +1,13 @@
+text {
+    font-family: 'Arial Narrow', sans-serif;
+    font-weight: bold;
+    font-size: 12px;
+    alignment-baseline: middle;
+    text-anchor: middle;
+    fill: white;
+}
+
+line {
+    fill: none;
+    stroke: black;
+}

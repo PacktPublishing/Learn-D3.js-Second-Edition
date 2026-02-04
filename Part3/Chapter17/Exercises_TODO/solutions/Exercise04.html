@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Paris metro force graph</title>
+    <style>
+        text {
+            font-family: 'Arial Narrow', sans-serif;
+            font-weight: bold;
+            font-size: 8px;
+            alignment-baseline: middle;
+            text-anchor: middle;
+        }
+
+        line {
+            fill: none;
+            stroke: black;
+        }
+    </style>
+</head>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+
+    const dim = { width: 1200, height: 900, margin: 40 };
+    const offsetX = dim.margin / 2 + dim.width / 2;
+    const offsetY = dim.margin / 2 + dim.height / 2;
+    const svg = d3.select("body").append("svg")
+                  .attr("width", dim.width + dim.margin)
+                  .attr("height", dim.height + dim.margin);
+    const chart = svg.append("g")
+                     .attr("transform", `translate(${[offsetX, offsetY]})`);
+
+    const data = await d3.json('../data/paris-sample.json');
+    data.connections.forEach(function(link) {
+        const nodeKeys = data.stations.map(n => n.station + ':' + n.line);
+        link.source = nodeKeys.indexOf(link.source + ":" + link.lines[0]);
+        link.target = nodeKeys.indexOf(link.target + ":" + link.lines[1]);
+    });
+
+    const lineNums = Array.from(new Set(data.stations.map(d => d.line)));
+    const lines = data.lines.filter(d => lineNums.includes(d.line));
+    const color = num => lines.find(l => l.line === num).color;
+
+    const sim = d3.forceSimulation(data.stations);
+    sim.force("center", d3.forceCenter())
+       .force("link", d3.forceLink(data.connections)
+                       .iterations(15)
+                       .distance(d => d.lines[0] !== d.lines[1] ? 0 : 1)    // transfer links shorter
+                       .strength(d => d.lines[0] !== d.lines[1] ? 1 : .5)); // transfer links stronger
+    sim.force("manybody", d3.forceManyBody().strength(-100))
+       .force("collide", d3.forceCollide(20).iterations(10));
+
+    sim.on("tick", redraw);
+
+    draw(data.stations, data.connections);
+
+    function redraw() {
+        chart.selectAll('g.node')
+            .attr("transform", d => `translate(${[d.x, d.y]})`);
+
+        chart.selectAll('line')
+            .attr("x1", d => d.source.x)
+            .attr("x2", d => d.target.x)
+            .attr("y1", d => d.source.y)
+            .attr("y2", d => d.target.y)
+    }
+
+    function draw(nodes, links) {
+        chart.selectAll('line')
+            .data(links, d => `${d.source.node}-${d.target.node}`)
+            .join(
+                enter => enter.append('line')
+                    .lower()
+                    .attr("stroke-width", d => d.value * d.value),
+                update => update.attr("stroke-width", d => d.value * d.value),
+                exit => exit.remove()
+            )
+            .style("stroke", d => d.lines[0] === d.lines[1] ? color(d.lines[0]) : 'black')
+            .style("stroke-width", d => d.lines[0] !== d.lines[1] ? 12 : 4)
+
+        // Bind nodes: append only on enter, update positions on update
+        chart.selectAll('g.node')
+            .data(nodes, d => d.station)
+            .join(
+                enter => {
+                    const g = enter.append('g').attr('class', 'node')
+                        .attr('id', d => d.station); // Save ID to select the node
+                    g.append('circle').attr('r', 15)
+                        .style('fill', d => color(d.line))
+                        .style('stroke', 'black');
+                    g.append('text').text(d => d.station.substring(0,6))
+                        .style('fill', d => contrast(color(d.line)));
+                    return g;
+                },
+                update => update,
+                exit => exit.remove()
+            );
+    }
+
+    function contrast(color, darker = false) {
+        const c = d3.hsl(darker ? color : d3.color(color).darker());
+        return c.l > .3 ? 'black' : 'white';
+    }
+</script>
+
+</body>
+</html>
