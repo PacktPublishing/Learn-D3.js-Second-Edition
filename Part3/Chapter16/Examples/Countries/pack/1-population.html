@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Circle pack: population</title>
+    <link rel="stylesheet" href="css/pack-countries.css">
+</head>
+<body>
+<h1>Continents and countries <span id="continent"></span> by population</h1>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+    import {rootFromRollup} from "../../../js/nest.js";
+
+    const width = 1000, height = 1000, margin = 25;
+
+    const chart = d3.select("body").append("svg").attr("height", height).attr("width", width)
+        .attr("viewBox", `0 0 ${width*1.5} ${height*1.5}`)
+        .append("g").attr("transform", `translate(${[margin,margin]})`);
+
+    const colorScale = d3.scaleSequential(d3.interpolatePuRd);
+
+    const result = await d3.csv("../../../data/un_regions.csv");
+
+    const keyFunctions = [
+        //    d => d.Supercontinent,
+        d => d.Continent,
+        //    d => d.UN_Region,
+        d => d.Country
+    ];
+    const reductionFunction = d => ({area: +d[0].Area_km2, population: +d[0].Pop_2016});
+    const rollupRoot = d3.rollup(result, reductionFunction, ...keyFunctions);
+    const hierarchy = rootFromRollup(rollupRoot, "World", false);
+    const root = d3.hierarchy(hierarchy);
+
+    root.sum(d => d.value ? d.value[0].population : d.population);
+    root.sort((a,b) => b.height - a.height || b.value - a.value);
+
+    const pack = d3.pack()
+        .size([width-margin*2,height-margin*2])
+        .padding(8);
+
+    colorScale.domain(d3.extent(root, n => n.height));
+    pack(root);
+
+    drawTooltip();
+
+    draw(root);
+
+    function draw(data) {
+        chart.selectAll("g.node")
+             .data(data, d => d.data.id)
+                 .join(enter => appendNodes(enter), update => update, exit => exit.remove())
+                 .attr("transform", d => `translate(${[d.x, d.y]})`)
+                 .on("click", (evt, d) => changeRoot(data, d.data.id))
+                 .each(function(d) { updateNodes(d3.select(this), d); });
+    }
+
+    function drawTooltip() {
+        const tooltip = d3.select("svg").append("g")
+            .attr("id", "tooltip")
+            .style("pointer-events", "none")
+            .style("opacity", 0);
+
+        tooltip.append("rect")
+               .style("fill", "#fff")
+               .style("stroke", "#000");
+
+        tooltip.append("text")
+               .style("font-size", "18px")
+               .style("alignment-baseline", "baseline")
+               .style("text-anchor", "middle")
+               .each(function() {
+                    d3.select(this).append("tspan").attr("class", "title");
+                    d3.select(this).append("tspan").attr("class", "value").attr("dy", "1.2em").attr("x", 0).style("font-size", "14px");
+               });
+    }
+
+    function appendNodes(enter) {
+        return enter.append("g")
+                    .attr("class", "node")
+                    .each(function() {
+                        d3.select(this).append("circle");
+                        d3.select(this).append("text")
+                          .style("pointer-events", "none")
+                    });
+    }
+
+    function updateNodes(node, d) {
+        node.select("circle")
+            .attr("r", d.r)
+            .attr("fill", colorScale(d.height))
+            .attr("stroke", d3.color(colorScale(d.value)).darker())
+            .on("mouseover", showPop)
+            .on("mouseout", () => d3.select("#tooltip").style("opacity", 0));
+        node.select("text")
+            .text(d => d.data.id)
+            .attr("opacity", !d.children ? 1 : 0)
+            .style("font-size", function() {
+                requestAnimationFrame(() => {       // necessary to get correct bbox
+                    const bbox = this.getBBox();    // get bounding box to fit text in circle
+                    const diameter = d.r * 2;
+                    const fontSize = Math.min(diameter/(bbox.width), diameter/(bbox.height));
+                    d3.select(this).style("font-size", fontSize > 1 ? fontSize * 10 : 0);
+                });
+            });
+    }
+
+    const fmt = d3.format(",.2s");
+
+    function showPop(evt, d) {
+        const tooltip = d3.select("#tooltip").transition();
+        const text = tooltip.attr("transform", `translate(${[d.x, d.y]})`)
+                            .style("opacity", 1)
+        text.select("tspan.title")
+            .text(d.data.id)
+            .attr("font-weight", "bold");
+        text.select("tspan.value")
+            .text(`Population: ${fmt(d.value).replace("G", "B")}`);
+        tooltip.select("rect")  // TODO: Use BBox or computed text length to set width
+            .attr("x", -75)
+            .attr("y", -25)
+            .attr("width", 150)
+            .attr("height", 50);
+    }
+
+    function changeRoot(nodes, nodeId) {
+        const node = root.find(d => d.data.id === nodeId);
+        if(!node || !node.children) return;
+        if(nodeId !== nodes.data.id) {   // clicking on root, returns to main root
+            const subtree = node.copy();
+            pack(subtree);
+            draw(subtree);
+            d3.select("#continent").text(`in ${node.data.id}`);
+        } else {
+            draw(root);
+            d3.select("#continent").text("");
+        }
+    }
+</script>
+</body>
+</html>

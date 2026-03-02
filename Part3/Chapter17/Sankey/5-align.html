@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Creating a simple Sankey diagram - using rightAlign</title>
+    <style>
+        text {
+            font-family: 'Arial', sans-serif;
+            font-size: 14px;
+            alignment-baseline: middle;
+            text-anchor: middle;
+            fill: white;
+        }
+        path.link {
+            fill: none;
+            stroke-opacity: .5;
+        }
+    </style>
+</head>
+<body>
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7.9.0";
+    import * as d3_sankey from "https://cdn.skypack.dev/d3-sankey@0";
+    const d3 = Object.assign({}, d3_all, d3_sankey);
+
+    const width = 800;
+    const height = 550;
+    const margin = 100;
+
+    const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+    // nodes must be objects
+    const nodes = [
+        {label: 'A'},
+        {label: 'B'},
+        {label: 'C'},
+        {label: 'D'},
+        {label: 'E'},
+        {label: 'F'},
+        {label: 'G'},
+        {label: 'H'}
+    ];
+
+    // one-way (no cycles): use target > source
+    const links = [
+        {source: 0, target: 1, value: 3},
+        {source: 0, target: 2, value: 4},
+        {source: 1, target: 3, value: 2},
+        {source: 1, target: 4, value: 1},
+        {source: 2, target: 5, value: 3},
+        {source: 5, target: 6, value: 1},
+        {source: 5, target: 3, value: 2},
+        {source: 2, target: 3, value: 1},
+        {source: 6, target: 3, value: .5},
+        {source: 4, target: 3, value: .5},
+        {source: 6, target: 7, value: .5},
+        {source: 4, target: 7, value: .5},
+    ];
+
+    color.domain([0, nodes.length]);
+
+    const svg = d3.select("body").append("svg").attr("width",width).attr("height",height);
+    const chart = svg.append("g");
+
+    // Set up the sankey generator
+    const sankey = d3.sankey()
+                     .nodePadding(300)
+                     .nodeAlign(d3.sankeyRight) // using rightAlign instead of justify (the default)
+                     .extent([[margin/2, margin/2], [width-margin, height-margin]])
+                     .iterations(100);
+
+    sankey.nodes(nodes).links(links);
+
+    const graph = sankey();
+    console.log(graph); // inspect it!
+
+    // Draw the links
+    chart.selectAll("path.link")
+         .data(graph.links)
+         .join("path").attr("class", "link")
+         .attr("d", d3.sankeyLinkHorizontal())
+         .style("stroke-width", d => d.width)
+         .style("stroke", d => color(d.source.index));
+
+    // Draw the nodes and text labels
+    chart.selectAll("g.node")
+         .data(graph.nodes)
+         .join("g").attr("class", "node")
+         .attr("transform", d => `translate(${[d.x0, d.y0]})`)
+         .each(function(d,i) {
+            d3.select(this).append("rect")
+                .attr("width", d.x1 - d.x0)
+                .attr("height", d.y1 - d.y0)
+                .style("fill", color(i))
+            d3.select(this).append("text")
+                .attr("x", (d.x1 - d.x0)/2)
+                .attr("y", (d.y1 - d.y0)/2 + 2)
+                .text(d.label);
+         });
+
+    // console access
+    window.sankey = sankey;
+    window.graph = graph;
+    window.d3 = d3;
+
+</script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 // Common data for tree examples from sample JSON data
 
-import * as d3 from "https://cdn.skypack.dev/d3@7";
+import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 
 // JSON file
 const file = "../../data/sample.json";

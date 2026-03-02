@@ -1,0 +1,35 @@
+{
+  "name": "Campus",
+  "children": [
+    {
+      "name": "Building1",
+      "children": [
+        {
+          "name": "Library",
+          "children": [
+            {"name": "MainHall", "capacity": 100},
+            {"name": "Chamber1", "capacity": 5},
+            {"name": "Chamber2", "capacity": 10},
+            {"name": "Chamber3", "capacity": 4}
+          ]
+        },
+        {"name": "Room1", "capacity": 50},
+        {"name": "Room2", "capacity": 100},
+        {"name": "Room3", "capacity": 200}
+      ]
+    },
+    {
+      "name": "Building2",
+      "children": [
+        {"name": "Room1", "capacity": 75},
+        {"name": "Room2", "capacity": 150}
+      ]
+    },
+    {
+      "name": "Building3",
+      "children": [
+        {"name": "Auditorium", "capacity": 500}
+      ]
+    }
+  ]
+}

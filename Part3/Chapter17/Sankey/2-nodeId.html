@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Creating a simple Sankey diagram - using ID-based links</title>
+    <style>
+        text {
+            font-family: 'Arial', sans-serif;
+            font-size: 14px;
+            alignment-baseline: middle;
+            text-anchor: middle;
+            fill: white;
+        }
+        path.link {
+            fill: none;
+            stroke-opacity: .5;
+        }
+    </style>
+</head>
+<body>
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7.9.0";
+    import * as d3_sankey from "https://cdn.skypack.dev/d3-sankey@0";
+    const d3 = Object.assign({}, d3_all, d3_sankey);
+
+    const width = 800;
+    const height = 550;
+    const margin = 100;
+
+    const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+    // nodes must be objects
+    // the index is not used here, so they can be in any order
+    const nodes = [
+        {label: 'G'},
+        {label: 'C'},
+        {label: 'A'},
+        {label: 'H'},
+        {label: 'E'},
+        {label: 'B'},
+        {label: 'F'},
+        {label: 'D'}
+    ];
+
+    // one-way (no cycles): use target > source
+    // uses labels instead of array indices
+    const links = [
+         {source: 'A', target: 'B', value: 3},
+         {source: 'A', target: 'C', value: 4},
+         {source: 'B', target: 'D', value: 2},
+         {source: 'B', target: 'E', value: 1},
+         {source: 'C', target: 'F', value: 3},
+         {source: 'F', target: 'G', value: 1},
+         {source: 'F', target: 'D', value: 2},
+         {source: 'C', target: 'D', value: 1},
+         {source: 'G', target: 'D', value: 0.5},
+         {source: 'E', target: 'D', value: 0.5},
+         {source: 'G', target: 'H', value: 0.5},
+         {source: 'E', target: 'H', value: 0.5},
+    ];
+
+    color.domain([0, nodes.length]);
+
+    const svg = d3.select("body").append("svg").attr("width",width).attr("height",height);
+    const chart = svg.append("g");
+
+    // Set up the sankey generator - using nodeId to match links to nodes by label instead of index
+    const sankey = d3.sankey()
+                     .nodeId(d => d.label) // the (unique) label is used to match links to nodes
+                     .nodePadding(300)
+                     .extent([[margin/2, margin/2], [width-margin, height-margin]])
+                     .iterations(100);
+
+    // Using setup via methods (see 3-object-setup.html for setup using a {nodes:..., links:...} object)
+    sankey.nodes(nodes).links(links);
+
+    const graph = sankey();
+    console.log(graph); // inspect it!
+
+    // Draw the links
+    chart.selectAll("path.link")
+         .data(graph.links)
+         .join("path").attr("class", "link")
+         .attr("d", d3.sankeyLinkHorizontal())
+         .style("stroke-width", d => d.width)
+         .style("stroke", d => color(d.source.label)); // color by label
+
+    // Draw the nodes and text labels
+    chart.selectAll("g.node")
+         .data(graph.nodes)
+         .join("g").attr("class", "node")
+         .attr("transform", d => `translate(${[d.x0, d.y0]})`)
+         .each(function(d,i) {
+            d3.select(this).append("rect")
+                .attr("width", d.x1 - d.x0)
+                .attr("height", d.y1 - d.y0)
+                .style("fill", color(d.label))  // color by label
+            d3.select(this).append("text")
+                .attr("x", (d.x1 - d.x0)/2)
+                .attr("y", (d.y1 - d.y0)/2 + 2)
+                .text(d.label);
+         });
+
+    // console access
+    window.sankey = sankey;
+    window.graph = graph;
+    window.d3 = d3;
+
+</script>
+</body>
+</html>

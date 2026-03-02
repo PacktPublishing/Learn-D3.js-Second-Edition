@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Radial dendrogram from tabular data</title>
+    <style>
+        svg {border: solid 1px lightgreen}
+    </style>
+</head>
+<body>
+<h2>Radial cladogram: Kellner's phylogeny of pterosaurs</h2>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+    import {addRotateDrag} from "../../js/rotate-drag.js";
+    import {addHighlightPath} from "./js/highlight-path.js";
+
+    const dim = {width: 1100, height: 1000};
+    const margin = {top: 100, right: 10, bottom: 300, left: 150};
+    const cht = {w: dim.width - margin.left - margin.right, h: dim.height - margin.top - margin.bottom};
+
+    const chart = d3.select("body").append("svg")
+                    .attr("width", dim.width)
+                    .attr("height", dim.height)
+                    .style("font", "10px sans-serif")
+                    .append("g")
+                       .attr("transform", `translate(${dim.width/2}, ${dim.height/2})`);
+
+    chart.append("circle")
+         .attr("r", cht.h * .6)
+         .attr("fill", "lightsalmon")
+         .attr("stroke", "#ccc")
+         .style("cursor", "grab");
+
+    const styles = {
+        leafRadius: 4,
+        groupRadius: 3,
+        strokeWidth: 2,
+        dotLeafColor: "black",
+        dotGroupColor: "maroon",
+        pathColor: "white"
+    }
+
+    const tabular = await d3.csv("../../data/Kellner.csv");
+    console.log('tabular data', tabular);
+
+    const root = d3.stratify()
+                   .id(d => d.node)
+                   .parentId(d => d.parent)(tabular);
+
+    const tree = d3.cluster()
+                    .separation((a, b) => (a.parent === b.parent ? 1 : 3))
+                    .nodeSize([4.2, cht.h * .0375])
+                    //.size([360, cht.h * .6]);
+
+    tree(root);
+
+    draw(chart, root);
+    addRotateDrag(chart, dim);
+    addHighlightPath(chart, styles);
+
+    // Functions
+    function draw(chart, tree) {
+        drawLinks(chart, tree.links(), styles.strokeWidth, styles.pathColor);
+        drawNodes(chart, tree.descendants(), styles.leafRadius, styles.groupRadius, styles.dotLeafColor, styles.dotGroupColor);
+    }
+
+    function drawLinks(chart, data, strokeWidth, pathColor) {
+        console.log(data)
+        chart.selectAll("path")
+             .data(data)
+                .join("path")
+                    .attr("class", d => `${d.target.node}`)
+                    .style("fill", "none")
+                    .style("stroke-width", strokeWidth)
+                    .style("stroke", pathColor)
+                    .attr("d", d3.linkRadial()
+                                 .angle(d => (d.x * Math.PI / 180 + Math.PI/2))
+                                 .radius(d => d.y));
+    }
+
+    function drawNodes(chart, data, radiusLeaf, radiusGroup, dotLeafColor, dotGroupColor) {
+        const node = chart.selectAll("g")
+                          .data(data)
+                             .join("g")
+                                .attr("class", d => d.children ? "group" : "leaf")
+                                .attr("transform", d => `rotate(${d.x}) translate(${d.y})`);
+
+        node.append("circle")
+            .attr("r", d => d.children ? radiusGroup : radiusLeaf)
+            .style("fill", d => d.children ? dotGroupColor : dotLeafColor);
+
+        node.append("text")
+            .attr("alignment-baseline", d => d.children ? 'baseline' : "middle")
+            .attr("x", d => d.children ? 0 : 8)
+            .attr("dy", d => d.children ? -6 : 0)
+            .style("text-anchor", d => d.children ? 'middle' : "start")
+            .style("fill", d => d.children ? '#321' : 'black')
+            .style("font-weight", d => d.children ? "bold" : "normal")
+            .attr("transform", d => d.children ? `rotate(90)` : ``)
+            .text(d => d.data.name);
+    }
+
+</script>
+
+</body>
+</html>

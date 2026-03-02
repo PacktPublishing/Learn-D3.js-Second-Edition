@@ -13,7 +13,7 @@
 <h3>Drag and drop using relative position</h3>
 <p>You can only drag the circle.</p>
 <script type="module">
-    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 
     const dim = {w: 500, h: 250};
     const svg = d3.select("body")
@@ -23,18 +23,14 @@
 
     // Drags at clicked point (uses difference from original point)
     const drag = d3.drag()
-        .on('start', function() {
-            d3.select(this).style("cursor", "grabbing");
-        })
+        .on('start', () => d3.select("svg").style("cursor", "grabbing"))
         .on('drag', function(e) {
             const obj = d3.select(this);
             const [x0, x1] = [+obj.attr("cx"), +obj.attr("cy")]; // must convert to number!
             const [x,y] = [x0 + e.dx, x1 + e.dy];
             obj.attr("cx", x).attr("cy", y);
         })
-        .on('end', function() {
-            d3.select(this).style("cursor", null);
-        });
+        .on('end', () => d3.select("svg").style("cursor", null));
 
     svg.append("rect")
         .attr("width", 100)

@@ -1,0 +1,33 @@
+circle {
+    fill: red;
+}
+line, .links path {
+    fill: none;
+    stroke: lightblue;
+    stroke-width: 1px;
+}
+text {
+    font-family: sans-serif;
+}
+
+.continent {
+    font-size: 9px;
+    font-weight: bold;
+    transform: rotate(-120deg) translate(0px,-3px);
+    fill: darkslateblue;
+}
+.world {
+    font-size: 12px;
+    font-weight: bold;
+    transform: rotate(-90deg) translate(-20px,-10px);
+    fill: red;
+}
+.country {
+    font-size: 5px;
+    transform: rotate(0deg);
+    alignment-baseline: middle;
+}
+
+svg {
+    border: solid 1px black;
+}

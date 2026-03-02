@@ -3,8 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://unpkg.com/topojson-client"></script>
     <style>
         svg {
             border: solid 1px gray;
@@ -17,7 +15,9 @@
     </style>
 </head>
 <body>
-<script>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+
     const width = 960;
     const height = 500;
     const FILE = "world-lowres.geojson";
@@ -33,8 +33,8 @@
     const popScale = d3.scaleSequentialSqrt(d3.interpolateReds);
 
     Promise.all([
-         d3.json('../Data/' + FILE),
-         d3.csv('../Data/un_regions.csv', function(row) {
+         d3.json('../data/' + FILE),
+         d3.csv('../data/un_regions.csv', function(row) {
              return {
                  population: +row.Pop_2016,
                  area: +row.Area_km2,

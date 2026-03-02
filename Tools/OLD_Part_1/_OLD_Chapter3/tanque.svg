@@ -80,6 +80,6 @@
         
 
     </defs>
-    <use xlink:href="#tanque_cheio"></use>
+    <use href="#tanque_cheio"></use>
 
 </svg>

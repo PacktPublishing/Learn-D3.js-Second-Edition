@@ -21,14 +21,6 @@ __`Trees/`__
 
 Description.
 
-__`Partitions/`__
-
-Description.
-
-__`Enclosures/`__
-
-Description.
-
 __`Examples/`__
 
 Description.

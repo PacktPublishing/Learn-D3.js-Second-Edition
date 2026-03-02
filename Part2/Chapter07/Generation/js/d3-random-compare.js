@@ -2,7 +2,7 @@
  * Comparing distributions of D3 random number generators
  */
 
-import * as d3 from 'https://cdn.skypack.dev/d3@7';
+import * as d3 from 'https://cdn.skypack.dev/d3@7.9.0';
 
 const dim = {
     width: 1000,

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple zoom - unrestricted zoomable area</title>
+    <style>
+        svg {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+<h3>Simple zoom - unrestricted zoomable area</h3>
+<p>Extents are correctly configured, but zoomable contents "leaks" outside the zooming area.</p>
+<p>Double-click to zoom in, shift-double-click to zoom out, or use mouse wheel / pinch touchscreen.</p>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+
+    // SVG dimensions
+    const dim = {width: 600, height: 300, margin: 50};
+
+    // Chart dimensions (the area where the data is displayed)
+    const cht = {width: dim.width - 2*dim.margin, height: dim.height - 2*dim.margin};
+
+    const svg = d3.select("body").append("svg")
+                    .attr("width", dim.width)
+                    .attr("height", dim.height);
+    const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+    // Without an internal viewport (svg), the objects will "leak" out of the zooming area.
+
+    // This is the fixed chart area.
+    // The <g> is not a viewport. It has no dimensions. It only groups objects and shifts their origin.
+    const chart = svg.append("g")
+                     .attr("transform", `translate(${dim.margin}, ${dim.margin})`);
+
+    // This rectangle shows the FIXED chart bounds
+    chart.append("rect")
+        .attr("width", cht.width)
+        .attr("height", cht.height)
+        .style("fill", "none")
+        .style("stroke-width", 2)
+        .style("stroke", "blue");
+
+    // This is the zoomable container within the SVG
+    // Any transform applied to it here will be reset by the zoom behavior
+    const container = chart.append("g").attr("class", "container");
+
+    // This rectangle shows the bounds of the ZOOMABLE contents
+    container.append("rect")
+            .attr("width", cht.width)
+            .attr("height", cht.height)
+            .style("fill", "none")
+            .style("stroke-width", 2)
+            .style("stroke", "olive");
+
+    // Add objects to the container
+    container.selectAll("circle")
+             .data(d3.range(50))
+                .join("circle")
+                    .attr("cx", d => Math.random(d)*cht.width)
+                    .attr("cy", d => Math.random(d)*cht.height)
+                    .attr("r", 10)
+                    .style("fill", color);
+
+
+    // Although the zoomable area is shifted, it's a <g> which has no width and height: these need
+    // to be adjusted in translateExtent, and extent must also be set to match translateExtent.
+    // Preventing native zooming keeps the browser from zooming the page when the mouse is over the SVG
+    // enforcing its limits.
+    const zextent = [[0, 0], [cht.width, cht.height]];
+    svg.call(d3.zoom()
+                .scaleExtent([0.25, 4])
+                .translateExtent(zextent)
+                .extent(zextent)  // must be set to match translateExtent!
+                .on('zoom', evt => {
+                    container.attr("transform", evt.transform);  // Zoom the container
+                }))
+                .on("wheel", event => event.preventDefault());   // Prevent native zooming behavior
+</script>
+
+</body>
+</html>

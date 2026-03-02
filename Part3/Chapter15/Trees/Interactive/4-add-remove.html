@@ -18,7 +18,7 @@
 <h1>Interactive tree: add and remove nodes</h1>
 <p>Click on a node to add a child. Double-click to remove it (except for the root).</p>
 <script type="module">
-    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
     import {cht, chart} from "./js/treedata-json.js";
 
     const color = d3.scaleOrdinal(d3.schemeObservable10);
@@ -169,6 +169,9 @@
         redraw();
     }
 
+    // To allow inspection in the browser console
+    window.root = root;
+    window.d3 = d3;
 </script>
 </body>
 </html>

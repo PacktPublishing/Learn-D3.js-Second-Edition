@@ -1,4 +1,4 @@
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+import * as d3 from 'https://cdn.skypack.dev/d3@7.9.0';
 import {app, data} from "./common.js";
 
 export async function load(file) {

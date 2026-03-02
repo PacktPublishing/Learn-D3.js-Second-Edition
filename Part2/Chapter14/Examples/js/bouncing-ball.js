@@ -2,7 +2,7 @@
  * Most of this file implements a simple bouncing ball animation.
  */
 
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+import * as d3 from 'https://cdn.skypack.dev/d3@7.9.0';
 
 export {svg, width, height, r, start};
 
@@ -18,7 +18,7 @@ const svg = d3.select("body")
 svg.append("rect")
     .attr("width", width/2)
     .attr("height", height)
-    .style("fill", "rgba(255,0,0,.1)");
+    .style("fill", "white");
 
 const traps = [makeTrap("blue", 50, 50, 60),
                makeTrap("red", 30, 200, 60),

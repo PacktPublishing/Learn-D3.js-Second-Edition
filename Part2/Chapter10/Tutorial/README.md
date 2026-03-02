@@ -97,7 +97,7 @@ The continents were sorted in alphabetical order. If `continents` was an array, 
 Now we can generate the legend, binding rectangles and text elements to the `continents` set. Create a new `js/legend.js` module, and add the following code:
 
 ```js
-import * as d3 from 'https://cdn.skypack.dev/d3@7';
+import * as d3 from 'https://cdn.skypack.dev/d3@7.9.0';
 import {dim, app} from './common.js';
 
 export function drawLegend() {
@@ -168,7 +168,7 @@ To provide the viewer with information about each dot, we will create a tooltip 
 The module requires D3 and the `app` object from `js/common.js`. It should export three functions. One will draw the tooltip and the other two will respond to events.
 
 ```js
-import * as d3 from 'https://cdn.skypack.dev/d3@7';
+import * as d3 from 'https://cdn.skypack.dev/d3@7.9.0';
 import {app} from './common.js';
 
 function draw() {}

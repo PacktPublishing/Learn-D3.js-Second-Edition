@@ -15,7 +15,7 @@
 <body>
 <h1>Radial tree</h1>
 <script type="module">
-    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
     import {dim, chart, root} from "./js/treedata-json.js";
 
     // Move near center
@@ -59,6 +59,9 @@
             .style("opacity", d => d.target.depth *.15 + .4);
     }
 
+    // To allow inspection in the browser console
+    window.root = root;
+    window.d3 = d3;
 </script>
 </body>
 </html>

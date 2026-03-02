@@ -1,0 +1,16 @@
+name,location,capacity
+Campus,,
+Building1,Campus,
+Building2,Campus,
+Building3,Campus,
+Library,Building1,
+Auditorium,Building3,500
+Room1,Building1,50
+Room2,Building1,100
+Room3,Building1,200
+Room1,Building2,75
+Room2,Building2,150
+MainHall,Library,100
+Chamber1,Library,5
+Chamber2,Library,10
+Chamber3,Library,4

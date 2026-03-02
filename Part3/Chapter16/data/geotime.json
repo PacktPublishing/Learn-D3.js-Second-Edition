@@ -1,0 +1,1389 @@
+{
+  "id": "Geological Timeline",
+  "children": [
+    {
+      "id": "Precambrian",
+      "division": "supereon",
+      "chrono": "informal-unit",
+      "color": "rgb(247,67,112)",
+      "children": [
+        {
+          "id": "Hadean",
+          "start": 4567,
+          "end": 4031,
+          "division": "eon",
+          "chrono": "eonothem",
+          "color": "rgb(174,2,126)"
+        },
+        {
+          "id": "Archean",
+          "division": "eon",
+          "chrono": "eonothem",
+          "color": "rgb(240,4,127)",
+          "children": [
+            {
+              "id": "Eoarchean",
+              "start": 4031,
+              "end": 3600,
+              "division": "era",
+              "chrono": "erathem",
+              "color": "rgb(218,3,127)"
+            },
+            {
+              "id": "Paleoarchean",
+              "start": 3600,
+              "end": 3200,
+              "division": "era",
+              "chrono": "erathem",
+              "color": "rgb(244,68,159)"
+            },
+            {
+              "id": "Mesoarchean",
+              "start": 3200,
+              "end": 2800,
+              "division": "era",
+              "chrono": "erathem",
+              "color": "rgb(247,104,169)"
+            },
+            {
+              "id": "Neoarchean",
+              "start": 2800,
+              "end": 2500,
+              "division": "era",
+              "chrono": "erathem",
+              "color": "rgb(250,167,200)"
+            }
+          ]
+        },
+        {
+          "id": "Proterozoic",
+          "division": "eon",
+          "chrono": "eonothem",
+          "color": "rgb(247,53,99)",
+          "children": [
+            {
+              "id": "Paleoproterozoic",
+              "division": "era",
+              "chrono": "erathem",
+              "color": "rgb(247,67,112)",
+              "children": [
+                {
+                  "id": "Siderian",
+                  "start": 2500,
+                  "end": 2300,
+                  "division": "period",
+                  "chrono": "system",
+                  "color": "rgb(247,79,124)"
+                },
+                {
+                  "id": "Rhyacian",
+                  "start": 2300,
+                  "end": 2050,
+                  "division": "period",
+                  "chrono": "system",
+                  "color": "rgb(247,91,137)"
+                },
+                {
+                  "id": "Orosirian",
+                  "start": 2050,
+                  "end": 1800,
+                  "division": "period",
+                  "chrono": "system",
+                  "color": "rgb(247,104,152)"
+                },
+                {
+                  "id": "Statherian",
+                  "start": 1800,
+                  "end": 1600,
+                  "division": "period",
+                  "chrono": "system",
+                  "color": "rgb(248,117,167)"
+                }
+              ]
+            },
+            {
+              "id": "Mesoproterozoic",
+              "division": "era",
+              "chrono": "erathem",
+              "color": "rgb(253,180,98)",
+              "children": [
+                {
+                  "id": "Calymmian",
+                  "start": 1600,
+                  "end": 1400,
+                  "division": "period",
+                  "chrono": "system",
+                  "color": "rgb(253,192,122)"
+                },
+                {
+                  "id": "Ectasian",
+                  "start": 1400,
+                  "end": 1200,
+                  "division": "period",
+                  "chrono": "system",
+                  "color": "rgb(253,204,138)"
+                },
+                {
+                  "id": "Stenian",
+                  "start": 1200,
+                  "end": 1000,
+                  "division": "period",
+                  "chrono": "system",
+                  "color": "rgb(254,217,154)"
+                }
+              ]
+            },
+            {
+              "id": "Neoproterozoic",
+              "division": "era",
+              "chrono": "erathem",
+              "color": "rgb(254,179,66)",
+              "children": [
+                {
+                  "id": "Tonian",
+                  "start": 1000,
+                  "end": 720,
+                  "division": "period",
+                  "chrono": "system",
+                  "color": "rgb(254,191,78)"
+                },
+                {
+                  "id": "Cryogenian",
+                  "start": 720,
+                  "end": 635,
+                  "division": "period",
+                  "chrono": "system",
+                  "color": "rgb(254,204,92)"
+                },
+                {
+                  "id": "Ediacaran",
+                  "start": 635,
+                  "end": 541,
+                  "division": "period",
+                  "chrono": "system",
+                  "color": "rgb(254,217,106)"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "Phanerozoic",
+      "division": "supereon",
+      "chrono": "informal-unit",
+      "color": "rgb(154,217,221)",
+      "children": [
+        {
+          "id": "Phanerozoic",
+          "division": "eon",
+          "chrono": "eonothem",
+          "color": "rgb(154,217,221)",
+          "children": [
+            {
+              "id": "Paleozoic",
+              "division": "era",
+              "chrono": "erathem",
+              "color": "rgb(153,192,141)",
+              "children": [
+                {
+                  "id": "Cambrian",
+                  "division": "period",
+                  "chrono": "system",
+                  "color": "rgb(127,160,86)",
+                  "children": [
+                    {
+                      "id": "Terreneuvian",
+                      "division": "series",
+                      "chrono": "system",
+                      "color": "rgb(140,176,108)",
+                      "children": [
+                        {
+                          "id": "Fortunian",
+                          "start": 539,
+                          "end": 529,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(153,181,117)"
+                        },
+                        {
+                          "id": "Stage 2",
+                          "start": 529,
+                          "end": 521,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(166,186,128)"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "Series 2",
+                      "division": "series",
+                      "chrono": "system",
+                      "color": "rgb(153,192,120)",
+                      "children": [
+                        {
+                          "id": "Stage 3",
+                          "start": 521,
+                          "end": 515,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(166,197,131)"
+                        },
+                        {
+                          "id": "Stage 4",
+                          "start": 515,
+                          "end": 507,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(179,202,142)"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "Miaolingian",
+                      "division": "series",
+                      "chrono": "system",
+                      "color": "rgb(166,207,134)",
+                      "children": [
+                        {
+                          "id": "Wuliuan",
+                          "start": 507,
+                          "end": 500,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(179,212,146)"
+                        },
+                        {
+                          "id": "Drumian",
+                          "start": 505,
+                          "end": 500,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(191,217,157)"
+                        },
+                        {
+                          "id": "Guzhangian",
+                          "start": 500,
+                          "end": 497,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(204,223,170)"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "Furongian",
+                      "division": "series",
+                      "chrono": "system",
+                      "color": "rgb(179,224,149)",
+                      "children": [
+                        {
+                          "id": "Paibian",
+                          "start": 497,
+                          "end": 494,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(204,235,174)"
+                        },
+                        {
+                          "id": "Jiangshanian",
+                          "start": 494,
+                          "end": 491,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(217,240,187)"
+                        },
+                        {
+                          "id": "Stage 10",
+                          "start": 491,
+                          "end": 487,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(230,245,201)"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "Ordovician",
+                  "division": "period",
+                  "chrono": "system",
+                  "color": "rgb(0,146,112)",
+                  "children": [
+                    {
+                      "id": "Early",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(26,157,111)",
+                      "children": [
+                        {
+                          "id": "Tremadocian",
+                          "start": 487,
+                          "end": 477,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(51,169,126)"
+                        },
+                        {
+                          "id": "Floian",
+                          "start": 477,
+                          "end": 471,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(65,176,135)"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "Middle",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(77,180,126)",
+                      "children": [
+                        {
+                          "id": "Dapingian",
+                          "start": 471,
+                          "end": 469,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(102,192,146)"
+                        },
+                        {
+                          "id": "Darriwilian",
+                          "start": 469,
+                          "end": 458,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(116,198,156)"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "Late",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(127,202,147)",
+                      "children": [
+                        {
+                          "id": "Sandbian",
+                          "start": 458,
+                          "end": 453,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(140,208,148)"
+                        },
+                        {
+                          "id": "Katian",
+                          "start": 453,
+                          "end": 445,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(153,214,159)"
+                        },
+                        {
+                          "id": "Hirnantian",
+                          "start": 445,
+                          "end": 443,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(166,219,171)"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "Silurian",
+                  "division": "period",
+                  "chrono": "system",
+                  "color": "rgb(179,225,182)",
+                  "children": [
+                    {
+                      "id": "Llandovery",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(153,215,179)",
+                      "children": [
+                        {
+                          "id": "Rhuddanian",
+                          "start": 443,
+                          "end": 440,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(166,220,181)"
+                        },
+                        {
+                          "id": "Aeronian",
+                          "start": 440,
+                          "end": 439,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(179,225,194)"
+                        },
+                        {
+                          "id": "Telychian",
+                          "start": 439,
+                          "end": 433,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(191,230,207)"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "Wenlock",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(179,225,194)",
+                      "children": [
+                        {
+                          "id": "Sheinwoodian",
+                          "start": 433,
+                          "end": 430,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(191,230,195)"
+                        },
+                        {
+                          "id": "Homerian",
+                          "start": 430,
+                          "end": 427,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(204,235,209)"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "Ludlow",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(191,230,207)",
+                      "children": [
+                        {
+                          "id": "Gorstian",
+                          "start": 427,
+                          "end": 425,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(204,236,221)"
+                        },
+                        {
+                          "id": "Ludfordian",
+                          "start": 425,
+                          "end": 423,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(217,240,223)"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "Pridoli",
+                      "start": 423,
+                      "end": 419,
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(230,245,225)"
+                    }
+                  ]
+                },
+                {
+                  "id": "Devonian",
+                  "division": "period",
+                  "chrono": "system",
+                  "color": "rgb(203,140,55)",
+                  "children": [
+                    {
+                      "id": "Early",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(229,172,77)",
+                      "children": [
+                        {
+                          "id": "Lochkovian",
+                          "start": 419,
+                          "end": 410,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(229,183,90)"
+                        },
+                        {
+                          "id": "Pragian",
+                          "start": 410,
+                          "end": 407,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(229,196,104)"
+                        },
+                        {
+                          "id": "Emsian",
+                          "start": 407,
+                          "end": 393,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(229,208,117)"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "Middle",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(241,200,104)",
+                      "children": [
+                        {
+                          "id": "Eifelian",
+                          "start": 393,
+                          "end": 387,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(241,213,118)"
+                        },
+                        {
+                          "id": "Givetian",
+                          "start": 387,
+                          "end": 382,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(241,225,133)"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "Late",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(241,225,157)",
+                      "children": [
+                        {
+                          "id": "Frasnian",
+                          "start": "382",
+                          "end": "372",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(242,237,137)"
+                        },
+                        {
+                          "id": "Famennian",
+                          "start": "372",
+                          "end": "359",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(242,237,197)"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "Carboniferous",
+                  "division": "period",
+                  "chrono": "system",
+                  "color": "rgb(103,165,153)",
+                  "children": [
+                    {
+                      "id": "Mississippian",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(103,143,102)",
+                      "children": [
+                        {
+                          "id": "Tournaisian",
+                          "start": 359,
+                          "end": 346,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(140,176,108)"
+                        },
+                        {
+                          "id": "Viséan",
+                          "start": 346,
+                          "end": 339,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(166,185,108)"
+                        },
+                        {
+                          "id": "Serpukhovian",
+                          "start": 339,
+                          "end": 323,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(191,194,107)"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "Pennsylvanian",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(153,194,181)",
+                      "children": [
+                        {
+                          "id": "Bashkirian",
+                          "start": "323",
+                          "end": "315",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(153,194,181)"
+                        },
+                        {
+                          "id": "Moscovian",
+                          "start": "315",
+                          "end": "307",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(179,203,185)"
+                        },
+                        {
+                          "id": "Kasimovian",
+                          "start": "307",
+                          "end": "303.7",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(191,208,197)"
+                        },
+                        {
+                          "id": "Gzhelian",
+                          "start": "303.7",
+                          "end": "299.0",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(204,212,199)"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "Permian",
+                  "division": "period",
+                  "chrono": "system",
+                  "color": "rgb(240,64,40)",
+                  "children": [
+                    {
+                      "id": "Cisuralian",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(239,88,69)",
+                      "children": [
+                        {
+                          "id": "Asselian",
+                          "start": 299,
+                          "end": 293,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(227,99,80)"
+                        },
+                        {
+                          "id": "Sakmarian",
+                          "start": 293,
+                          "end": 290,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(227,111,92)"
+                        },
+                        {
+                          "id": "Artinskian",
+                          "start": 290,
+                          "end": 283,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(227,123,104)"
+                        },
+                        {
+                          "id": "Kungurian",
+                          "start": 283,
+                          "end": 274,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(227,135,118)"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "Guadalupian",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(251,116,92)",
+                      "children": [
+                        {
+                          "id": "Roadian",
+                          "start": 274,
+                          "end": 267,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(251,128,105)"
+                        },
+                        {
+                          "id": "Wordian",
+                          "start": "267",
+                          "end": "265",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(251,141,118)"
+                        },
+                        {
+                          "id": "Capitanian",
+                          "start": "265",
+                          "end": "260",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(251,154,133)"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "Lopingian",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(251,167,148)",
+                      "children": [
+                        {
+                          "id": "Wuchiapingian",
+                          "start": "260",
+                          "end": "254",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(252,180,162)"
+                        },
+                        {
+                          "id": "Changhsingian",
+                          "start": "254",
+                          "end": "252",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(252,192,178)"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "Mesozoic",
+              "division": "era",
+              "chrono": "erathem",
+              "color": "rgb(103,197,202)",
+              "children": [
+                {
+                  "id": "Triassic",
+                  "division": "period",
+                  "chrono": "system",
+                  "color": "rgb(129,43,146)",
+                  "children": [
+                    {
+                      "id": "Early",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(152,57,153)",
+                      "children": [
+                        {
+                          "id": "Induan",
+                          "start": 252,
+                          "end": 247,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(164,70,159)"
+                        },
+                        {
+                          "id": "Olenekian",
+                          "start": 247,
+                          "end": 242,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(176,81,165)"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "Middle",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(177,104,177)",
+                      "children": [
+                        {
+                          "id": "Anisian",
+                          "start": 242,
+                          "end": 237,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(188,117,183)"
+                        },
+                        {
+                          "id": "Ladinian",
+                          "start": 237,
+                          "end": 227,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(201,131,191)"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "Late",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(189,140,195)",
+                      "children": [
+                        {
+                          "id": "Carnian",
+                          "start": "227",
+                          "end": "217",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(201,155,203)"
+                        },
+                        {
+                          "id": "Norian",
+                          "start": "217",
+                          "end": "205",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(214,170,211)"
+                        },
+                        {
+                          "id": "Rhaetian",
+                          "start": "205",
+                          "end": "201",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(227,185,219)"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "Jurassic",
+                  "division": "period",
+                  "chrono": "system",
+                  "color": "rgb(52,178,201)",
+                  "children": [
+                    {
+                      "id": "Early",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(66,174,208)",
+                      "children": [
+                        {
+                          "id": "Hettangian",
+                          "start": 201,
+                          "end": 199,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(78,179,211)"
+                        },
+                        {
+                          "id": "Sinemurian",
+                          "start": 199,
+                          "end": 191,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(103,188,216)"
+                        },
+                        {
+                          "id": "Pliensbachian",
+                          "start": 191,
+                          "end": 183,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(128,197,221)"
+                        },
+                        {
+                          "id": "Toarcian",
+                          "start": "183",
+                          "end": "174",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(153,206,227)"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "Middle",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(128,207,216)",
+                      "children": [
+                        {
+                          "id": "Aalenian",
+                          "start": "174",
+                          "end": "170",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(154,217,221)"
+                        },
+                        {
+                          "id": "Bajocian",
+                          "start": "170",
+                          "end": "168.3",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(166,221,224)"
+                        },
+                        {
+                          "id": "Bathonian",
+                          "start": "168.3",
+                          "end": "166.1",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(179,226,227)"
+                        },
+                        {
+                          "id": "Callovian",
+                          "start": "166.1",
+                          "end": "163.5",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(191,231,229)"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "Late",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(179,227,238)",
+                      "children": [
+                        {
+                          "id": "Oxfordian",
+                          "start": "163.5",
+                          "end": "157.3",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(191,231,241)"
+                        },
+                        {
+                          "id": "Kimmeridgian",
+                          "start": "157.3",
+                          "end": "152.1",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(204,236,244)"
+                        },
+                        {
+                          "id": "Tithonian",
+                          "start": "152.1",
+                          "end": "145",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(217,241,247)"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "Cretaceous",
+                  "division": "period",
+                  "chrono": "system",
+                  "color": "rgb(127,198,78)",
+                  "children": [
+                    {
+                      "id": "Early",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(140,205,87)",
+                      "children": [
+                        {
+                          "id": "Berriasian",
+                          "start": 145,
+                          "end": 138,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(140,205,96)"
+                        },
+                        {
+                          "id": "Valanginian",
+                          "start": 138,
+                          "end": 132,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(153,211,106)"
+                        },
+                        {
+                          "id": "Hauterivian",
+                          "start": 132,
+                          "end": 126,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(166,217,117)"
+                        },
+                        {
+                          "id": "Barremian",
+                          "start": 126,
+                          "end": 121,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(179,223,127)"
+                        },
+                        {
+                          "id": "Aptian",
+                          "start": "121",
+                          "end": "113",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(191,228,138)"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "Middle",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(179,222,83)",
+                      "children": [
+                        {
+                          "id": "Albian",
+                          "start": "113",
+                          "end": "100.5",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(204,234,151)"
+                        },
+                        {
+                          "id": "Cenomanian",
+                          "start": "100.5",
+                          "end": "93.9",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(179,222,83)"
+                        },
+                        {
+                          "id": "Turonian",
+                          "start": "93.9",
+                          "end": "89.8",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(191,227,93)"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "Late",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(166,216,74)",
+                      "children": [
+                        {
+                          "id": "Coniacian",
+                          "start": "89.8",
+                          "end": "86.3",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(204,233,104)"
+                        },
+                        {
+                          "id": "Santonian",
+                          "start": "86.3",
+                          "end": "83.6",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(217,239,116)"
+                        },
+                        {
+                          "id": "Campanian",
+                          "start": "83.6",
+                          "end": "72.1",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(230,244,127)"
+                        },
+                        {
+                          "id": "Maastrichtian",
+                          "start": "72.1",
+                          "end": "66.0",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(242,250,140)"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "Cenozoic",
+              "division": "era",
+              "chrono": "erathem",
+              "color": "rgb(242,249,29)",
+              "children": [
+                {
+                  "id": "Paleogene",
+                  "division": "period",
+                  "chrono": "system",
+                  "color": "rgb(253,154,82)",
+                  "children": [
+                    {
+                      "id": "Paleocene",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(253,167,95)",
+                      "children": [
+                        {
+                          "id": "Danian",
+                          "start": 66,
+                          "end": 61.6,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(253,180,98)"
+                        },
+                        {
+                          "id": "Selandian",
+                          "start": 61.6,
+                          "end": 59.2,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(254,191,101)"
+                        },
+                        {
+                          "id": "Thanetian",
+                          "start": 59.2,
+                          "end": 56,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(253,191,111)"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "Eocene",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(253,180,108)",
+                      "children": [
+                        {
+                          "id": "Ypresian",
+                          "start": "56",
+                          "end": "47.8",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(252,167,115)"
+                        },
+                        {
+                          "id": "Lutetian",
+                          "start": "47.8",
+                          "end": "41.3",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(252,180,130)"
+                        },
+                        {
+                          "id": "Bartonian",
+                          "start": "41.3",
+                          "end": "37.8",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(253,192,145)"
+                        },
+                        {
+                          "id": "Priabonian",
+                          "start": "37.8",
+                          "end": "33.9",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(253,205,161)"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "Oligocene",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(253,192,122)",
+                      "children": [
+                        {
+                          "id": "Rupelian",
+                          "start": "33.9",
+                          "end": "28.4",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(254,217,154)"
+                        },
+                        {
+                          "id": "Chattian",
+                          "start": "28.4",
+                          "end": "23.03",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(254,230,170)"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "Neogene",
+                  "division": "period",
+                  "chrono": "system",
+                  "color": "rgb(255,230,25)",
+                  "children": [
+                    {
+                      "id": "Miocene",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(255,255,0)",
+                      "children": [
+                        {
+                          "id": "Aquitanian",
+                          "start": 23,
+                          "end": 20.4,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(255,255,51)"
+                        },
+                        {
+                          "id": "Burdigalian",
+                          "start": 20.4,
+                          "end": 16,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(255,255,65)"
+                        },
+                        {
+                          "id": "Langhian",
+                          "start": 16,
+                          "end": 11.6,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(255,255,77)"
+                        },
+                        {
+                          "id": "Serravallian",
+                          "start": "11.6",
+                          "end": "7.2",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(255,255,89)"
+                        },
+                        {
+                          "id": "Tortonian",
+                          "start": "7.2",
+                          "end": "2.6",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(255,255,102)"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "Pliocene",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(255,255,153)",
+                      "children": [
+                        {
+                          "id": "Zanclean",
+                          "start": "5.3",
+                          "end": "3.6",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(255,255,179)"
+                        },
+                        {
+                          "id": "Piacenzian",
+                          "start": "3.6",
+                          "end": "2.6",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(255,255,191)"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "Quaternary",
+                  "division": "period",
+                  "chrono": "system",
+                  "color": "rgb(249,249,127)",
+                  "children": [
+                    {
+                      "id": "Pleistocene",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(255,239,175)",
+                      "children": [
+                        {
+                          "id": "Gelasian",
+                          "start": 2.6,
+                          "end": 1.8,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(255,237,179)"
+                        },
+                        {
+                          "id": "Calabrian",
+                          "start": 1.8,
+                          "end": 0.781,
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(255,242,186)"
+                        },
+                        {
+                          "id": "Chibanian",
+                          "start": "0.781",
+                          "end": "0.126",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(255,242,199)"
+                        },
+                        {
+                          "id": "Tarantian",
+                          "start": "0.126",
+                          "end": "0.0117",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(255,242,211)"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "Holocene",
+                      "division": "epoch",
+                      "chrono": "series",
+                      "color": "rgb(254,235,210)",
+                      "children": [
+                        {
+                          "id": "Greenlandian",
+                          "start": "0.0117",
+                          "end": "0.0082",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(254,236,219)"
+                        },
+                        {
+                          "id": "Northgrippian",
+                          "start": "0.0082",
+                          "end": "0.0042",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(253,236,228)"
+                        },
+                        {
+                          "id": "Meghalayan",
+                          "start": "0.0042",
+                          "end": "0",
+                          "division": "age",
+                          "chrono": "stage",
+                          "color": "rgb(253,237,236)"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import * as d3 from "https://cdn.skypack.dev/d3@7";
+import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 
 const scaleAxis = d3.scaleLinear().range([0,1000]).domain([0,100])
 const axis = d3.axisBottom().scale(scaleAxis);

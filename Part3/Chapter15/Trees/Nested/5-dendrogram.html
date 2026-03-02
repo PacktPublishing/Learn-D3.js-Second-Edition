@@ -12,7 +12,7 @@
 <body>
 <h1>Drawing dendrograms</h1>
 <script type="module">
-    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
     import {cht, chart, root} from "./js/treedata-json.js";
 
     // Code for dimensions, SVG and data are now in treedata-json.js
@@ -54,6 +54,9 @@
                     .style("opacity", d => d.target.depth *.15 + .4);
     }
 
+    // To allow inspection in the browser console
+    window.root = root;
+    window.d3 = d3;
 </script>
 </body>
 </html>

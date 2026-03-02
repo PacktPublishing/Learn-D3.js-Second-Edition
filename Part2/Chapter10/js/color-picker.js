@@ -1,4 +1,4 @@
-import * as d3 from 'https://cdn.skypack.dev/d3@7';
+import * as d3 from 'https://cdn.skypack.dev/d3@7.9.0';
 
     /**
  * Override the following defaults and call init() to render

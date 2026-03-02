@@ -3,8 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/d3-geo-projection@4"></script>
     <style>
         text {
             font-family: "Yanone Kaffeesatz", sans-serif;
@@ -20,7 +18,18 @@
     </style>
 </head>
 <body>
-<script>
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+    const d3 = Object.assign({}, d3_all, d3_geo_projection);
+
+    const dataPath = "../data/";
+    const dataFiles = new Map([
+        ["shape", dataPath + "africa.geojson"],
+        ["rivers", dataPath + "africa-rivers.geojson"],
+        ["cities", dataPath + "africa-1500-cities.csv"]
+    ]);
+
     const width = 500;
     const height = 500;
 
@@ -35,9 +44,9 @@
     const format = d3.format(".0f");
 
     Promise.all([
-        d3.json('../Data/africa.geojson'),
-        d3.json('../Data/africa-rivers.geojson'),
-        d3.csv('../Data/africa-1500-cities.csv', function(row) {
+        d3.json(dataFiles.get("shape")),
+        d3.json(dataFiles.get("rivers")),
+        d3.csv(dataFiles.get("cities"), function(row) {
             return {
                 city: row.city,
                 coordinates: [+row.lng, +row.lat],
@@ -140,7 +149,7 @@
                 .text(d => format(d.coordinates[0][0]) + '°').attr("y",-25)
     }
 
-    function showName(d) {
+    function showName(evt, d) {
         console.log(d.city)
         d3.select(this)
                 .append('text')
@@ -149,7 +158,7 @@
         d3.selectAll(".country")
                 .classed("highlight", c => d3.geoContains(c, d.coordinates))
     }
-    function hideName(d) {
+    function hideName() {
         d3.select(this).select('text').remove();
         d3.selectAll(".country").classed("highlight", false);
     }

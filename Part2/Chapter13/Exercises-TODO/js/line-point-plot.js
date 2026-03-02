@@ -1,4 +1,4 @@
-import * as d3 from "https://cdn.skypack.dev/d3@7";
+import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 import * as utils from "../../js/chart-utils.js";
 
 /**
@@ -66,7 +66,7 @@ export function plotCartesian(container, dim, data, points, labels, animLabels =
 
 /**
  * Creates animated SVG textPath for each item
- * (<textPath xlink:href='#line-city'><animate>...</animate></textPath>)
+ * (<textPath href='#line-city'><animate>...</animate></textPath>)
  * @param container
  * @param data
  * @param color
@@ -79,9 +79,9 @@ function animateLabels(container, data, color) {
                  .attr("x", 100)
                  .attr("dy", -10)
                  .style("fill", (d,i) => color(i))
-                 .append("textPath") // <textPath xlink:href='#line-city'>
+                 .append("textPath") // <textPath href='#line-city'>
                     .attr("startOffset", "-25%")
-                    .attr("xlink:href", d => `#line-${d[0].split(" ")[0]}`)
+                    .attr("href", d => `#line-${d[0].split(" ")[0]}`)
                     .text(d => d[0])
                     .append("animate") // <animate>
                         .attr("attributeName", "startOffset")

@@ -127,7 +127,7 @@ The `<script>` block in `index.html` imports the modular D3 library and the `js/
 
 ```js
 <script type="module">
-  import * as d3 from "https://cdn.skypack.dev/d3@7";
+  import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
   import { dim } from "./js/common.js";
 
   const svg = d3.select("#moons")
@@ -179,7 +179,7 @@ With this information, you can load the file, parse it and filter the `planets` 
 Start creating a new script file: `js/data.js`. It requires the _d3-fetch_ module (since we will use `d3.json()`) and the `js/common.js` (since we will populate the `app.planets` array). To keep things simple, at this stage, we will import the entire D3 library, since we might use other functions later. Add the following two lines to `js/data.js`:
 
 ```js
-import * as d3 from "https://cdn.skypack.dev/d3@7";
+import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 import {app} from "./common.js";
 ```
 
@@ -279,7 +279,7 @@ After the data is loaded and every time a view is selected, the application shou
 Although the application is not interactive yet, we will implement these features now, since they can be triggered by simply changing the value of `app.current.id`. This is done in the `js/config.js` file. It requires the following imports:
 
 ```js
-import * as d3 from "https://cdn.skypack.dev/d3@7";
+import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 import {app, dim} from "./common.js";
 ```
       
@@ -358,7 +358,7 @@ Since we have now calculated all the necessary values, we can start rendering th
 Let’s create a new module `js/view.js` for the code that renders the shapes. It will contain a `draw()` function to draw the circles for planet and moons. We will need the `dim` constants to place the objects, the `app` constant to obtain the data, and tools from the D3 library, so `js/view.js` should include the following imports:
 
 ```js
-import * as d3 from "https://cdn.skypack.dev/d3@7";
+import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 import {app, dim} from "./common.js";
 ```
 The `draw()` function will be called from the main page after `configure()`, so it needs to be imported in `index.html`:

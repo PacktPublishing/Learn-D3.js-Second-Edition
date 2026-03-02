@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Example using d3-quadtree</title>
+    <style>
+        svg {
+            border: 1px solid lightgray;
+        }
+    </style>
+</head>
+<body>
+<h1>Example using d3-quadtree</h1>
+<p>See console for results.</p>
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+
+    const width = 400, height = 400;
+
+    // Create a set of 25 random data points
+    const points = Array.from({length: 25}, () => [Math.random() * width, Math.random() * height]);
+
+    // Create a quadtree with the points
+    const quadtree = d3.quadtree().addAll(points).extent([[2, 2], [width-2, height-2]]);
+
+    // Search for the nearest point to a given point
+    const nearest = quadtree.find(50, 50);
+
+    console.log("The nearest point to (50,50) is", nearest);
+
+    // Draw the quadtree
+    const svg = d3.select("body").append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+    // Draw the points
+    svg.selectAll("circle")
+        .data(points)
+        .join("circle")
+            .attr("cx", d => d[0])
+            .attr("cy", d => d[1])
+            .attr("r", 3)
+            .attr("fill", "blue");
+
+    // Draw the nearest point
+    svg.append("circle")
+        .attr("cx", nearest[0])
+        .attr("cy", nearest[1])
+        .attr("r", 5)
+        .attr("fill", "red");
+
+    // Draw the quadtree
+    const nodes = quadtree.cover();
+
+    svg.selectAll("rect")
+        .data(nodes)
+        .join("rect")
+            .attr("x", d => d.x0)
+            .attr("y", d => d.y0)
+            .attr("width", d => d.x1 - d.x0)
+            .attr("height", d => d.y1 - d.y0)
+            .attr("fill", "yellow")
+            .attr("stroke", "black");
+
+
+
+</script>
+</body>
+</html>

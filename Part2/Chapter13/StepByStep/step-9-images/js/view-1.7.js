@@ -1,4 +1,4 @@
-import * as d3 from "https://cdn.skypack.dev/d3@7";
+import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 
 import {dim, chart, app, getTransition} from "./common-1.5.js";
 
@@ -50,7 +50,7 @@ function createClipping() {
            .join("clipPath")
              .attr("id", d => `clip-${makeID(d)}`)
              .append("use")
-               .attr("xlink:href", d => `#bar-${makeID(d)}`);
+               .attr("href", d => `#bar-${makeID(d)}`);
 }
 
 export function show(dataFrame) {

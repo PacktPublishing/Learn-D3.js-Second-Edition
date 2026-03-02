@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Partition: geological time scale</title>
+    <style>
+        text {font-family: 'Arial', sans-serif; font-size: 10px}
+        rect {stroke: white; stroke-width: 1}
+        h1 {font-family: 'Arial', sans-serif; font-size: 30px}
+    </style>
+</head>
+<body>
+<h1>Partition: geological time scale - Mesozoic era</h1>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+
+    const dim = {width: 1200, height: 1000};
+    const margin = {top: 10, right: 100, bottom: 10, left: 10};
+    const cht = {w: dim.width - margin.left - margin.right, h: dim.height - margin.top - margin.bottom};
+
+    const chart = d3.select("body").append("svg")
+                    .attr("width", dim.width)
+                    .attr("height", dim.height)
+                    .style("font", "10px sans-serif")
+                    .append("g")
+                        .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+    const nested = await d3.json("../../data/geotime.json");
+
+    // Root is Mesozoic era
+    const subtree = nested.children.find(d => d.id === "Phanerozoic") // super-eon
+        .children.find(d => d.id === "Phanerozoic") // eon
+        .children.find(d => d.id === "Mesozoic") // era
+
+    const root = d3.hierarchy(subtree);
+    // root.count();
+    root.sum(d => d.start - d.end);  // proportional to the time span
+
+    d3.partition().size([cht.h, cht.w])(root);
+
+   const displayData = root.descendants();
+
+   const displayChart = chart.append("g")
+                             .attr("class", "partition");
+
+    draw(displayChart, displayData);
+
+    function draw(g, data) {
+        const cell = g.selectAll("g.node")
+                      .data(data)
+                        .join("g")
+                        .attr("class", "node")
+                        .attr("transform", d => `translate(${[d.y0, d.x0]})`)
+                        .style("pointer-events", "none");
+
+        cell.append('rect')
+            .attr('width', d => d.children ? d.y1 - d.y0 : cht.w - d.y0)  // stretch the leaf node to the right
+            .attr('height', d => d.x1 - d.x0)
+            .attr("fill", d => d.data.color);
+
+        // nodes
+        cell.append("text")
+            .text(d => d.children ? d.data.id : d.data.id + " (" + d.data.start + " - " + d.data.end + ")")
+            .attr("y", d => (d.x1 - d.x0) / 2)
+            .attr("x", 5)
+            .style("fill", d => d3.hsl(d.data.color).l > 0.45 ? "black" : "white")
+            .style("text-anchor", "start")
+            .style("alignment-baseline", "middle");
+    }
+
+</script>
+
+</body>
+</html>

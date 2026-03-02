@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Symbols</title>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
         svg { border: solid 1px gray}
         path {
@@ -31,7 +30,7 @@
    Each square below is 8 pixels wide, and the default size is 64 (8x8).<br>The SVG was scaled up (using viewBox).</p>
 
 <script type="module">
-    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
     import sym from "./js/custom-symbols.js";
     import {drawSymbol, drawGrid} from "./js/symbol-utils.js";
 

@@ -8,13 +8,13 @@
 <body>
 <h1>Amazon tributaries</h1>
 <script type="module">
-    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 
     const dim = {width: 1000, height: 800};
     const margin = {top: 50, right: 75, bottom: 50, left: 25};
     const cht = {w: dim.width - margin.left - margin.right, h: dim.height - margin.top - margin.bottom};
 
-    const csvFile = "../../Data/amazon-river.csv";
+    const csvFile = "../../data/amazon-river.csv";
     const result = await d3.csv(csvFile);
 
     const stratify = d3.stratify()

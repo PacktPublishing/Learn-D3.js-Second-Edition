@@ -15,11 +15,11 @@
                    A 244,220 0 1,0 493,175                       
                    A 244,220 0 0,0 20,175"/>
         </g>
-        <image id="abissal" xlink:href="TheFish.png" height="80" width="200" x="0" y="-100">
+        <image id="abissal" href="TheFish.png" height="80" width="200" x="0" y="-100">
             <animateMotion dur="10s" repeatCount="indefinite" rotate="auto" calcMode="spline"
                 keyTimes="0;1" keyPoints="0;1"
                 keySplines="0.75,0.25  0.25, 0.75">
-                <mpath xlink:href="#orbita"/>
+                <mpath href="#orbita"/>
             </animateMotion>
         </image>
     

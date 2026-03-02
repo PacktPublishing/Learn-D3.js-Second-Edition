@@ -32,7 +32,7 @@ Now that we have successfully displayed one complete view, we can demonstrate th
 Create the `js/page.js` file and declare your imports as follows:
 
 ```js
-import * as d3 from "https://cdn.skypack.dev/d3@7";
+import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 import {app} from "./common.js";
 import {configure} from "./config.js";
 import {draw} from "./view.js";

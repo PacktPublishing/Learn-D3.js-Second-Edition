@@ -6,10 +6,10 @@
 </head>
 <body>
 <script type="module">
-    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
     import { methodDemo } from "./js/method-demo.js";
 
-    const tabular = await d3.csv("../data/sample-hierarchy.csv", d3.autoType);
+    const tabular = await d3.csv("../data/sample.csv", d3.autoType);
     console.log("JSON table", tabular);
 
     // 1) Creates the hierarchy in a single step
@@ -17,13 +17,6 @@
                        .id(d => d.id)
                        .parentId(d => d.context);
     const root = hierarchy(tabular);
-
-    // replace content1 and content2 in each node with content: [content1, content2]
-    root.each(d => {
-        d.data.content = [d.data.content1, d.data.content2];
-        delete d.data.content1;
-        delete d.data.content2;
-    });
 
     console.log("1. Root", root.copy());
 

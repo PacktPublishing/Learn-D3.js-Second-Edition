@@ -21,7 +21,7 @@
 <h1>Interactive tree: navigating to descendants and ancestors</h1>
 <p>Click on nodes to expand or collapse tree. Each node counts number of leaves among descendants.</p>
 <script type="module">
-    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
     import {cht, chart, root} from "./js/treedata-json.js";
 
     root.count(); // stores number of leaves in the 'value' property of each node
@@ -76,13 +76,10 @@
 
     // show or hide descendants
     function toggle(evt, node) {
-        if (node.expanded) {
-            node.each(n => n.expanded = false);
-            draw(node, node.depth);
-        } else {
-            node.expanded = true;
-            draw(node, node.depth + 1);
-        }
+        const expanded = !node.expanded;
+        if (!expanded) node.each(n => n.expanded = false);
+        node.expanded = expanded;
+        draw(node, node.depth + (expanded ? 1 : 0));
     }
 
     function expandAll() {
@@ -95,6 +92,9 @@
         draw(root, 0);
     }
 
+    // To allow inspection in the browser console
+    window.root = root;
+    window.d3 = d3;
 </script>
 </body>
 </html>

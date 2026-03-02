@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Cities as dots - Europe</title>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
         svg {border: solid 1px gray;}
         .graticule {
@@ -14,7 +13,9 @@
     </style>
 </head>
 <body>
-<script>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
     const width = 960;
     const height = 680;
 

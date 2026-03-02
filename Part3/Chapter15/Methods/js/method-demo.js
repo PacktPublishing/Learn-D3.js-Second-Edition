@@ -1,4 +1,4 @@
-import * as d3 from "https://cdn.skypack.dev/d3@7";
+import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 
 export function methodDemo(root) {
     // 2) value property before calling count() or sum() (undefined)
@@ -25,7 +25,7 @@ export function methodDemo(root) {
     console.log(root.copy().descendants().map(d => d.value))
 
     // 6) sum() - leaf-sum
-    root.sum(d => d.content ? d.content[0] : 0);
+    root.sum(d => d.weight ? d.weight : 0);
     console.log("6. Cumulative sum of values[0]", root.value, root.copy());
     console.log(root.copy().descendants().map(d => d.value))
 
@@ -36,14 +36,13 @@ export function methodDemo(root) {
     // 8) root.eachAfter() – set values for each node based on descendants
     root.eachAfter(function(d) {
         if(d.children) {
-            d.data.content = [0,0];
+            d.data.weight = 0;
             d.children.forEach(function(c) {
-                d.data.content[0] += c.data.content[0];
-                d.data.content[1] += c.data.content[1]
+                d.data.weight += c.data.weight;
             });
         }
     });
-    console.log("8. root.eachAfter(): sum of data values", root.data.content);
+    console.log("8. root.eachAfter(): sum of data values", root.data.weight);
 
     // 9) root.eachBefore() – create property with hierarchical numbering
     root.eachBefore(function(d) {

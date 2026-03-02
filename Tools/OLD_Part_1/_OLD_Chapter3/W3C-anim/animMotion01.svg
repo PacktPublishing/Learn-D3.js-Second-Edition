@@ -8,7 +8,7 @@
   <rect x="1" y="1" width="498" height="298"
         fill="none" stroke="blue" stroke-width="2" >
         <animateMotion dur="20s" repeatCount="indefinite" rotate="auto" >
-              <mpath xlink:href="#path1"/>
+              <mpath href="#path1"/>
         </animateMotion>
         
   </rect>
@@ -22,22 +22,22 @@
             S 600 500 300 500 z"
         fill="none" stroke="blue" stroke-width="7.06"  >
             <animateMotion dur="16s" repeatCount="indefinite" rotate="auto" >
-                  <mpath xlink:href="#path1"/>
+                  <mpath href="#path1"/>
             </animateMotion>
       </path>
   <circle cx="100" cy="250" r="17.64" fill="blue"  >
         <animateMotion dur="15s" repeatCount="indefinite" rotate="auto" >
-              <mpath xlink:href="#path1"/>
+              <mpath href="#path1"/>
         </animateMotion>
   </circle>
   <circle cx="250" cy="100" r="17.64" fill="red"  >
         <animateMotion dur="3s" repeatCount="indefinite" rotate="auto" >
-              <mpath xlink:href="#path1"/>
+              <mpath href="#path1"/>
         </animateMotion>
   </circle>
   <circle cx="400" cy="250" r="17.64" fill="green"  >
         <animateMotion dur="15s" repeatCount="indefinite" rotate="auto" >
-              <mpath xlink:href="#path1"/>
+              <mpath href="#path1"/>
         </animateMotion>
   </circle>
 
@@ -47,12 +47,12 @@
 
     <!-- Define the motion path animation -->
     <animateMotion dur="10s" repeatCount="indefinite" rotate="auto" >
-       <mpath xlink:href="#path1"/>
+       <mpath href="#path1"/>
     </animateMotion>
   </path>
       
             <animateMotion dur="16s" repeatCount="indefinite" rotate="auto" >
-                  <mpath xlink:href="#path1"/>
+                  <mpath href="#path1"/>
             </animateMotion>
       
   <path d="M-25,-12.5 C-25,0 25,0 25,-12.5 L 0,-50.5 z"
@@ -60,7 +60,7 @@
             
             <!-- Define the motion path animation -->
       <animateMotion dur="6s" repeatCount="indefinite" rotate="auto" >
-          <mpath xlink:href="#path1"/>
+          <mpath href="#path1"/>
       </animateMotion>
   </path>
       
@@ -69,7 +69,7 @@
             
             <!-- Define the motion path animation -->
             <animateMotion dur="9s" repeatCount="indefinite" rotate="auto" >
-                  <mpath xlink:href="#path1"/>
+                  <mpath href="#path1"/>
             </animateMotion>
       </path>
       
@@ -78,7 +78,7 @@
             
             <!-- Define the motion path animation -->
             <animateMotion dur="5s" repeatCount="indefinite" rotate="auto" >
-                  <mpath xlink:href="#path1"/>
+                  <mpath href="#path1"/>
             </animateMotion>
       </path>
             

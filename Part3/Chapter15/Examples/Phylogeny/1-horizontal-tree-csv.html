@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dendrogram from tabular data</title>
+</head>
+<body>
+<h2>Cladogram: Kellner's phylogeny of pterosaurs</h2>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+    import {addHighlightPath} from "./js/highlight-path.js";
+
+    const dim = {width: 1200, height: 1200};
+    const margin = {top: 10, right: 10, bottom: 250, left: 100};
+    const cht = {w: dim.width - margin.left - margin.right, h: dim.height - margin.top - margin.bottom};
+
+    const chart = d3.select("body").append("svg")
+                    .attr("width", dim.width)
+                    .attr("height", dim.height)
+                    .style("font", "10px sans-serif")
+                    .append("g")
+                       .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+    const styles = {
+        leafRadius: 4,
+        groupRadius: 3,
+        strokeWidth: 2,
+        dotLeafColor: "orange",
+        dotGroupColor: "green",
+        pathColor: "#ccc"
+    }
+
+    const tabular = await d3.csv("../../data/Kellner.csv");
+
+    const root = d3.stratify()
+                   .id(d => d.node)
+                   .parentId(d => d.parent)(tabular);
+
+    d3.cluster().size([cht.w, cht.h])(root);
+
+    draw(chart, root);
+    addHighlightPath(chart, styles);
+
+    // Functions
+    function draw(chart, tree) {
+        drawLinks(chart, tree.links(), styles.strokeWidth, styles.pathColor);
+        drawNodes(chart, tree.descendants(), styles.leafRadius, styles.groupRadius, styles.dotLeafColor, styles.dotGroupColor);
+    }
+
+    function drawLinks(chart, data, strokeWidth, pathColor) {
+        chart.selectAll("path")
+             .data(data)
+                .join("path")
+                    .attr("class", d => `${d.target.node}`)
+                    .style("fill", "none")
+                    .style("stroke-width", strokeWidth)
+                    .style("stroke", pathColor)
+                    .attr("d", d3.link(d3.curveStepBefore).x(d => d.y).y(d => d.x));  // using step curve
+    }
+
+    function drawNodes(chart, data, radiusLeaf, radiusGroup, dotLeafColor, dotGroupColor) {
+        const node = chart.selectAll("g")
+                          .data(data)
+                             .join("g")
+                                 .attr("class", d => d.children ? "group" : "leaf")
+                                 .attr("transform", d => `translate(${d.y},${d.x})`);
+
+        node.append("circle")
+            .attr("r", d => d.children ? radiusGroup : radiusLeaf)
+            .attr("fill", d => d.children ? dotGroupColor : dotLeafColor);
+
+        node.append("text")
+            .attr("alignment-baseline", d => d.children ? "baseline" : "middle")
+            .attr("y", d => d.children ? -3 : 0)
+            .attr("x", d => d.children ? -6 : 6)
+            .attr("text-anchor", d => d.children ? "end" : "start")
+            .attr("fill", d => d.children ? 'purple' : 'black')
+            .text(d => d.data.name);
+    }
+
+</script>
+
+</body>
+</html>

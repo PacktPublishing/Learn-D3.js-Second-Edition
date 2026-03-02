@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Global temperatures 1880 to 2024</title>
+    <style>
+        path.line {
+            stroke-width: .5px;
+            fill: none;
+        }
+        h1, p {
+            font-family: sans-serif;
+        }
+        svg {
+            border: solid 1px #ccc;
+            position: absolute;
+        }
+        button {
+            position: relative;
+            top: 10px;
+            left: 10px;
+        }
+    </style>
+</head>
+<body>
+<h1>Global temperatures from 1880 to 2023</h1>
+<p>Based on the NASA GISS reference (https://data.giss.nasa.gov/gistemp/)</p>
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+    import * as utils from "../../js/chart-utils.js";
+
+    // Global temperatures 1880 to 2024 (Source: https://data.giss.nasa.gov/gistemp/)
+    const file = "../../data/GLB.Ts.1880.2025.csv";
+
+    const dim = {
+        width: 800, height: 500,
+        margin: {x: 75, y: 50}
+    };
+    const cht = {
+        width: dim.width - dim.margin.x * 2,
+        height: dim.height - dim.margin.y * 2
+    }
+
+    // Configure layers for zooming
+    const svg = d3.select("body").append("svg").attr("height", dim.height).attr("width", dim.width);
+    const context = svg.append("g").attr("transform", `translate(${dim.margin.x}, ${dim.margin.y})`); // Add context (was view)
+    const chart = context.append("svg").attr("width", cht.width).attr("height", cht.height); // Add new fixed layer
+    const view = chart.append("g"); // This is the new zoomable layer (the container)
+
+    // Add zooming behavior to the svg
+    svg.call(d3.zoom()
+            .extent([[0,0],[cht.width, cht.height]])
+            .scaleExtent([1, 100]) // Limit zooming to 100x
+                .translateExtent([[0, 0], [cht.width, cht.height]]) // Limit panning to the chart area
+                .on("zoom", evt => {
+                    view.attr("transform", evt.transform);
+                }));
+
+    // Get and prepare data
+    const text = await d3.text(file);
+    const dataByYear = d3.csvParseRows(text, d3.autoType)
+                         .filter((d,i) => i > 0)           // get rid of header
+                         .map(d => [d[0], d.slice(1)]);    // separate year from data
+
+    const isoDateString = (year,month) => `${year}-${month}-27`;
+    const data = dataByYear.map(d => d[1].map((v,i) => [isoDateString(d[0], i+1), v])
+                           .filter(v => v[1] !== null)); // remove null months);
+
+    // Scales
+    const extent = d3.extent(data.flat(), d => d[1]);
+    const scale = {
+        date: d3.scaleTime().clamp(true)
+                .range([0, cht.width])
+                .domain([d3.isoParse(data[0][0][0]),
+                         d3.isoParse(data[data.length-1][data[data.length-1].length-1][0])]),
+        temp: d3.scaleLinear()
+                .range([cht.height, 0])
+                .domain([extent[0] -.1, extent[1] +.1])
+
+    }
+
+    // Line function
+    const line = d3.line().x(d => scale.date(d3.isoParse(d[0])))
+                          .y(d => scale.temp(d[1]))
+                          .defined(d => d && !isNaN(d[1]));
+
+    // Render temperature line
+    view.append("path").attr("class", "line")
+        .datum(data.flat())
+           .attr("d", line)
+           .style("stroke", "red");
+
+    // Render axes
+    utils.cartesianAxes()
+         .container(context)        // Attach the axes to the context!
+         .xScale(scale.date)
+         .yScale(scale.temp)
+         .showHorizontalGrid(true)
+         .xLabel("Years")
+         .yLabel("Anomaly (˚C)")();
+
+</script>
+
+</body>
+</html>

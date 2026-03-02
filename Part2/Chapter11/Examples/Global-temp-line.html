@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Global temperatures 1880 to 2024</title>
-    <link rel="stylesheet" href="../css/chart-utils.css">
     <style>
         path.line {
             stroke-width: .5px;
@@ -28,11 +27,11 @@
 <p>Based on the NASA GISS reference (https://data.giss.nasa.gov/gistemp/)</p>
 
 <script type="module">
-    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
     import * as utils from "../js/chart-utils.js";
 
     // Global temperatures 1880 to 2024 (Source: https://data.giss.nasa.gov/gistemp/)
-    const file = "../data/GLB.Ts.1880.2024.csv";
+    const file = "../data/GLB.Ts.1880.2025.csv";
 
     const dim = {
         width: 800, height: 500,
@@ -84,7 +83,7 @@
          .yScale(scale.temp)
          .showHorizontalGrid(true)
          .xLabel("Years")
-         .yLabel("Anomaly (˚C")();
+         .yLabel("Anomaly (˚C)")();
 
 </script>
 

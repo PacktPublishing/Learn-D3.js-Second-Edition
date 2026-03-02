@@ -28,11 +28,11 @@ __`Symbol/`__
 
 Description.
 
-__`StepByStep1/`__
+__`StepByStep/`__
 
 Description.
 
-__`StepByStep2/`__
+__`Tutorial/`__
 
 Description.
 

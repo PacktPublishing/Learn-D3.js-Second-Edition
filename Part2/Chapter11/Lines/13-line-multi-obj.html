@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>A multi-series line chart from an array of objects</title>
+    <style>
+        .dataset {
+            stroke-width: 3px;
+            fill: none;
+        }
+    </style>
+</head>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+    import * as utils from "../js/chart-utils.js";
+
+    const dim = { width: 800, height: 400, margin: 50 };
+    const scale = {
+        x: d3.scaleLinear().range([dim.margin, dim.width - dim.margin]),
+        y: d3.scaleLinear().range([dim.height - dim.margin, dim.margin])
+    }
+    const container = d3.select("body")
+                        .append("svg")
+                        .attr("height", dim.height)
+                        .attr("width", dim.width);
+
+    // Change this to add more data series
+    const series = 3;
+
+    // The data is an array of series, each with 5 points and random y-values
+    const datasets = [];
+
+    // There are 5 x-values in each series
+    const steps = d3.range(0,21,5); // [0,5,10,15,20]
+
+    // The y-values are random numbers between 0 and 50
+    // In this example, each data series is an array of objects
+    for (let i = 0; i < series; i++) {
+        datasets.push(steps.map( (d,i) => ({step: d, value: d3.randomInt(50)(), index: i})));
+    }
+
+    // Scales -
+    scale.x.domain(d3.extent(datasets.flat(), d => d.step));
+    scale.y.domain(d3.extent(datasets.flat(), d => d.value));
+
+    // Generates a color for each data series
+    const color = d3.scaleOrdinal(d3.schemeCategory10)
+                    .domain([0,datasets.length]);
+
+    // line function for all lines
+    const line = d3.line()
+                   .x(d => scale.x(d.step))
+                   .y(d => scale.y(d.value));
+
+
+    // Bind the data array to a selection of <path> elements. Each <path> will receive a data series.
+    container.selectAll("path.dataset")
+       .data(datasets)
+         .join("path")
+           .attr("class", "dataset")
+           .attr("d", line)
+           .style("stroke", color);
+
+    // Draw the axes (we are using a utility function from chart-utils.js)
+    utils.cartesianAxes()
+         .container(container)
+         .xScale(scale.x)
+         .yScale(scale.y)()
+
+
+</script>
+</body>
+</html>

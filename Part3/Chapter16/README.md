@@ -1,26 +1,30 @@
-# Chapter16
+# Chapter15
 
 Files and exercises for chapter 16.
 
 ## 1) Description of each subfolder in this folder
 
-__`TODO/`__
+__`Hierarchies/`__
 
 Description.
 
-__`TODO/`__
+__`Partitions/`__
 
 Description.
 
-__`TODO/`__
+__`Enclosures/`__
 
 Description.
 
-__`TODO/`__
+__`Examples/`__
 
 Description.
 
-__`StepByStep/`__
+__`Exercises/`__
+
+Description.
+
+__`js/`__
 
 Description.
 

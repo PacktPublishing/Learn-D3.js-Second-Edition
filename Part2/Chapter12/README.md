@@ -51,3 +51,11 @@ Resources used in examples and exercises.
 __`js/`__
 
 JavaScript modules and scripts used in examples and exercises.
+
+__`Tutorial1/`__
+
+Instructions for the step-by-step pie chart tutorial.
+
+__`Tutorial2/`__
+
+Instructions for the step-by-step stacked area chart tutorial.

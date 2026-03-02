@@ -9,7 +9,7 @@ In this tutorial, you will apply what you learned in the last three chapters to 
 You can run and view the complete code for each step in the `Chapter09/StepByStep/` folder. As in other tutorials, each step contains a complete application folder, consisting of an `index.html` file, a local `js/` subfolder where JavaScript modules will be stored, and a local `css/` subfolder for the stylesheets. To code as you read, you can create a similar structure or start with step 1 (`StepByStep/1-load-data/`). To view the results after each step, launch the `index.html` file in a local web server and preview it in your browser.
 
 ## Table of contents
-The following section are contained in this tutorial:
+The following sections are contained in this tutorial:
 - [The data](#the-data)
 - [Step 1: Loading and preparing the data](#step-1-loading-and-preparing-the-data)
 - [Step 2: Setting up the page](#step-2-setting-up-the-page)
@@ -46,7 +46,7 @@ To create the visualization from scratch, start by creating a project folder for
 Add the following two lines to `js/data.js`. This code will import the D3 library (as an ESM module from the SkyPack CDN) and store the URL for the data source.
 
 ```js
-import * as d3 from 'https://cdn.skypack.dev/d3@7';
+import * as d3 from 'https://cdn.skypack.dev/d3@7.9.0';
 const file = "data/un_regions_2017.csv";
 ```
 
@@ -129,7 +129,7 @@ The application object will store the data (initially empty) and two scales. We 
 Since we are using the D3 library, it needs to be imported at the beginning of the module:
 
 ```js
-import * as d3 from 'https://cdn.skypack.dev/d3@7';
+import * as d3 from 'https://cdn.skypack.dev/d3@7.9.0';
 ```
 
 We also need to export these two objects so they can be used in other modules:
@@ -174,7 +174,7 @@ svg { border: solid 1px; }
 Let’s create one more module: `js/view.js`. It will be used to render the chart. For now, it will just contain a `draw()` function with the code that generates the SVG viewport. This requires imports for the D3 library and for the `dim` object (from `js/common-1.0.js`):
 
 ```js
-import * as d3 from 'https://cdn.skypack.dev/d3@7';
+import * as d3 from 'https://cdn.skypack.dev/d3@7.9.0';
 import {dim} from './common-1.0.js';
 
 export function draw() {

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Radial dendrogram from tabular data</title>
+    <style>
+        svg {border: solid 1px lightgreen}
+    </style>
+</head>
+<body>
+<h2>Radial cladogram: Headden/Campos (2015) phylogeny of pterosaurs</h2>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+    import {addRotateDrag} from "../../js/rotate-drag.js";
+    import {addHighlightPath} from "./js/highlight-path.js";
+    import {parseTree} from "./js/phylotree.js";
+
+    const dim = {width: 1100, height: 1000};
+    const margin = {top: 100, right: 10, bottom: 300, left: 150};
+    const cht = {w: dim.width - margin.left - margin.right, h: dim.height - margin.top - margin.bottom};
+
+    const chart = d3.select("body").append("svg")
+                    .attr("width", dim.width)
+                    .attr("height", dim.height)
+                    .style("font", "10px sans-serif")
+                    .append("g")
+                       .attr("transform", `translate(${dim.width/2}, ${dim.height/2})`);
+
+    chart.append("circle")
+         .attr("r", cht.h * .6)
+         .attr("fill", "lightsalmon")
+         .attr("stroke", "#ccc")
+         .style("cursor", "grab");
+
+    const styles = {
+        leafRadius: 4,
+        groupRadius: 3,
+        strokeWidth: 2,
+        dotLeafColor: "black",
+        dotGroupColor: "maroon",
+        pathColor: "white"
+    }
+
+    // This phylogeny is provided as a Newick string. The parseTree function converts it to a nested object.
+    const data = "(Ornithosuchus_woodwardi ,(Herrerasaurus_ischigualastensis ,(Scleromochlus_taylori ,(Anurognathus_ammoni ,(Rhamphorhynchus_muensteri ,(Pterodactylus_antiquus ,(Nyctosaurus_gracilis ,((Pteranodon_longiceps ,((Tropeognathus_mesembrinus ,(Anhanguera_blittersdorffi ,Anhanguera_piscator ,Anhanguera_santanae )),(Ludodactylus_sibbicki ,Guidraco_venator ),(Nurhachius_ignaciobritoi ,Istiodactylus_latidens ))),((Banguela_oberlii ,(Dsungaripterus_weii ,Noripterus_parvus )),(((Azhdarcho_lancicollis ,Wellnhopterus_brevirostris ,Zhejiangopterus_linhaiensis ),(Chaoyangopterus_zhangi ,Shenzhoupterus_chaoyangensis )),(Vectidraco_daisymorrisae ,((Thalassodromeus_sethi ,Tupuxuara_leonardii ),((Tupandactylus_imperator ,Tapejara_wellnhoferi ),(Sinopterus_dongi ,Eopteranodon_lii ,(Huaxipterus_benxiensis ,Huaxiadraco_corollatus )))))))))))))))";
+
+    const objData = parseTree(data);    // Parse the Newick string to a nested object (see phylotree.js)
+    const root = d3.hierarchy(objData);
+
+    console.log(root)
+
+    const tree = d3.cluster()
+                    .separation((a, b) => (a.parent === b.parent ? 1 : 3))
+                    .nodeSize([4.2, cht.h * .0375])
+                    //.size([360, cht.h * .6]);
+
+    tree(root);
+
+    draw(chart, root);
+    addRotateDrag(chart, dim);
+    addHighlightPath(chart, styles);
+
+    // Functions
+    function draw(chart, tree) {
+        drawLinks(chart, tree.links(), styles.strokeWidth, styles.pathColor);
+        drawNodes(chart, tree.descendants(), styles.leafRadius, styles.groupRadius, styles.dotLeafColor, styles.dotGroupColor);
+    }
+
+    function drawLinks(chart, data, strokeWidth, pathColor) {
+        console.log(data)
+        chart.selectAll("path")
+             .data(data)
+                .join("path")
+                    .attr("class", d => `${d.target.node}`)
+                    .style("fill", "none")
+                    .style("stroke-width", strokeWidth)
+                    .style("stroke", pathColor)
+                    .attr("d", d3.linkRadial()
+                                 .angle(d => (d.x * Math.PI / 180 + Math.PI/2))
+                                 .radius(d => d.y));
+    }
+
+    function drawNodes(chart, data, radiusLeaf, radiusGroup, dotLeafColor, dotGroupColor) {
+        const node = chart.selectAll("g")
+                          .data(data)
+                             .join("g")
+                                .attr("class", d => d.children ? "group" : "leaf")
+                                .attr("transform", d => `rotate(${d.x}) translate(${d.y})`);
+
+        node.append("circle")
+            .attr("r", d => d.children ? radiusGroup : radiusLeaf)
+            .style("fill", d => d.children ? dotGroupColor : dotLeafColor);
+
+        node.append("text")
+            .attr("alignment-baseline", d => d.children ? 'baseline' : "middle")
+            .attr("x", d => d.children ? 0 : 8)
+            .attr("dy", d => d.children ? -6 : 0)
+            .style("text-anchor", d => d.children ? 'middle' : "start")
+            .style("fill", d => d.children ? '#321' : 'black')
+            .style("font-weight", d => d.children ? "bold" : "normal")
+            .attr("transform", d => d.children ? `rotate(90)` : ``)
+            .text(d => d.data.name);
+    }
+
+</script>
+
+</body>
+</html>

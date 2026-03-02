@@ -1,4 +1,4 @@
-import * as d3 from "https://cdn.skypack.dev/d3@7";
+import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 import {dim, data, app} from "./common-1.1.js";
 import * as utils from "../../../../js/chart-utils.js";
 

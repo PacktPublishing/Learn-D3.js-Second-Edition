@@ -52,6 +52,10 @@ __`StepByStep/`__
 
 A step-by-step tutorial.
 
+__`StepByStep/`__
+
+Instructions for the step-by-step tutorial.
+
 __`Examples/`__
 
 Additional examples.

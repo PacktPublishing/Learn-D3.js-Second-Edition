@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sunburst: world population</title>
+    <style>
+        * {font-family: 'Helvetica Neue', sans-serif; }
+        h1 {font-size: 30px; z-index: 1; position: absolute; top: 10px; left: 10px; opacity: .5; color: blue}
+        p {font-size: 12px; z-index: 1; position: absolute; top: 60px; left: 10px;}
+        svg {position: absolute; top: 0; left: 0;}
+        text {font-size: 9px}
+        path {stroke: white; stroke-width: .5}
+    </style>
+</head>
+<body>
+<h1>Sunburst: World population per continent and country</h1>
+<p>Source: United Nations (2016)</p>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+    import {rootFromRollup} from "../../../js/nest.js";
+    import {addRotateDrag} from "../../../js/rotate-drag.js";
+
+    const dim = {width: 1000, height: 950, margin: 25};
+
+    const svg = d3.select("body").append("svg").attr("height", dim.height).attr("width", dim.width);
+    const chart = svg.append("g").attr("transform", `translate(${[dim.width/2,dim.height/2]})`);
+
+    d3.csv("../../../data/un_regions.csv").then(function(result) {
+
+        const keyFunctions = [
+                d => d.Supercontinent,
+                d => d.Continent,
+                d => d.UN_Region,
+                d => d.Country
+        ];
+        const reductionFunction = d => ({area: +d[0].Area_km2, population: +d[0].Pop_2016});
+        const rollupRoot = d3.rollup(result, reductionFunction, ...keyFunctions);
+        const hierarchy = rootFromRollup(rollupRoot, "World", false);
+        const root = d3.hierarchy(hierarchy);
+
+        root.sum(d => d.population)
+        root.sort((a,b) => b.height - a.height || a.value - b.value);
+
+        d3.partition().size([2 * Math.PI, dim.width * .4])(root);
+
+        chart.append("circle")
+            .attr("r", dim.height *.9)
+            .attr("fill", "white")
+            .style("cursor", "grab");
+
+        drawPartition(chart.append("g").attr("class", "partition"), root);
+
+        addRotateDrag(chart, dim, -169);
+
+    });
+
+    function drawPartition(g, data) {
+        const levelColor = d3.scaleOrdinal(d3.schemeYlGnBu[7].reverse().slice(2));
+
+        const arc = d3.arc().startAngle(d => d.x0)
+                            .endAngle(d => d.x1)
+                            .innerRadius(d => d.y0)
+                            .outerRadius(d => d.y1);
+        const start = arc.startAngle();
+        const end   = arc.endAngle();
+
+        const cell = g.selectAll("g.slice")
+                      .data(data.descendants().filter(d => d.depth > 0))
+                        .join("g")
+                          .attr("class", "slice");
+
+        cell.append('path')
+            .attr('d', arc)
+            .attr("fill", (d,i) => i%2 === 1 ? d3.color(levelColor(d.height)) : d3.hsl(levelColor(d.height)).darker())
+            .style("cursor", "grab");
+
+        cell.append("text")
+            .text(d => (end(d) - start(d) > Math.PI/180) ? d.data.id : '')
+            .attr("transform", d => {
+                const [x, y] = arc.centroid(d);
+                const angle = (180 / Math.PI * (start(d) + end(d)) / 2) - 90;
+                return `translate(${x},${y}) rotate(${angle})`;
+            })
+            .style("pointer-events", "none")
+            .attr("x", d => d.children ? -dim.width/25 + 5 : dim.width/25 + 5)
+            .style("alignment-baseline", "middle");
+    }
+</script>
+</body>
+</html>

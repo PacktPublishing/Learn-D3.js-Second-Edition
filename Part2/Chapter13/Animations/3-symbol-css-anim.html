@@ -21,7 +21,7 @@
 </head>
 <body>
 <script type="module">
-    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
     import * as utils from "../js/chart-utils.js";
 
     const width  = 800;
@@ -87,7 +87,7 @@
                        .attr("dur", `${duration/1000}s`)
                        .attr("rotate", "auto") // rotate the symbol along the path
                        .append("mpath")     // <mpath> element
-                          .attr("xlink:href", `#path${i}`);
+                          .attr("href", `#path${i}`);
               }).on("end", function() {
                  d3.selectAll(".dot").remove();
                  svg.node().setCurrentTime(0);

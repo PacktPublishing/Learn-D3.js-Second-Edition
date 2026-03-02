@@ -17,7 +17,7 @@
 <h3>Drag and drop using scales</h3>
 <p>Invert scales to obtain data points. Using CTM to obtain coordinates.</p>
 <script type="module">
-    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 
     const dim = {w: 500, h: 250};
     const svg = d3.select("body")
@@ -49,18 +49,14 @@
 
     // Using scales and CTM to get transform coordinates
     const drag = d3.drag()
-                    .on('start', function() {
-                        d3.select(this).style("cursor", "move");
-                    })
+                    .on('start', () => d3.select("svg").style("cursor", "move"))
                     .on('drag', function(evt,d) {
                         const ctm = this.getCTM();
                         d.x = scale.x.invert(ctm.e + evt.dx);
                         d.y = scale.y.invert(ctm.f + evt.dy);
                         update();
                     })
-                    .on('end', function() {
-                        d3.select(this).style("cursor", null);
-                    });
+                    .on('end', () => d3.select("svg").style("cursor", null));
 
     // Attach the dragging behavior to the container
     d3.select(".container").call(drag);

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Icicle: Kellner's phylogeny of pterosaurs</title>
+    <!-- Yannone Kaffeesatz fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:200,400,700">
+    <style>
+        text {font-family: 'Arial Narrow', sans-serif; font-size: 11px}
+        rect {stroke: white; stroke-width: 1}
+        h1 {font-family: 'Arial Narrow', sans-serif; font-size: 30px}
+    </style>
+</head>
+<body>
+<h1>Icicle: Kellner's phylogeny of pterosaurs</h1>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+
+    const dim = {width: 1400, height: 800};
+    const margin = {top: 10, right: 100, bottom: 10, left: 10};
+    const cht = {w: dim.width - margin.left - margin.right, h: dim.height - margin.top - margin.bottom};
+
+    const chart = d3.select("body").append("svg")
+                    .attr("width", dim.width)
+                    .attr("height", dim.height)
+                    .style("font", "10px sans-serif")
+                    .append("g")
+                        .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+    const tabular = await d3.csv("../../data/Kellner.csv");
+
+    const root = d3.stratify()
+                   .id(d => d.node)
+                   .parentId(d => d.parent)(tabular);
+
+    //root.count();
+    root.sum(d => 1)  // number of nodes
+
+    d3.partition().size([cht.h, cht.w])(root);
+
+    draw(chart.append("g").attr("class", "partition"), root.descendants());
+    d3.selectAll("g.node").filter(d => !d.data.name || d.height === 0).lower();
+
+    function draw(g, data) {
+        const colorScale = d3.scaleSequential(d3.interpolateYlGnBu)
+                             .domain([30, -30]);
+
+        const cell = g.selectAll("g.node")
+                      .data(data)
+                        .join("g")
+                        .attr("class", "node")
+                        .attr("transform", d => `translate(${[d.y0, d.x0]})`)
+                        .style("pointer-events", "none");
+
+        cell.append('rect')
+            .attr('width', d => d.y1 - d.y0)
+            .attr('height', d => d.x1 - d.x0)
+            .attr("fill", d => d.height !== 0 ? colorScale(d.depth) : 'orange');
+
+        // nodes
+        cell.filter(d => d.height !== 0)
+            .append("text")
+            .text(d => d.data.name)
+            .attr("y", d => (d.x1 - d.x0) / 2)
+            .attr("x", 5)
+            .style("text-anchor", "start");
+
+        // leaves
+        cell.filter(d => d.height === 0)
+            .append("text")
+            .text(d => d.data.name)
+            .attr("y", d => (d.x1 - d.x0) / 2)
+            .style("text-anchor", "start")
+            .attr("x", d => d.y1 - d.y0 + 5)
+            .style("pointer-events", "none")
+            .style("alignment-baseline", "middle")
+    }
+
+</script>
+
+</body>
+</html>

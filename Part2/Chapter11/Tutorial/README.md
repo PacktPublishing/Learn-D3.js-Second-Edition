@@ -42,7 +42,7 @@ app/
     ├── data/
     │   └── GLB.Ts.1880.2025.csv
     ├── css/
-    │   └── styles.css
+    │   └── main.css
     ├── js/
     │   ├── common.js
     │   ├── data.js
@@ -64,7 +64,7 @@ This step describes the initial file structure for the project, as shown above. 
 Most of the code in the JavaScript modules (located in the `js/` folder) will use D3, so they should import it:
 
 ```js
-import * as d3 from "https://cdn.skypack.dev/d3@7";
+import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 ```
 
 The `js/common.js` module will contain and export constants and objects shared by other modules. At this point, it only contains an empty `data` object, which will be populated later:
@@ -133,7 +133,7 @@ const file = "./data/GLB.Ts.1880.2025.csv";
 Now we can load and parse the data. First, add the following import statements to the top of the `js/data.js` module:
 
 ```js
-import * as d3 from "https://cdn.skypack.dev/d3@7";
+import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 import {data} from "./common.js";
 ```
 
@@ -213,7 +213,7 @@ We can now set up the scales.
 The scales will map the data to screen coordinates. Open the `js/common.js` module to add and export two more objects: `dim` and `app`:
 
 ```js
-import * as d3 from "https://cdn.skypack.dev/d3@7";
+import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 
 export {data, app, dim};
 
@@ -351,7 +351,7 @@ Now we can finally draw the lines.
 The rendering code will be placed in a new module: `js/view.js`. Create it and import the constants and the D3 library:
 
 ```js
-import * as d3 from "https://cdn.skypack.dev/d3@7";
+import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 import {dim, app} from "./common.js";
 import * as utils from "./chart-utils.js";  // get this from the chapter's js/ folder
 ```

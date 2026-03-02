@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple zoom - restricting the zoomable area with nested viewports</title>
+    <style>
+        svg {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+<h3>Simple zoom - restricting the zoomable area with nested viewports</h3>
+<p>This is a basic template for zooming apps. The chart's contents are constrained within a
+smaller area in the SVG. Between the main SVG viewport there is a <code>&lt;g></code> <b>layer</b>, which translates
+the contents and can be used to add axes, a <b>chart</b> <code>&lt;svg></code> viewport, which defines the
+fixed area where the data is displayed, and a <b>container</b> <code>&lt;g></code> where the zoomable objects
+are appended to. See comments in code. </p>
+<p>Double-click to zoom in, shift-double-click to zoom out, or use mouse wheel / pinch touchscreen.</p>
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+
+    // SVG dimensions
+    const dim = {width: 600, height: 300, margin: 50};
+
+    // Chart dimensions (the area where the data is displayed)
+    const cht = {width: dim.width - 2*dim.margin, height: dim.height - 2*dim.margin};
+
+    // This is the main viewport
+    const svg = d3.select("body").append("svg")
+                    .attr("width", dim.width)
+                    .attr("height", dim.height);
+    const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+    // Add an internal viewport for the chart. It must be placed within a <g> layer
+    // so it can be translated (not all browsers support transforms on the <svg> element).
+    // An internal viewport is necessary because it has dimensions, while a <g> element does not.
+
+    // This is in the fixed chart area - use this layer to add fixed objects that
+    // shouldn't be clipped by the chart's viewport, such as axes or grids
+    const context = svg.append("g")
+                       .attr("class", "context")
+                       .attr("transform", `translate(${dim.margin}, ${dim.margin})`)
+
+    // This is the viewport that will display the zoomable content. Anything outside
+    // will be clipped by its bounds
+    const chart = context.append("svg")
+                         .attr("class", "chart")
+                         .attr("width", cht.width)
+                         .attr("height", cht.height);
+
+    // This rectangle shows the FIXED chart bounds. You can also add it to 'chart',
+    // but it will be clipped by the chart's viewport (you will see half the stroke width)
+    context.append("rect")
+           .attr("width", cht.width)
+           .attr("height", cht.height)
+           .style("fill", "none")
+           .style("stroke-width", 2)  // 2px border (you will only see 1px if appended to 'chart')
+           .style("stroke", "blue");
+
+    // This is the zoomable container - zooming will happen within its bounds
+    const container = chart.append("g");
+
+    // This rectangle shows the bounds of the ZOOMABLE contents
+    container.append("rect")
+             .attr("width", cht.width)
+             .attr("height", cht.height)
+             .style("fill", "none")
+             .style("stroke-width", 2)
+             .style("stroke", "olive");
+
+    // Add zoomable objects to the container
+    container.selectAll("circle")
+            .data(d3.range(50))
+                .join("circle")
+                    .attr("cx", d => Math.random(d)*cht.width)
+                    .attr("cy", d => Math.random(d)*cht.height)
+                    .attr("r", 10)
+                    .style("fill", color);
+
+
+    // Since extent defaults to caller bounds, it needs to be set to match translateExtent
+    // Preventing native zooming keeps the browser from zooming the page when the mouse is over the SVG
+    // enforcing its limits.
+    const zextent = [[0, 0], [cht.width, cht.height]];
+    svg.call(d3.zoom()
+                .scaleExtent([0.25, 4])
+                .translateExtent(zextent)
+                .extent(zextent)  // must be set to match translateExtent!
+                .on('zoom', evt => {
+                    container.attr("transform", evt.transform);  // Zoom the container
+                }))
+                .on("wheel", event => event.preventDefault());   // Prevent native zooming behavior
+</script>
+
+</body>
+</html>

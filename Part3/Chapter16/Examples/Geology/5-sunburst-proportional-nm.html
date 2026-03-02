@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sunburst partition</title>
+    <style>
+        text {font-family: 'Arial', sans-serif; font-size: 8px}
+        rect {stroke: white; stroke-width: 1}
+        h1 {font-family: 'Arial', sans-serif; font-size: 30px}
+    </style>
+</head>
+<body>
+<h1>Geological time scale: proportional</h1>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+
+    const dim = {width: 1100, height: 560};
+    const margin = {top: 10, right: 10, bottom: 10, left: 10};
+    const cht = {w: dim.width - margin.left - margin.right, h: dim.height - margin.top - margin.bottom};
+
+    const chart = d3.select("body").append("svg")
+                    .attr("width", dim.width)
+                    .attr("height", dim.height)
+                    .style("font", "10px sans-serif")
+                    .append("g")
+                        .attr("transform", `translate(${dim.width/2}, ${dim.height/2})`);
+
+    const nested = await d3.json("../../data/geotime.json");
+
+    const root = d3.hierarchy(nested);
+    // root.count();
+    root.sum(d => d.start - d.end);  // proportional to the time span
+
+    d3.partition().size([Math.PI, cht.w/2])(root);
+
+    // Adjust for a half-circle chart
+    const displayChart = chart.append("g")
+                              .attr("class", "partition")
+                              .attr("transform", `translate(0,${dim.height/2 - 10}) rotate(-90)`);
+
+    // Remove slices too small to be visible
+
+    // Remove the root (super-eon) and level 1 nodes (eon)
+    const displayData = root.descendants().filter(d => d.depth > 1);
+
+    draw(displayChart, displayData);
+
+    // Remove children of a node by id and adjust height of parent node
+    function removeChildren(node, id) {
+        const n1 = node.find(d => d.data.id === id);
+        n1.children = [];
+        n1.height = 0;
+    }
+
+    // Draw the chart
+    function draw(g, data) {
+        const arc = d3.arc().startAngle(d => d.x0)
+                            .endAngle(d => d.x1)
+                            .innerRadius(d => d.y0)
+                            .outerRadius(d => d.height === 0 && d.depth !== 6 ? cht.w/2 : d.y1);
+        const start = arc.startAngle();
+        const end   = arc.endAngle();
+
+        const cell = g.selectAll("g.slice")
+                      .data(data)
+                      .join("g")
+                      .attr("class", "slice");
+
+        cell.append('path')
+            .attr('d', arc)
+            .attr("fill", d => d.data.color);
+
+        cell.append("text")
+            .text(d => end(d) - start(d) < .015 ? '' : d.data.id)
+            .style("text-anchor", "middle")
+            .style("fill", d => d3.hsl(d.data.color).l > 0.5 ? "black" : "white")
+            .attr("transform", d =>
+                   `translate(${arc.centroid(d)}) rotate(${(180/Math.PI * (start(d) + end(d))/2 + (d.x1 >= Math.PI/2 ? -90 : 90))})`)
+            .style("alignment-baseline", "middle");
+    }
+
+</script>
+
+</body>
+</html>

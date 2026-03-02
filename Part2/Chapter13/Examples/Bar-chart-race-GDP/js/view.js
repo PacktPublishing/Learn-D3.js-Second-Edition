@@ -1,4 +1,4 @@
-import * as d3 from "https://cdn.skypack.dev/d3@7";
+import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 import * as utils from "../../../js/chart-utils.js";
 
 import {app, dim, chart, getTransition} from "./common.js";
@@ -105,7 +105,7 @@ function createClipping() {
            .join("clipPath")
               .attr("id", d => `clip-${makeID(d)}`)
               .append("use")
-                 .attr("xlink:href", d => `#bar-${makeID(d)}`);
+                 .attr("href", d => `#bar-${makeID(d)}`);
 }
 
 /**
@@ -174,7 +174,7 @@ function joinEnter(enter, barWidth) {
         enterGrp.append("image")
             .attr("class", "bar")
             .attr("preserveAspectRatio", app.img.svgAspectRatio)
-            .attr("xlink:href", d => icon(d.name))
+            .attr("href", d => icon(d.name))
             .attr("height", app.scale.y.bandwidth())
             .attr("width", app.scale.y.bandwidth() * (1 + app.img.extraWidth))
             .attr("x", d => barWidth(d) - app.scale.y.bandwidth() * (1 + app.img.extraWidth))

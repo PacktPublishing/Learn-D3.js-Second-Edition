@@ -16,7 +16,7 @@
 <body>
 <h1>Horizontal dendrogram</h1>
 <script type="module">
-    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
     import {cht, chart, root} from "./js/treedata-json.js";
 
     // labels and sorting
@@ -65,6 +65,9 @@
                 .style("font-size", d => 14 + (d.height*d.height));
     }
 
+    // To allow inspection in the browser console
+    window.root = root;
+    window.d3 = d3;
 </script>
 </body>
 </html>

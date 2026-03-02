@@ -19,7 +19,7 @@
 </head>
 <body>
 <script type="module">
-    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 
     const svg = d3.create("svg")
                   .attr("width", 800)
@@ -40,7 +40,7 @@
             .attr("rotate", "auto")
             .attr("repeatCount", "indefinite")
             .append("mpath")
-                .attr("xlink:href", "#road");
+                .attr("href", "#road");
 
     d3.select("body").append(() => svg.node());
 </script>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Horizontal partition: left to right</title>
+    <style>
+        rect {
+            stroke: white;
+            stroke-width: 1;
+        }
+        text {
+            font-family: 'Arial narrow', sans-serif;
+            text-anchor: middle;
+            fill: white;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+<h1>Horizontal layered partition: left to right</h1>
+<p>Horizontal layered partitions don't look like icicles or flames, but they may be more convenient in some visualizations. Swap vertical and horizontal coordinates to obtain this effect. This example draws the partitions from left to right. See commented source-code for details.</p>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+    import {cht, chart, root} from "./js/treedata-json.js";
+
+    root.sort((a,b) => d3.ascending(a.height, b.height))
+        .sum(d => d.weight);  // adding values
+
+    // Generate partition properties (x0, y0, x1, y1) for each node in root
+    d3.partition().size([cht.h, cht.w])(root);  // x,y swapped
+
+    const nodes = root.descendants();
+    const color = d3.scaleOrdinal(d3.schemeCategory10).domain(d3.extent(nodes, n => n.depth));
+    const font = d3.scaleLinear()
+                   .domain(d3.extent(root.descendants(), d => d.depth).reverse())
+                   .range([14,30]);
+
+    drawPartition();
+    drawLabels();
+
+    function drawPartition() {
+        chart.selectAll("rect")
+             .data(nodes)
+                .join("rect")
+                    .attr("x", d => d.y0)   // x0 and y0 swapped
+                    .attr("y", d => d.x0)
+                    .attr("width", d => d.y1 - d.y0)
+                    .attr("height", d => d.x1 - d.x0)
+                    .style("fill", d => color(d.depth));
+    }
+
+    function drawLabels() {
+        const label = chart.selectAll("text")
+            .data(nodes)
+              .join("text")
+                .attr("x", d => (d.y0 + d.y1) / 2)  // x0 and y0 swapped
+                .attr("y", d => (d.x0 + d.x1) / 2 + 8);
+
+        label.append("tspan")
+            .text(d => d.x1 - d.x0 > 20 ? d.data.id : '')
+            .style("font-size", d => font(d.depth));
+        label.append("tspan")
+            .attr("dx", "3em")
+            .attr("x", d => (d.y0 + d.y1) / 2)
+            .text(d => !d.children && d.x1 - d.x0 > 20 ? d.data.weight : '');
+    }
+
+    // To allow inspection in the browser console
+    window.root = root;
+</script>
+</body>
+</html>

@@ -74,7 +74,7 @@ We will start with an `index.html` file, a CSS file, and three modules, which al
 The `common.js` module contains the global settings for the application. It exports a `chart` object, which will contain the data used by the application and controls to change the views, a `dim` object with dimensions and margins, and an `app` object with a few global constants and scale functions:
 
 ```js
-import * as d3 from "https://cdn.skypack.dev/d3@7";
+import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 
 export { app, dim, chart };
 
@@ -99,7 +99,7 @@ The height of the chart will be determined by the number of bars and the desired
 The `view.js` module exports a `draw()` function that creates the `<svg>.chart` container, places a `<text>.step.label` object for the year label at bottom-right, and appends the `<g>.entries` container for the bars:
 
 ```js
-import * as d3 from "https://cdn.skypack.dev/d3@7";
+import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 import {dim} from "./common.js";
 
 const svg = d3.select("body").append("svg").attr("class", "chart");
@@ -137,7 +137,7 @@ The full code is in [`StepByStep/step-1-setup/`](../StepByStep/step-1-setup/), w
 The `data.js` module will contain everything related to data (except for the data URL, which will be placed in `main.js`). It should import D3 and the `app` and `chart` objects from `common.js`:
 
 ```js
-import * as d3 from "https://cdn.skypack.dev/d3@7";
+import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 import {app, chart} from "./common.js";
 ```
 

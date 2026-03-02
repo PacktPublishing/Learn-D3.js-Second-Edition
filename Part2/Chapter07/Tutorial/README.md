@@ -12,7 +12,7 @@ This is a small application, so we will use a single HTML file to contain the co
 
 ```js
 <script type="module">
-    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
     const dataFile = "../data/rain_sao_paulo_tidy.csv";   // check if file location is correct
 </script>
 ```

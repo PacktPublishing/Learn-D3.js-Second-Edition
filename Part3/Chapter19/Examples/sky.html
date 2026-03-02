@@ -3,13 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz">
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/d3-geo-projection@4"></script>
-    <script type="module" src="../JavaScript/planetary-positions.js"></script>
     <style>
         text {
-            font-family: "Yanone Kaffeesatz", sans-serif;
+            font-family: "Arial Narrow", sans-serif;
             font-size: 10px;
             font-weight: 100;
             alignment-baseline: middle;
@@ -18,7 +14,12 @@
 </head>
 <body>
 <script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+    const d3 = Object.assign({}, d3_all, d3_geo_projection);
+
     import astro from "../JavaScript/planetary-positions.js";
+
     const width = 1152;
     const height = 600;
 
