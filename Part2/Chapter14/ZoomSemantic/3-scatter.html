@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Geometric zoom transform rescaling</title>
+    <title>A simple scatterplot with axes</title>
     <style>
         svg {
             border: solid 1px lightgray;
@@ -17,29 +17,27 @@
     </style>
 </head>
 <body>
-<h2>Geometric zoom transform rescaling</h2>
+<h2>A simple scatterplot with axes</h2>
 <svg></svg>
-<p>Zoom: <span id="k">0.00</span>x</p>
 <script type="module">
     import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
     import * as utils from "../js/chart-utils.js";
 
     // DATA
-    // The cluster: a normal distribution of 10000 points
+    // The cluster: a normal distribution of 25000 points
     const data1 = d3.range(25000).map(() => ({
         x: d3.randomNormal(50, 2)(),
         y: d3.randomNormal(50, 3)(),
         n: d3.randomExponential(1/100)() / 600
     }));
 
-    // The background: a uniform distribution of 10000 points
+    // The background: a uniform distribution of 25000 points
     const data2 = d3.range(25000).map(() => ({
         x: d3.randomUniform(0, 100)(),
         y: d3.randomUniform(0, 100)(),
         n: d3.randomExponential(1/100)() / 600
     }));
     const data = data1.concat(data2);
-    console.log(d3.extent(data, d => d.n));
 
 
     // CHART dimensions
@@ -58,7 +56,7 @@
                       .attr("width", cht.width)
                       .attr("height", cht.height);
 
-    // 3) This is the zoomable container (plot the data here)
+    // 3) This is the data container (you can make it zoomable)
     const container = chart.append("g");
 
     // 4) This is an opaque rectangle, to allow dragging and selecting from empty areas
@@ -90,7 +88,7 @@
            .join("circle")
               .attr("cx", d => xScale(d.x))
               .attr("cy", d => yScale(d.y))
-              .attr("r", d => d.n)
+              .attr("r", d => radius(d,1))
               .style("fill", "black");
 
     // ZOOM
@@ -103,10 +101,21 @@
         .on("zoom", evt => {
             container.attr("transform", evt.transform)
                      .selectAll("circle")
-                         .attr("r", d => d.n);
+                         .attr("r", d => radius(d, evt.transform.k));
             d3.select("#k").text(d3.format(".2f")(evt.transform.k));
             updateAxes(evt.transform);
         }));
+
+    // Semantic radius function
+    function radius(d, k) {
+        if(d.n * k > 1) {
+            return 1/k + d.n * k / 2000;
+        } else if(d.n * k < 0.02) {
+            return 0;
+        } else {
+            return d.n/k;
+        }
+    }
 
     // Update graphical elements based on the new scales and data
     function updateAxes(transform) {

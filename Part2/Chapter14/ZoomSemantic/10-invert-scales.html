@@ -23,7 +23,7 @@
 <p class="stats">Zoom: <span id="zoom">1</span>x.</p>
 <script type="module">
     import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
-    import {makeChart, drawGrid, drawSquare} from "../js/grid-squares.js";
+    import {makeChart, drawGrid} from "../js/grid-squares.js";
 
     const chart = makeChart(25,450,350);
     drawGrid(chart.width, chart.height);
@@ -49,11 +49,9 @@
     // Since a scale is used, two inversions are needed
     d3.select(".chart")
         .on("click", function(evt) {
-            const [screenX, screenY] = d3.pointer(evt);
-            const scaleX = currentTransform.rescaleX(scale.x);
-            const scaleY = currentTransform.rescaleY(scale.y);
-            const [x,y] = [scaleX.invert(screenX), scaleY.invert(screenY)];  // invert scale to data coordinates
-            dots.push([x,y]);
+            const [screenX, screenY] = currentTransform.invert(d3.pointer(evt));         // invert transform to screen coordinates
+            const [x, y] = [scale.x.invert(screenX), scale.y.invert(screenY)];  // invert scale to data coordinates
+            dots.push([x, y]);
             update();
         });
 

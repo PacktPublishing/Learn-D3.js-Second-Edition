@@ -80,14 +80,12 @@
     // Rescale the chart based on the brush selection
     function rescale([start, end]) {
         // get domain values from the selection
-        const x0 = xScale.invert(start[0]);
-        const y1 = yScale.invert(start[1]);  // inverse direction for y
-        const x1 = xScale.invert(end[0]);
-        const y0 = yScale.invert(end[1]);    // inverse direction for y
+        const xDomain = [xScale.invert(start[0]), xScale.invert(end[0])];
+        const yDomain = [yScale.invert(end[1]), yScale.invert(start[1])];    // inverse direction for y
 
         // update the scale domains and the axes
-        xScale.domain([x0, x1]);
-        yScale.domain([y0, y1]);
+        xScale.domain(xDomain);
+        yScale.domain(yDomain);
     }
 
     // Update graphical elements based on the new scales and data

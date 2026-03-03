@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Zoom transform rescaling</title>
+    <title>Semantic zoom transform rescaling</title>
     <style>
         svg {
             border: solid 1px lightgray;
@@ -14,17 +14,11 @@
             font-family: sans-serif;
             font-size: 14px;
         }
-        canvas, #svg {
-            position: absolute;
-            top: 60px;
-            left: 10px;
-        }
     </style>
 </head>
 <body>
-<h2>Zoom transform rescaling</h2>
-<svg id="svg"></svg>
-<canvas></canvas>
+<h2>Semantic zoom transform rescaling</h2>
+<svg></svg>
 <p>Zoom: <span id="k">0.00</span>x</p>
 <script type="module">
     import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
@@ -46,24 +40,32 @@
     }));
     const data = data1.concat(data2);
 
+
     // CHART dimensions
     const dim = {width: 800, height: 500, margin: 50};
     const cht = {width: dim.width - 2*dim.margin, height: dim.height - 2*dim.margin};
 
-    // CANVAS for the points
-    const canvas = d3.select("canvas")
-                     .style("margin", `${dim.margin}px`);
-    const ctx = canvas.node().getContext("2d");
-
     // LAYERS for zooming
-    // 1) Add the axes to this <g> layer
-    const layer = d3.select("#svg")
+    // 1) Add the axes to this <g> context layer
+    const context = d3.select("svg")
                   .attr("width", dim.width).attr("height", dim.height)
                   .append("g")
                      .attr("transform", `translate(${dim.margin}, ${dim.margin})`)
 
     // 2) This is the fixed SVG for the chart (within the axes' bounds)
-    canvas.attr("width", cht.width).attr("height", cht.height)
+    const chart = context.append("svg")
+                      .attr("width", cht.width)
+                      .attr("height", cht.height);
+
+    // 3) This is the zoomable container (plot the data here)
+    const container = chart.append("g");
+
+    // 4) This is an opaque rectangle, to allow dragging and selecting from empty areas
+    container.append("rect")
+        .attr("width", cht.width)
+        .attr("height", cht.height)
+        .style("fill", "white")
+        .style("pointer-events", "all");
 
     // SCALES
     // Scales are relative to the chart
@@ -76,58 +78,46 @@
 
     // We will need the axes to update them after zooming
     const [xAxis, yAxis] = utils.cartesianAxes()
-                                .container(layer)
-                                .xScale(xScale)
-                                .yScale(yScale)();
+        .container(context)
+        .xLabel("").yLabel("")
+        .xScale(xScale)
+        .yScale(yScale)();
 
-    // Zooming parameters
-    let currentTransform = d3.zoomIdentity;
-    let isRendering = false; // flag to prevent rendering while zooming (performance)
+    d3.selectAll("text").style("font-size", "15px");
 
+    // SCATTERPLOT
     // Plot the points in the container
-    paint();
+    container.selectAll("circle")
+        .data(data)
+           .join("circle")
+              .attr("cx", d => xScale(d.x))
+              .attr("cy", d => yScale(d.y))
+              .attr("r", d => radius(d,1))
+              .style("fill", "black");
 
-    // Configure the zoom behavior
+    // ZOOM
+    // Configure the zoom behavior and call it from the chart
     const zextent = [[0, 0],[cht.width, cht.height]];
-    canvas.call(d3.zoom()
+    chart.call(d3.zoom()
         .extent(zextent)
         .translateExtent(zextent)
         .scaleExtent([1,100])
         .on("zoom", evt => {
-            currentTransform = evt.transform;
-            if (!isRendering) {
-                isRendering = true;
-                requestAnimationFrame(() => paint()); // improve performance for rendering
-            }
-
-            d3.select("#k").text(d3.format(".2f")(currentTransform.k));
-            updateAxes();
+            container.attr("transform", evt.transform)
+                     .selectAll("circle")
+                         .attr("r", d => radius(d, evt.transform.k));
+            d3.select("#k").text(d3.format(".2f")(evt.transform.k));
         }));
 
-    // Update graphical elements based on the new scales and data
-    function updateAxes() {
-        xAxis.scale(currentTransform.rescaleX(xScale));
-        yAxis.scale(currentTransform.rescaleY(yScale));
-        d3.select(".x-axis").call(xAxis);
-        d3.select(".y-axis").call(yAxis);
-    }
-
-    // CANVAS: Paint the points
-    function paint() {
-        isRendering = false;
-        const {x, y, k} = currentTransform;
-
-        ctx.save();
-        ctx.clearRect(0, 0, cht.width, cht.height);
-        ctx.translate(x, y);
-        ctx.scale(k, k);
-        data.forEach(d => {
-            ctx.beginPath();
-            ctx.arc(xScale(d.x), yScale(d.y), d.n, 0, 2*Math.PI);
-            ctx.fillStyle = "black";
-            ctx.fill();
-        });
-        ctx.restore();
+    // Semantic radius function
+    function radius(d, k) {
+        if(d.n * k > 1) {
+            return 1/k + d.n * k / 2000;
+        } else if(d.n * k < 0.02) {
+            return 0;
+        } else {
+            return d.n/k;
+        }
     }
 
 </script>

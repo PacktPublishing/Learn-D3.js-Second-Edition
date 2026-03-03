@@ -79,8 +79,11 @@
     // We will need the axes to update them after zooming
     const [xAxis, yAxis] = utils.cartesianAxes()
                                 .container(context)
+                                .xLabel("").yLabel("")
                                 .xScale(xScale)
                                 .yScale(yScale)();
+
+    d3.selectAll("text").style("font-size", "15px");
 
     // SCATTERPLOT
     // Plot the points in the container
@@ -127,6 +130,7 @@
         // Update the axes
         d3.select(".x-axis").call(xAxis);
         d3.select(".y-axis").call(yAxis);
+        d3.selectAll("text").style("font-size", "15px");
     }
 
 </script>

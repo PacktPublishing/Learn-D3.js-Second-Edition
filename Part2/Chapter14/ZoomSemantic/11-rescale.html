@@ -23,13 +23,18 @@
 <p class="stats">Zoom: <span id="zoom">1</span>x.</p>
 <script type="module">
     import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
-    import {makeChart, drawGrid, drawSquare} from "../js/grid-squares.js";
+    import {makeChart, drawGrid} from "../js/grid-squares.js";
 
     const chart = makeChart(25,450,350);
     drawGrid(chart.width, chart.height);
 
-    const dots = [[241,106],[298,172],[327,292],[71,104],[170,180],[354,46],[87,238],[227,248],[190,127],[329,112]];
+    const dots = [[2.5,1],[3,1.7],[3.2,2.9],[0.7,1],[1.7,1.8],[3.5,0.5],[0.9,2.4],[2.3,2.5],[1.9,1.3],[3.3,1.1]];
     const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+    const scale = {
+        x: d3.scaleLinear().domain([0,4]).range([0, chart.width]),
+        y: d3.scaleLinear().domain([0,3]).range([0, chart.height])
+    }
 
     // Creating an invisible tooltip attached to the fixed context layer
     d3.select(".context")
@@ -41,11 +46,13 @@
 
     update(); // Initial update
 
-    // Add new points
+    // Since a scale is used, two inversions are needed
     d3.select(".chart")
         .on("click", function(evt) {
-            const [x,y] = d3.pointer(evt);
-            //const [x,y] = currentTransform.invert(d3.pointer(evt));
+            const [screenX, screenY] = d3.pointer(evt);
+            const scaleX = currentTransform.rescaleX(scale.x);
+            const scaleY = currentTransform.rescaleY(scale.y);
+            const [x,y] = [scaleX.invert(screenX), scaleY.invert(screenY)];  // invert scale to data coordinates
             dots.push([x,y]);
             update();
         });
@@ -75,8 +82,8 @@
             .selectAll("circle")
             .data(dots, d => d)
             .join("circle")
-            .attr("cx", d => d[0])
-            .attr("cy", d => d[1])
+            .attr("cx", d => scale.x(d[0]))
+            .attr("cy", d => scale.y(d[1]))
             .attr("r", k < 0.5 ? 2.5/k : 5/k)  // semantic radius
             .style("fill", color)
             .style("stroke", "black")
@@ -84,9 +91,9 @@
             .on("pointerover", function(evt, d) {
                 d3.select(this).style("stroke", "red");
                 d3.select(".tooltip")
-                    .text(`(${d[0].toFixed(0)},${d[1].toFixed(0)})`)
+                    .text(`(${d[0].toFixed(1)},${d[1].toFixed(1)})`)
                     .style("opacity", 1)
-                    .attr("transform", `translate(${[currentTransform.apply(d)]})`)
+                    .attr("transform", `translate(${[currentTransform.apply([scale.x(d[0]), scale.y(d[1])])]})`)
                     //.attr("transform", `translate(${d})`)
             })
             .on("pointerout", function(evt, d) {
