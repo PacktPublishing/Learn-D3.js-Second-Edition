@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Drawing a GeoJSON as a single MultiPolygon</title>
     <style>
         svg {border: solid 1px gray;}
         .continent {
@@ -11,15 +11,18 @@
     </style>
 </head>
 <body>
+<h1>Drawing a GeoJSON as a single MultiPolygon containing 5 polygons (see JSON file)</h1>
+<p>The polygons are three lakes, one island and one continent.</p>
 <script type="module">
     import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 
     const width = 960;
     const height = 500;
 
+    const dataFile = '../data/geojson/africa-simple-multipolygon.geojson';
+
     // This is a simplified GeoJSON file - look at its contents!
-    d3.json('../Data/africa-simple-multipolygon.geojson')
-            .then(function(data) {
+    d3.json(dataFile).then(function(data) {
 
         console.log(data);
 
@@ -29,10 +32,9 @@
         const geoPath = d3.geoPath()
                 .projection(d3.geoMercator());
 
-        svg.selectAll("path").attr("class", "continent")
+        svg.selectAll(".continent")
                 .data(data.features)
-                .enter()
-                .append("path")
+                .join("path").attr("class", "continent")
                 .attr('d', geoPath);
     })
 </script>

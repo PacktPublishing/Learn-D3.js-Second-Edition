@@ -2,23 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Drawing a complete geojson file with outlines of african countries</title>
     <style>
+        svg {border: solid 1px gray;}
         .country {
             stroke: white;
+            stroke-width: .5px;
         }
     </style>
 </head>
 <body>
+<h1>Drawing a complete geojson file with outlines of african countries</h1>
+<p>The viewport fits the entire world in the Mercator projector, but only the African continent is drawn, as the geojson file only contains data for Africa.</p>
 <script type="module">
     import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 
     const width = 960;
     const height = 500;
 
+    const dataFile = '../data/africa/africa.geojson';
+
     // This file contains outlines of african countries
-    d3.json('../Data/africa.geojson')
-            .then(function(data) {
+    d3.json(dataFile).then(function(data) {
 
         const color = d3.scaleOrdinal(d3.schemeCategory10);
         const svg = d3.select("body").append("svg")
@@ -26,9 +31,10 @@
 
         const geoPath = d3.geoPath().projection(d3.geoMercator());
 
-        svg.selectAll("path").attr("class", "country")
-                .data(data.features).enter()
-                .append("path").attr('d', geoPath)
+        svg.selectAll(".country")
+                .data(data.features)
+                .join("path").attr("class", "country")
+                .attr('d', geoPath)
                 .style("fill", (d,i) => color(i))
     })
 </script>

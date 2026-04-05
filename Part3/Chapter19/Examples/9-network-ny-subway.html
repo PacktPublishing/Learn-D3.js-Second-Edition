@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>New York subway map overlay</title>
+    <style>
+        text {
+            font-family: "Arial Narrow", sans-serif;
+        }
+        .parallels, .meridians {
+            font-weight: 100;
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as topojson from 'https://cdn.skypack.dev/topojson-client@3';
+
+    const width = 960;
+    const height = 500;
+
+    const dataFiles = new Map([
+        ["land", '../data/ny/nyc.topojson'],
+        ["subway", '../data/ny/nyc_subway.geojson']
+    ]);
+
+    const color = d3.scaleOrdinal(d3.schemeGreens[9]);
+    const svg = d3.select("body").append("svg")
+            .attr("width", width).attr("height", height);
+    d3.select("svg").append("g").attr("id", "tiles");
+
+    const projection = d3.geoMercator()
+            .center([-73.8,40.74])
+            .scale(40000)
+    const geoPath = d3.geoPath().projection(projection);
+
+    const map = {};
+
+    Promise.all([
+        d3.json(dataFiles.get("land")),
+        d3.json(dataFiles.get("subway"))
+    ])
+    .then(([land, subway]) =>  {
+
+        map.topology   = land.objects['nyc'];
+        map.geometries = map.topology.geometries;
+        map.features   = topojson.feature(land, map.topology).features;
+        map.merge      = topojson.merge(land, map.geometries)
+
+        drawGraticules();
+        drawLand();
+        drawSubway(subway)
+
+    });
+
+    const lines = [
+        {id: '1', color: 'red'},
+        {id: '2', color: 'red'},
+        {id: '3', color: 'red'},
+        {id: 'A', color: 'blue'},
+        {id: 'C', color: 'blue'},
+        {id: 'E', color: 'blue'},
+        {id: 'B', color: 'orange'},
+        {id: 'D', color: 'orange'},
+        {id: 'F', color: 'orange'},
+        {id: 'V', color: 'orange'},
+        {id: 'R', color: 'yellow'},
+        {id: 'N', color: 'yellow'},
+        {id: 'Q', color: 'yellow'},
+        {id: 'W', color: 'yellow'},
+        {id: '4', color: 'green'},
+        {id: '5', color: 'green'},
+        {id: '6', color: 'green'},
+        {id: 'J', color: 'brown'},
+        {id: 'M', color: 'brown'},
+        {id: 'Z', color: 'brown'},
+        {id: 'L', color: 'gray'},
+        {id: '7', color: 'purple'},
+        {id: 'S', color: 'black'},
+        {id: 'G', color: 'black'}
+    ]
+
+    const colors = lines.map(d => d.color);
+    const names = lines.map(d => d.id);
+    const color = d3.scaleOrdinal().range(lines.map(colors)).domain(lines.map(names));
+
+    function drawLand() {
+        svg.append("g").attr("class","land")
+                .datum(map.merge)
+                .style("fill", "gray")
+                .attr("opacity", .4)
+                .append("path")
+                    .attr('d', geoPath)
+                    .style("stroke", "white")
+    }
+
+    function drawSubway(data) {
+        svg.selectAll("g.subway")
+                .data(data.features)
+                .join("g")
+                .attr("class","subway")
+                .style("fill", "none")
+                .style("stroke", d => names.indexOf(d.properties.name) >= 0 ? color(d.properties.name) : 'gray')
+                .style("stroke-width", 2)
+                .append("path")
+                .attr('d', geoPath)
+    }
+
+    const format = d3.format(".1f");
+
+    function drawGraticules() {
+        const bounds = d3.geoBounds(map.merge);
+
+        const graticule = d3.geoGraticule().extent(bounds).step([.1,.1]);
+
+        console.log(graticule.lines())
+
+        const meridians = graticule.lines().filter(d => d.coordinates[0][0] === d.coordinates[1][0]);
+        const parallels = graticule.lines().filter(d => d.coordinates[0][1] === d.coordinates[1][1]);
+
+
+        svg.append("g").attr("class","graticule")
+                .datum(graticule())
+                .style("fill", 'none')
+                .append("path")
+                .attr('d', geoPath)
+                .style("stroke", "gray")
+                .style('stroke-width', .25);
+
+        // graticule labels
+        svg.selectAll("text.parallels")
+                .data(parallels)
+                .join("text").attr("class","parallels")
+                .attr("transform", d => `translate(${[projection(bounds[0])[0], projection(d.coordinates[0])[1] - 5]})`)
+                .text(d => format(d.coordinates[0][1]) + '°');
+
+        svg.selectAll("text.meridians")
+                .data(meridians)
+                .join("text").attr("class","meridians")
+                .attr("transform", d => `translate(${[projection(d.coordinates[0])[0], projection(bounds[1])[1]]})`)
+                .text(d => format(d.coordinates[0][0]) + '°')
+    }
+
+</script>
+
+</body>
+</html>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Drawing lines and shapes with GeoJSON</title>
     <style>
         svg {border: solid 1px gray;}
         .continent {
@@ -17,9 +17,9 @@
     const width = 960;
     const height = 500;
 
+    const dataFile = '../data/geojson/africa-simple.geojson';
 
-    d3.json('../data/africa-simple.geojson')
-            .then(function(data) {
+    d3.json(dataFile).then(function(data) {
 
         console.log(data);
 
@@ -33,14 +33,14 @@
                           .pointRadius(3);
 
         svg.selectAll("path.continent")
-                .data(data.features).enter()
-                .append("path").attr("class","continent")
+                .data(data.features)
+                .join("path").attr("class","continent")
                 .style("fill", (d,i) => isLine(d) ? 'none' : color(i))
                 .attr("d", geoPath);
     })
 
     function isLine(d) {
-        return d.geometry.type == 'LineString' || d.geometry.type == 'MultiLineString';
+        return d.geometry.type === 'LineString' || d.geometry.type === 'MultiLineString';
     }
 
 </script>

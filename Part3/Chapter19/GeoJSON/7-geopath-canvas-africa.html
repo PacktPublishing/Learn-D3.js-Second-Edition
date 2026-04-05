@@ -2,20 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Using d3-geo and GeoJSON with Canvas to draw a map</title>
     <style>
         canvas {border: solid 1px gray;}
     </style>
 </head>
 <body>
+<h1>Using d3-geo and GeoJSON with Canvas to draw a map</h1>
+<p>This map is renderes on a Canvas, instead of SVG, but it also uses d3-geo to compute the projection.</p>
 <script type="module">
     import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 
     const width = 960;
     const height = 500;
 
-    d3.json('../Data/africa-simple-multipolygon.geojson')
-            .then(function(data) {
+    const dataFile = '../data/geojson/africa-simple-multipolygon.geojson';
+
+    d3.json(dataFile).then(function(data) {
 
         console.log(data);
 

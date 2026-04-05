@@ -1,0 +1,11 @@
+text {
+    font-family: "Arial narrow", sans-serif;
+}
+text.parallels, text.meridians {
+    font-size: 12px;
+    fill-opacity: .4
+}
+.highlight, .highlight path {
+    fill: lightgreen;
+    fill-opacity: 1;
+}

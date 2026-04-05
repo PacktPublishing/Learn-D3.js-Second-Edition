@@ -1,0 +1,12 @@
+svg {
+    background-color: #074268;
+}
+path.country {
+    stroke: white;
+    stroke-width: .7px;
+    fill: rgba(192, 140, 7, .4);
+}
+circle.city {
+    fill: lightyellow;
+    opacity: 0.5;
+}

@@ -1,0 +1,11 @@
+@import url('tooltips.css');
+
+svg {
+    background-color: darkgray;
+}
+path.country {
+    stroke: white;
+    stroke-width: .7px;
+    fill: darkslategray;
+}
+

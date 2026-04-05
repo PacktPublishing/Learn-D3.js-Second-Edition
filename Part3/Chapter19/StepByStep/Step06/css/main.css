@@ -1,0 +1,8 @@
+svg {
+    background-color: darkgray;
+}
+path.country {
+    stroke: darkslategray;
+    stroke-width: .7px;
+    fill: rgba(192, 140, 7, .4);
+}

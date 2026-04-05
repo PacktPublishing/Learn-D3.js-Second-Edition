@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Using GeoJSON to draw other shapes on a sphere</title>
     <style>
         svg {border: solid 1px gray;}
         .shape {
@@ -12,16 +12,18 @@
     </style>
 </head>
 <body>
+<h1>Using GeoJSON to draw other shapes on a sphere</h1>
+<p>Take a look at the GeoJSON file!</p>
 <script type="module">
     import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
 
     const width = 960;
     const height = 500;
 
+    const dataFile = '../data/geojson/border-example.geojson';
 
     // This file contains simple shapes on a sphere
-    d3.json('../Data/border-example.geojson')
-            .then(function(data) {
+    d3.json(dataFile).then(function(data) {
 
         console.log(data);
 
@@ -34,9 +36,7 @@
 
         svg.selectAll("g.shape")
                 .data(data.features)
-                .enter()
-                .append("g")
-                .attr("class","shape")
+                .join("g").attr("class","shape")
                 .style("fill", (d,i) => color(i))
                 .append("path")
                     .attr('d', geoPath)
