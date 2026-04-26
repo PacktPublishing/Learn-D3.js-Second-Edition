@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fitting in the viewport by extent</title>
+    <link rel="stylesheet" href="../css/projection-config.css">
+    <link rel="stylesheet" href="../../css/maps.css">
+</head>
+<body>
+<h1>Fitting in the viewport by extent</h1>
+<p>Using <code>fitExtent([[25,25], [dim.width-25, dim.height-25]], {type: "Sphere"})</code> to fit the entire globe by
+    the smallest dimension (height or width) in the viewport.</p>
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+    const d3 = Object.assign({}, d3_all, d3_geo_projection);
+    import {map, makeMap} from "../../js/maps.js";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../../data/world/world-medres.topojson";
+    const key  = "world";
+
+    map.projection = d3.geoMercator()
+                        .translate([120,45])  // these are ignored because of fitXXX
+                        .scale(300)           // these are ignored because of fitXXX
+                        .center([50,50])      // these are ignored because of fitXXX
+                        .fitExtent([[25,25], [map.dim.width-25, map.dim.height-25]], {type: "Sphere"});
+
+    map.geoPath = d3.geoPath().projection(map.projection);
+    makeMap(file, key);
+</script>
+
+</body>
+</html>

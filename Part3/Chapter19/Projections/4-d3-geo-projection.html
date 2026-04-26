@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>d3-geo-projection</title>
+    <link rel="stylesheet" href="../css/tissot.css">
+    <link rel="stylesheet" href="css/projections.css">
+</head>
+<body>
+<h1>All projections from <code>d3-geo-projection</code></h1>
+<p>Choose a projection from the list. Projections are using default parameters.</p>
+<div class="container">
+    <div id="sidebar">
+        <ol></ol>
+    </div>
+    <svg id="map" width="960" height="500">
+        <defs/>
+    </svg>
+</div>
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+    const d3 = Object.assign({}, d3_all, d3_geo_projection);
+    import * as map from "./js/projections.js";
+
+    const width = 960, height = 500;
+    const dataFile = '../data/world/world-lowres.topojson';
+
+    const all = [
+        "geoAitoff",
+        "geoArmadillo",
+        "geoAugust",
+        "geoBaker",
+        "geoBertin1953",
+        "geoBoggs",
+        "geoBonne",
+        "geoBottomley",
+        "geoBromley",
+        "geoChamberlinAfrica",
+        "geoCollignon",
+      //  "geoCraig",
+        "geoCraster",
+        "geoCylindricalEqualArea",
+        "geoCylindricalStereographic",
+        "geoEckert1",
+        "geoEckert2",
+        "geoEckert3",
+        "geoEckert4",
+        "geoEckert5",
+        "geoEckert6",
+        "geoEisenlohr",
+        "geoFahey",
+        "geoFoucaut",
+        "geoFoucautSinusoidal",
+        "geoGilbert",
+        "geoGinzburg4",
+        "geoGinzburg5",
+        "geoGinzburg6",
+        "geoGinzburg8",
+        "geoGinzburg9",
+        "geoGringorten",
+        "geoGuyou",
+        "geoHammer",
+        "geoHammerRetroazimuthal",
+        "geoHill",
+        "geoHomolosine",
+        "geoHufnagel",
+        "geoHyperelliptical",
+        "geoKavrayskiy7",
+        "geoLagrange",
+        "geoLarrivee",
+        "geoLaskowski",
+      //  "geoLittrow",
+        "geoLoximuthal",
+        "geoMiller",
+        "geoModifiedStereographicAlaska",
+        "geoModifiedStereographicGs48",
+        "geoModifiedStereographicGs50",
+        "geoModifiedStereographicMiller",
+        "geoModifiedStereographicLee",
+        "geoMollweide",
+        "geoMtFlatPolarParabolic",
+        "geoMtFlatPolarQuartic",
+        "geoMtFlatPolarSinusoidal",
+        "geoNaturalEarth2",
+        "geoNellHammer",
+        "geoNicolosi",
+        "geoPatterson",
+        "geoPolyconic",
+        "geoRectangularPolyconic",
+        "geoRobinson",
+        "geoSatellite",
+        "geoSinusoidal",
+        "geoSinuMollweide",
+        "geoTimes",
+        "geoTwoPointAzimuthalUsa",
+        "geoVanDerGrinten",
+        "geoVanDerGrinten2",
+        "geoVanDerGrinten3",
+        "geoVanDerGrinten4",
+        //"geoWagner",
+        "geoWagner4",
+        "geoWagner6",
+        //"geoWagner7",
+        "geoWiechel",
+        "geoWinkel3",
+        "geoInterruptedQuarticAuthalic",
+        "geoGringortenQuincuncial",
+        "geoPeirceQuincuncial",
+
+        // Prefer these from d3-geo-polygon, as they won't require clipping.
+        "geoPolyhedralButterfly",
+        "geoPolyhedralCollignon",
+        "geoPolyhedralWaterman",
+        "geoBerghaus",
+        "geoGingery",
+        "geoHealpix",
+        "geoInterruptedBoggs",
+        "geoInterruptedHomolosine",
+        "geoInterruptedMollweide",
+        "geoInterruptedMollweideHemispheres",
+        "geoInterruptedSinuMollweide",
+        "geoInterruptedSinusoidal",
+        "geoTwoPointEquidistantUsa",
+    ];
+
+    const projections = all.map(p => {
+        return {
+            name: p.split("geo")[1],
+            projection: d3[p]().fitExtent([[10,10], [width-20, height-20]], {type: "Sphere"}),
+            tissot: {radius: 2, stepLon: 30, stepLat: 10, maxLon: 180, maxLat: 90}
+        }
+    });
+
+    // Using the same file for all maps
+    projections.map(p => {p.file = "world/world-medres.topojson"; p.key= "world"; return p;});
+
+    // rotate Quincuncial at [0,89,0] to avoid winding error at the poles caused by this topojson file.
+    projections.filter(p => p.name.endsWith("Quincuncial")).forEach(p => p.projection.rotate([0,-89,0]));
+    projections.filter(p => p.name.startsWith("Wiechel")).forEach(p => p.projection.rotate([0,-89,0]));
+
+    // Create menu
+    projections.forEach(function(d,i) {
+        d3.select("#sidebar ol")
+                .append("li")
+                .attr("id", "p"+i)
+                .on("mouseover", () => map.updateMap(d, i))
+        .text(d.name);
+    })
+
+    map.showMap(projections[0], 0, true); // true = apply clipping (remove to see the effect on interrupted projections)
+</script>
+
+</body>
+</html>

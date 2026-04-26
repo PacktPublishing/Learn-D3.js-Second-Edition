@@ -1,0 +1,22 @@
+svg {
+    background: lightgray;
+    border: solid 1px gray;
+}
+line.axes {
+    stroke: red;
+    stroke-width: 1;
+}
+
+.clipped .background {
+    fill: gold;
+    fill-opacity: 1;
+}
+
+.clipped .outline {
+    stroke: red;
+}
+
+.clipped .feature path {
+    fill: red;
+    stroke: white;
+}

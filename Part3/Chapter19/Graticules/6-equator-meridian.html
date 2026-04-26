@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Default graticule with overlay equator and meridian</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<h1>Default graticule with overlay equator and meridian</h1>
+<p>This examples uses three graticules to draw a default grid, the equator and the main meridians as separate
+objects, which allow separate styling.</p>
+<script type="module">
+    import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+    import {map, createProjectionSwitcher, updateMap} from "./js/maps.js";
+
+    map.dim = {width: 960, height: 500};
+    map.view = d3.select("body").append("svg").attr("width", map.dim.width).attr("height", map.dim.height);
+    map.projection = d3.geoMercator();
+    map.geoPath = d3.geoPath().projection(map.projection);
+
+    createProjectionSwitcher((evt, projections) => {
+        map.projection = projections[+evt.target.value].config;
+        map.geoPath.projection(map.projection);
+        updateMap();
+    });
+
+    // background
+    map.view.append("path").attr("class","background")
+       .datum({type: "Sphere"})
+          .attr("d", map.geoPath);
+
+    // 10 degree default graticule
+    // graticule
+    map.view.append("path").attr("class","graticule")
+        .datum(d3.geoGraticule())
+        .attr("d", map.geoPath);
+
+    // overlay the equator graticule styled differently (via CSS)
+    map.view.append("path").attr("class","graticule equator")
+        .datum(d3.geoGraticule().step([0,90]))     // just render the equator
+        .attr("d", map.geoPath);
+
+    // overlay the meridian graticule styled differently (via CSS)
+    map.view.append("path").attr("class","graticule meridian")
+        .datum(d3.geoGraticule().step([180,0]))    // just render the prime and anti meridians
+        .attr("d", map.geoPath);
+</script>
+
+</body>
+</html>

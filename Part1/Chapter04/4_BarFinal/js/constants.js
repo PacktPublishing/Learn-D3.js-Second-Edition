@@ -1,4 +1,4 @@
-import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 const dim = {width: 600, height: 300};
 

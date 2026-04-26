@@ -5,7 +5,7 @@
  * Version 3.0.1 2026-02-19 (improved performance of matrixToLinks and linksToMatrix)
  */
 
-import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 /**
  * Converts a square matrix to a list of links in the form of {source: i, target: j, value: matrix[i,j]}

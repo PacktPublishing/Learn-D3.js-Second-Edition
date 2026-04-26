@@ -1,4 +1,4 @@
-import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import {data} from "./common-1.0.js";
 
 // Global temperatures 1880 to 2025 (Source: https://data.giss.nasa.gov/gistemp/)

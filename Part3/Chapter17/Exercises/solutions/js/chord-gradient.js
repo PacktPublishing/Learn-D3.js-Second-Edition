@@ -9,7 +9,7 @@
  * @module chord-gradient
  */
 
-import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 const gradientId = d => "grad-" + d.source.index + "-" + d.target.index;
 

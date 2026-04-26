@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Clipping a viewport in a Mercator projection</title>
+    <link rel="stylesheet" href="../../css/maps.css">
+    <link rel="stylesheet" href="../css/projection-config.css">
+    <style>
+        text {font-family: monospace}
+    </style>
+</head>
+<body>
+<h1>Clipping a viewport in a Mercator projection</h1>
+<p>Using <code>clipExtent(extent)</code> to apply clipping by defining a viewport in pixels. The light-color
+map is an underlay reference projection.</p>
+
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+    const d3 = Object.assign({}, d3_all, d3_geo_projection);
+    import {map, loadTopoJSON, renderMap} from "../../js/maps.js";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../../data/world/world-medres.topojson";
+    const key  = "world";
+
+    loadTopoJSON(file, key).then(() => {
+        drawClippedAt();  // This is the default (full extent)
+        drawClippedAt([[180,60], [300, 180]]);  // A viewport contained in the map
+        drawClippedAt([[90,60], [210, 180]]);   // A viewport that extends beyond the map boundaries
+    });
+
+    function drawClippedAt(clipExtent, highlight = true) {
+        const dim = {width: map.dim.width/2, height: map.dim.height/2};
+        const extent = [[0,5],[dim.width, dim.height-10]];
+
+        if (clipExtent === undefined) {
+            clipExtent = extent;
+        }
+
+        let refPath = null;
+        if(highlight) {
+            const refProjection = d3.geoMercator()
+                                    .fitExtent(extent, {type: "Sphere"})
+            refPath = d3.geoPath().projection(refProjection);
+        }
+
+        const projection = d3.geoMercator()
+                            .fitExtent(extent, {type: "Sphere"})
+                            .clipExtent(clipExtent);
+        const geoPath = d3.geoPath().projection(projection);
+        const svg = d3.select("body").append("svg")
+                      .attr("width", dim.width).attr("height", dim.height)
+                      .style("margin-right", "10px");
+
+        renderMap(svg.append("g").attr("class", "underlay"), refPath, dim);
+        svg.selectAll("path").style("opacity", .25);
+
+        renderMap(svg.append("g").attr("class", "clipped"), geoPath, dim);
+
+        svg.append("text")
+            .attr("y", 15).attr("x", 5).text(`clipExtent (pixels): `)
+            .append("tspan").attr("y", 35).attr("x", 5)
+            .text(`[[${clipExtent[0]}],[${clipExtent[1]}]]`);
+
+    }
+</script>
+
+</body>
+</html>

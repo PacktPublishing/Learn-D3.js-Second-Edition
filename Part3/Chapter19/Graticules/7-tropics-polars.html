@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tropics and polar circle</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<h1>Tropics and polar circle</h1>
+<p>Drawing a second graticule for the great circles (tropics, at 23.6 degrees from the equator, and polars, at 66.6 degrees) 
+    and a third one for the equator and main meridian.</p>
+<script type="module">
+    import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+    import {map, createProjectionSwitcher, updateMap} from "./js/maps.js";
+
+    map.dim = {width: 960, height: 500};
+    map.view = d3.select("body").append("svg").attr("width", map.dim.width).attr("height", map.dim.height);
+    map.projection = d3.geoMercator();
+    map.geoPath = d3.geoPath().projection(map.projection);
+
+    createProjectionSwitcher((evt, projections) => {
+        map.projection = projections[+evt.target.value].config;
+        map.geoPath.projection(map.projection);
+        updateMap();
+    });
+
+    // background
+    map.view.append("path").attr("class","background")
+        .datum({type: "Sphere"})
+        .attr("d", map.geoPath);
+
+    // 10 degree default graticule
+    // graticule
+    map.view.append("path").attr("class","graticule")
+        .datum(d3.geoGraticule())
+        .attr("d", map.geoPath);
+
+    // Using a single graticule for tropics and polar circles
+    // See another way to create them with d3.geoCircle() in the Circles folder.
+    map.view.append("path").attr("class","graticule standard-parallels")
+            .datum(d3.geoGraticule()
+                    .extentMinor([[-180,23.6],[180,-23.6]]) // tropics
+                    .extentMajor([[-180,66.6],[180,-66.6]]) // polar circles
+                    .stepMinor([0,23.5])
+                    .stepMajor([0,66.5]))
+            .attr("d", map.geoPath);
+
+    map.view.append("path").attr("class","graticule equator-meridians")
+            .datum(d3.geoGraticule().step([180,90]))
+            .attr("d", map.geoPath);
+
+</script>
+
+</body>
+</html>

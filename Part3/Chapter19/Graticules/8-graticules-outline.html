@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Highlight only part of the globe with a graticule</title>
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        .background {
+            fill: blue;
+            stroke-width: 2;
+        }
+        .grid {
+            fill: green;
+            fill-opacity: .1;
+            stroke: red;
+        }
+        .globe {
+            fill: none;
+            stroke: blue;
+        }
+        .outline {
+            stroke-width: 3;
+        }
+    </style>
+</head>
+<h1>Highlight only part of the globe with a graticule</h1>
+<p>Using <code>extent([[-90,-70],[90,70]])</code> to restrict the graticule to the near hemisphere and 30 degrees from the poles.
+Creating an outline for the graticule (using <code>d3.geoGraticule().outline()</code> and also for the globe (using a GeoJSON type <code>Sphere</code>).</p>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+    import {map, createProjectionSwitcher, updateMap} from "./js/maps.js";
+
+    map.dim = {width: 960, height: 500};
+    map.view = d3.select("body").append("svg").attr("width", map.dim.width).attr("height", map.dim.height);
+    map.projection = d3.geoMercator();
+    map.geoPath = d3.geoPath().projection(map.projection);
+
+    createProjectionSwitcher((evt, projections) => {
+        map.projection = projections[+evt.target.value].config;
+        map.geoPath.projection(map.projection);
+        updateMap();
+    });
+
+    // background
+    map.view.append("path").attr("class","background")
+        .datum({type: "Sphere"})
+        .attr("d", map.geoPath);
+
+    // 10 degree graticule with reduced extent
+    map.view.append("path").attr("class","graticule")
+        .datum(d3.geoGraticule().extent([[-90,-60],[90,60]]))
+        .attr("d", map.geoPath);
+
+    // Outline of the graticule
+    map.view.append("path").attr("class","grid outline")
+            .datum(d3.geoGraticule().extent([[-90,-60],[90,60]]).outline())
+            .attr("d", map.geoPath);
+
+    // Outline of the globe
+    map.view.append("path").attr("class","globe outline")
+            .datum({type:"Sphere"})
+            .attr("d", map.geoPath);
+
+</script>
+
+</body>
+</html>

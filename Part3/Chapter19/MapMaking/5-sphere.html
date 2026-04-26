@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The D3 GeoJSON Sphere geometry</title>
+    <style>
+        svg {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+<h1>The D3 GeoJSON Sphere geometry</h1>
+<p>Rendering a GeoJSON sphere as the background for the map.</p>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    const data = await d3.json('../data/world/world-lowres.geojson');
+    const dim = {width: 960, height: 500};
+    const svg = d3.select("body").append("svg")
+            .attr("width", dim.width).attr("height", dim.height);
+
+    const geoPath = d3.geoPath().projection(d3.geoMercator());
+
+    // Draw the sphere behind everything else
+    svg.append("path")
+        .datum({type: "Sphere"}) // This is a D3-specific GeoJSON geometry.
+        .attr("d", geoPath)
+        .style("fill", "lightblue") // apply a fill color to the sphere
+        .style("stroke", "none");   // you can stroke to draw an outline if you wish
+
+    svg.selectAll("path.feature")
+       .data(data.features)
+         .join("path")
+           .attr("class", "feature")
+           .attr("d", geoPath)
+           .style("fill", "green")
+           .style("stroke", "black");
+
+</script>
+
+</body>
+</html>

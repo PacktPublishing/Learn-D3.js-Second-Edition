@@ -1,4 +1,4 @@
-import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 import * as view from "./view-1.2.js";
 import {chart} from "./common-1.1.js";

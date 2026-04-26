@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Basic map used to demonstrate projection (Mercator)</title>
+    <link rel="stylesheet" href="../../css/maps.css">
+    <link rel="stylesheet" href="../css/projection-config.css">
+</head>
+<body>
+<h1>Basic map used to demonstrate projection configuration (Mercator)</h1>
+<p>See different configurations in the files in the subfolders:
+<ol>
+    <li><a href="../Fit">Fit</a>: fitting the projection in the viewport (pixels).</li>
+    <li><a href="../Center">Center</a>: setting the geographic center (longitude and latitude).</li>
+    <li><a href="../Translate-Scale-Angle">Translate, scale and angle</a>: transforming the projected map (pixels).</li>
+    <li><a href="../Clip">Clip</a>: clipping the projection.</li>
+    <li><a href="../Rotate">Rotate</a>: rotating the globe using geographic coordinates (degrees).</li>
+    <li><a href="../Invert">Invert</a>: getting geo coordinates from pixel positions.</li>
+</ol>
+<div id="switcher"></div>
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+    const d3 = Object.assign({}, d3_all, d3_geo_projection);
+    import {map, makeMap, createProjectionSwitcher} from "../../js/maps.js";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../../data/world/world-medres.topojson";
+    const key  = "world";
+
+    const projections = [
+        {name: "Mercator", config: d3.geoMercator()},
+        {name: "Orthographic", config: d3.geoOrthographic().rotate([0, -30, 0])},   // Slightly tilted
+    ];
+    map.projection = projections[0].config;
+    map.geoPath = d3.geoPath().projection(map.projection);
+
+    makeMap(file, key);
+
+    // Adds a radio-button switcher at #switcher
+    createProjectionSwitcher(projections, "switcher", changeProjection);
+    function changeProjection(evt) {
+        map.projection = projections[+evt.target.value].config;
+        map.geoPath.projection(map.projection);
+    }
+</script>
+
+</body>
+</html>

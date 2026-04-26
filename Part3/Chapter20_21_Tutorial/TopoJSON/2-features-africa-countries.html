@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        svg {
+            border: solid 1px gray;
+            stroke: white;
+        }
+    </style>
+</head>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+    import * as topojson from 'https://cdn.skypack.dev/topojson-client@3'
+
+    const width = 960;
+    const height = 500;
+
+    const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+    const svg = d3.select("body").append("svg")
+            .attr("width", width).attr("height", height);
+
+    const geoPath = d3.geoPath().projection(d3.geoMercator());
+
+
+    d3.json('../data/africa/africa.topojson').then(function(data) {
+
+        const geodata = topojson.feature(data, data.objects['africa'])
+
+        svg.selectAll("path.country")
+                .data(geodata.features).enter()
+                .append("path").attr("class","country")
+                .style("fill", (d,i) => color(i))
+                .attr("d", geoPath)
+    })
+</script>
+
+</body>
+</html>

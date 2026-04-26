@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Default scale for Mercator</title>
+    <link rel="stylesheet" href="../css/projection-config.css">
+    <link rel="stylesheet" href="../../css/maps.css">
+</head>
+<body>
+<h1>Default scale for Mercator</h1>
+<p>Default scale for the Mercator projection (153) in D3 cuts at 70 latitude. For full Mercator in this viewport, use scale(80).</p>
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+    const d3 = Object.assign({}, d3_all, d3_geo_projection);
+    import {map, renderMap, loadTopoJSON, drawViewportAxes} from "../../js/maps.js";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../../data/world/world-medres.topojson";
+    const key  = "world";
+
+    map.projection = d3.geoMercator()
+    //        .scale(80)    // Full Mercator
+    //        .scale(153);  // default for Mercator (cutting at 70 latitude)
+
+    map.geoPath = d3.geoPath().projection(map.projection);
+    loadTopoJSON(file, key).then(() => {
+        renderMap();
+        drawViewportAxes(map);
+    });
+</script>
+
+</body>
+</html>

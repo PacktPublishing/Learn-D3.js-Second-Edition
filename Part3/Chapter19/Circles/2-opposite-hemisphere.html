@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Highlighting an opposite hemisphere</title>
+    <link rel="stylesheet" href="css/hemispheres.css">
+</head>
+<h1>Highlighting an opposite hemisphere</h1>
+<body>
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+    const d3 = Object.assign({}, d3_all, d3_geo_projection);
+
+    import {map, loadTopoJSON, updateMap, createProjectionSwitcher} from "../js/maps.js";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../data/world/world-medres.topojson";
+    const key  = "world";
+    map.projection = d3.geoMercator();
+    map.geoPath = d3.geoPath().projection(map.projection);
+    map.view = d3.select("body").append("svg")
+                 .attr("width", map.dim.width).attr("height", map.dim.height);
+
+    loadTopoJSON(file, key).then(() => {
+        drawGraticule();
+        drawCircles();
+        drawFeatures();
+
+        createProjectionSwitcher((evt, projections) => {
+            map.projection = projections[+evt.target.value].config;
+            map.geoPath.projection(map.projection);
+            updateMap([".shadow", ".country", ".hemisphere"]);
+        });
+    });
+
+    function drawFeatures() {
+        map.view.selectAll("path.country")
+           .data(map.data.features)
+              .join("path").attr("class","country")
+                .attr("d", map.geoPath);
+    }
+
+    function drawGraticule() {
+        map.view.append("path").attr("class", "graticule")
+            .datum(d3.geoGraticule())
+            .attr("d", map.geoPath);
+    }
+
+    // Fill a circle centered on the opposite hemisphere (relative to the center of the projection, which defaults to [0,0])
+    function drawCircles() {
+        map.view.append("path").attr("class", "opposite hemisphere")
+           .datum(d3.geoCircle().center([-180, 0])) // opposite hemisphere
+               .attr('d', map.geoPath)
+
+        // Draw an outline around the closest hemisphere (to the center of the projection, which defaults to [0,0])
+        map.view.append("path").attr("class", "outline")
+           .datum(d3.geoGraticule().extent([[-90, -90], [90, 90]]).outline()) // this hemisphere
+              .attr("d", map.geoPath);
+    }
+</script>
+
+</body>
+</html>

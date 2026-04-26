@@ -1,0 +1,6 @@
+.indicatrix, .tissot {
+    fill:orange;
+    fill-opacity: .5;
+    stroke: black;
+    stroke-width: .5;
+}

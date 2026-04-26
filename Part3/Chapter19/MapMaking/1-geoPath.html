@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Generating path strings with geometries and features</title>
+    <style>
+        svg {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+<h1>Generating path strings with geometries and features</h1>
+<p>This example shows how <code>d3.geoPath</code> generates SVG path strings from GeoJSON geometries and features.
+    See the source code and the console for a full experience. The SVG below only shows the rendered results.</p>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    // Sample GeoJSON geometries
+    // A point (a rocket launch site in Brazil)
+    const point = {type: "Point", coordinates: [-35.16, -5.92] }    // note that longitude comes first in GeoJSON.
+
+    // A line string (a simple line connecting two rocket lauch sites)
+    const linestring = {type: "LineString", coordinates: [[-35.16, -5.92], [-44.37, -2.32]]}
+
+    // A polygon (a continent and three lakes)
+    const polygon = {
+        type: "Polygon",
+            coordinates: [
+                [[34,31],[34,27],[37,18],[44,10],[51,12],[50,9],[47,3],[42,0],[39,-6],[40,-15],[35,-20],[36,-24],[28,-33],[19,-35],[11,-17],[13,-7],[9,-1],[10,5],[6,4],[4,6],[-8,4],[-17,12],[-17,21],[-15,26],[-11,29],[-6,35],[10,37],[11,33],[19,30],[21,33],[29,31],[34,31]],
+                [[35,-12],[34,-9],[34,-12],[34,-13],[35,-14],[35,-12],[35,-12]],
+                [[32,-2],[33,-2],[34,-2],[34,0],[32,0],[32,-2]],
+                [[29,-4],[29,-6],[31,-9],[30,-6],[29,-4]]
+        ]
+    }
+
+    // A feature containing a geometry (a multiline string) and some properties. This is the Nile river.
+    const feature = {
+        type: "Feature",
+        properties: {name: "Nile river"},
+        geometry: {
+            type: "MultiLineString",
+            coordinates: [
+                [[31, 31], [31, 30], [31, 29], [31, 27], [32, 26], [33, 25], [33, 23], [32, 23], [32, 23], [30, 21], [31, 18], [33, 20], [34, 18], [34, 17], [34, 17], [33, 16], [32, 15], [33, 13], [33, 11], [31, 9], [30, 9], [31, 7], [32, 5], [32, 4], [31, 3], [31, 3], [31, 2], [32, 2], [32, 2], [33, 1], [33, 0]],
+                [[33, 16], [33, 15], [34, 14], [34, 12], [35, 11], [35, 10], [38, 10], [38, 11], [37, 12]]
+            ]
+        }
+    }
+
+    // Another feature containing multiple points.
+    const feature2 = {
+        type: "Feature",
+        properties: {name: "Launch sites", location: "Brazil"},
+        geometry: {
+            type: "MultiPoint", coordinates: [[-35.16, -5.92], [-44.37, -2.32]]
+        }
+    }
+
+    const world = {type: "Sphere"};  // this is a non-standard D3-specific geometry type that represents the entire world
+
+    // SVG path strings generated for each geometry and feature (and no projection)
+    console.log(">>> USING THE DEFAULT IDENTITY PROJECTION - will render some data offscreen");
+    console.log("\nPoint (One site):", d3.geoPath()(point));
+    console.log("\nLineString (Line connecting sites):", d3.geoPath()(linestring));
+    console.log("\nPolygon (Africa):", d3.geoPath()(polygon));
+    console.log("\nFeature / MultiLineString (Nile river):", d3.geoPath()(feature));  // the geometry is extracted automatically
+    console.log("\nFeature / MultiPoint (Two sites):", d3.geoPath()(feature2));  // the geometry is extracted automatically
+
+    // Render the data in a viewport that fits the entire world, using the Mercator projection.
+    // Set up the view port
+    const dim = {width: 960, height: 500};  // a standard viewport size for maps with the Mercator projection
+    const svg = d3.select("body").append("svg").attr("width", dim.width).attr("height", dim.height);
+
+    // Create a geoPath generator with the Mercator projection
+    const geoPath = d3.geoPath()
+                      .projection(d3.geoMercator())
+                      .pointRadius(5); // this is used to set the radius for Point geometries
+
+    // This will place the rendered shapes in the viewport
+    console.log("\n>>> USING THE MERCATOR PROJECTION - will render all data in the viewport");
+    console.log("\nPoint (One site):", geoPath(point));
+    console.log("\nLineString (Line connecting sites):", geoPath(linestring));
+    console.log("\nPolygon (Africa):", geoPath(polygon));
+    console.log("\nFeature / MultiLineString (Nile river):", geoPath(feature));  // the geometry is extracted automatically
+    console.log("\nFeature / MultiPoint (Two sites):", geoPath(feature2));  // the geometry is extracted automatically
+
+    // To render all the geometries at once, we can combine them into a single geometry collection
+    const collection = {
+        type: "GeometryCollection",
+        geometries: [point, linestring, polygon, feature.geometry]
+    };
+
+    // Render the geometries
+    svg.selectAll("path.geometry")
+       .data(collection.geometries)   // get the array
+         .join("path").attr("class", "geometry")
+           .attr("d", geoPath)   // call the geoPath generator for each geometry to get the path string
+           .style("fill", "red")
+           .style("stroke", "black");
+
+    // Rendering a single feature containing a MultiPoint geometry.
+    svg.append("path")
+       .datum(feature2)   // the geeometry is extracted automatically
+        .attr("d", geoPath.pointRadius(10))
+        .style("fill", "orange")
+        .style("stroke", "black")
+        .lower();   // place it behind the previous rendering
+
+    // Coloring the sphere that contains the world
+    svg.append("path").datum(world) // this is a D3-specific geometry ({type: "Sphere"})
+        .attr("d", geoPath)
+        .style("fill", "lightblue")
+        .lower();   // place it behind the other renderings
+
+</script>
+
+</body>
+</html>

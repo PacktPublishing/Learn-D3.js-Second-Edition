@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Main projections</title>
+    <link rel="stylesheet" href="../css/tissot.css">
+    <link rel="stylesheet" href="css/projections.css">
+</head>
+<body>
+<h1>Main projections</h1>
+<p>Choose a projection from the list. This selection includes different configurations of the same projections.
+Equator, prime and anti-meridian are highlighted in blue.
+    Orange circles are Tissot's indicatrix and indicate changes in area and distortions.
+    Orange latitude bands indicate secant zones (within two parallels that cut the projection).</p>
+<div class="container">
+    <div id="sidebar">
+        <ol></ol>
+    </div>
+    <svg id="map" width="960" height="500">
+        <defs/>
+    </svg>
+</div>
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+    import * as d3_geo_polygon from "https://cdn.skypack.dev/d3-geo-polygon@1";
+    const d3 = Object.assign({}, d3_all, d3_geo_projection, d3_geo_polygon);
+    import * as map from "./js/projections.js";
+
+    const dim = {width: 960, height: 500};
+    const dataFile = '../data/world/world-lowres.topojson';
+
+    const projections = [
+        {
+            name: "Azimuthal Equidistant",
+            projection: d3.geoAzimuthalEquidistant(),
+            tissot: {radius: 2.5, stepLon: 30, stepLat: 10, maxLon: 180, maxLat: 90}
+        },{
+            name: "Azimuthal Equidistant South Pole",
+            projection: d3.geoAzimuthalEquidistant().rotate([0,90,0]),
+            tissot: {radius: 2.5, stepLon: 30, stepLat: 10, maxLon: 180, maxLat: 90}
+        },{
+            name: "Azimuthal Equal Area",
+            projection: d3.geoAzimuthalEqualArea(),
+            tissot: {radius: 2.5, stepLon: 30, stepLat: 10, maxLon: 180, maxLat: 90}
+        },{
+            name: "Azimuthal Equal Area North Pole",
+            projection: d3.geoAzimuthalEqualArea().rotate([0,-89.9,0]),
+            tissot: {radius: 2.5, stepLon: 30, stepLat: 10, maxLon: 180, maxLat: 90}
+        },{
+            name: "Azimuthal Conformal (Stereographic)",
+            projection: d3.geoStereographic().scale(100).clipAngle(170),
+            tissot: {radius: 2.5, stepLon: 30, stepLat: 10, maxLon: 180, maxLat: 90}
+        },{
+            name: "Azimuthal Conformal (Stereographic) South Pole",
+            projection: d3.geoStereographic().rotate([0,90,0]),
+            tissot: {radius: 2.5, stepLon: 20, stepLat: 10, maxLon: 180, maxLat: 90}
+        },{
+            name: "Azimuthal Orthographic Hemisphere",
+            projection: d3.geoOrthographic(),
+            tissot: {radius: 2.5, stepLon: 20}
+        },{
+            name: "Azimuthal Orthographic South Pole",
+            projection: d3.geoOrthographic().rotate([0,90,0]),
+            tissot: {radius: 2.5, stepLon: 30, stepLat: 10, maxLon: 180, maxLat: 90}
+        },{
+            name: "Azimuthal Orthographic Tilt",
+            projection: d3.geoOrthographic().rotate([-80,-30,20]),
+            tissot: {radius: 2.5, stepLon: 20}
+        },{
+            name: "Azimuthal Gnomonic",
+            projection: d3.geoGnomonic()
+                    // .clipAngle(60) // default
+                    // .scale(140) // default
+                    .rotate([0,-90,0]),
+            tissot: {}, // use defaults
+            file: "world-lowres.topojson",
+            key: "world"
+        },{
+            name: "Conic Equidistant (0,60)",
+            projection: d3.geoConicEquidistant().fitExtent([[0,0],[dim.width, dim.height]], {type: 'Sphere'}),
+            tissot: {radius: 1.5, stepLon: 20}
+        },{
+            name: "Conic Equidistant Tangent (35)",
+            projection: d3.geoConicEquidistant()
+                    .fitExtent([[0,90],[dim.width, dim.height]], {type: 'Sphere'})
+                    .parallels([35,35]), // if lat == -lon will become plate-carree
+            tissot: {radius: 1.5, stepLon: 20}
+        },{
+            name: "Conic Equal Area (0,60)",
+            projection: d3.geoConicEqualArea()
+                    .fitExtent([[0,0],[dim.width, dim.height]], {type: 'Sphere'}),
+            tissot: {radius: 1.5, stepLon: 20}
+        },{
+            name: "Conic Equal Area Tangent (35)",
+            projection: d3.geoConicEqualArea()
+                    .parallels([35,35])
+                    .fitExtent([[0,0],[dim.width, dim.height]], {type: 'Sphere'}),
+            tissot: {radius: 1.5, stepLon: 20}
+        },{
+            name: "Conic Albers",
+            projection: d3.geoAlbers().scale(350),
+            tissot: {radius: 1.5, stepLon: 20}
+        },{
+            name: "Conic Conformal (30)",
+            projection: d3.geoConicConformal().scale(80),
+            tissot: {radius: 1.5, stepLon: 20}
+        },{
+            name: "Conic Conformal Rotated (30)",
+            projection: d3.geoConicConformal().rotate([-0,90,0]),
+            tissot: {radius: 1.5, stepLon: 20}
+        },{
+            name: "Conic Conformal Secant (-50,10)",
+            projection: d3.geoConicConformal().scale(50)
+                    //.parallels([-30,-30]), // default parallels inverted
+                    .parallels([-50,10]),
+            tissot: {radius: 1.5, stepLon: 20}
+        },{
+            name: "Cylindrical Equidistant (Plate Carree)",
+            projection: d3.geoEquirectangular(),
+            tissot: {radius: 1.5, stepLon: 20}
+        },{
+            name: "Cylindrical Equidistant Transverse",
+            projection: d3.geoEquirectangular().rotate([0,-90,0]),
+            tissot: {radius: 1.5, stepLon: 20}
+        },{
+            name: "Cylindrical Equal Area (38.58)",
+            projection: d3.geoCylindricalEqualArea(),
+            tissot: {radius: 1.5, stepLon: 20}
+        },{
+            name: "Cylindrical Equal Area Berhmann (30)",
+            projection: d3.geoCylindricalEqualArea()
+                    .fitExtent([[0,25],[dim.width, dim.height-25]], {type: 'Sphere'})
+                    .parallel(30),
+            tissot: {radius: 1.5, stepLon: 20}
+        },{
+            name: "Cylindrical Equal Area Gall-Peters (45)",
+            projection: d3.geoCylindricalEqualArea()
+                    .fitExtent([[0,25],[dim.width, dim.height-25]], {type: 'Sphere'})
+                    .parallel(45),
+            tissot: {radius: 1.5, stepLon: 20}
+        },{
+            name: "Cylindrical Equal Area Tangent",
+            projection: d3.geoStereographic()
+                    .scale(100)
+                    .clipAngle(170),
+            tissot: {radius: 1.5, stepLon: 20}
+        },{
+            name: "Cylindrical Conformal (Mercator)",
+            projection: d3.geoMercator().fitExtent([[0,0],[dim.width, dim.height]], {type: 'Sphere'}),
+            tissot: {radius: 2, stepLon: 30, stepLat: 10, maxLon: 180, maxLat: 90}
+        },{
+            name: "Cylindrical Conformal (Mercator) Oblique",
+            projection: d3.geoMercator()
+                    .rotate([0,45,0])
+                    .fitExtent([[0,0-25],[dim.width, dim.height]], {type: 'Sphere'}),
+            tissot: {radius: 2, stepLon: 30, stepLat: 10, maxLon: 180, maxLat: 90}
+        },{
+            name: "Cylindrical Conformal (Mercator) Transverse",
+            projection: d3.geoMercator()
+                    .rotate([0,-90,0])
+                    .fitExtent([[0,0-25],[dim.width, dim.height]], {type: 'Sphere'}),
+            tissot: {radius: 2, stepLon: 30, stepLat: 10, maxLon: 180, maxLat: 90}
+        }
+    ];
+
+    projections.map(p => {p.file = "world/world-medres.topojson"; p.key= "world"; return p;});
+
+    projections.forEach(function(d,i) {
+        d3.select("#sidebar ol").append("li").attr("id", "p"+i)
+            .on("mouseover", () => map.updateMap(d, i))
+            .text(d.name);
+    })
+
+    map.showMap(projections[0], 0);
+</script>
+
+</body>
+</html>

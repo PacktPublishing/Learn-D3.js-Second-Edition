@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Using other projections</title>
+    <style>
+        svg {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+<h1>Using other projections</h1>
+<p>Using a different projection renders the globe differently on the plane.
+    Compare this to <a href="5-sphere.html">4-sphere.html</a>.
+    Only one line was changed to replace Mercator with an Orthographic projection that resembles the globe in 3D.
+    Note that the projection affects all objects rendered with the geoPath (features and background).</p>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    // Load the feature collection
+    // Inspect this file - it contains an object with a features property that contains an array of feature objects.
+    const data = await d3.json('../data/world/world-lowres.geojson');
+
+    // Set up the view port
+    const dim = {width: 960, height: 500};
+    const svg = d3.select("body").append("svg")
+            .attr("width", dim.width).attr("height", dim.height);
+
+    // This code only changes this line (compared to 4-feature-collection.html) to use a different projection.
+    const geoPath = d3.geoPath().projection(d3.geoOrthographic().rotate([-160,-90,0]));
+
+    // Draw the sphere behind everything else
+    svg.append("path")
+        .datum({type: "Sphere"}) // This is a D3-specific GeoJSON geometry.
+        .attr("d", geoPath)
+        .style("fill", "lightblue")
+        .style("stroke", "none");
+
+    svg.selectAll("path.feature")
+       .data(data.features)
+         .join("path")
+           .attr("class", "feature")
+           .attr("d", geoPath)
+           .style("fill", "green")
+           .style("stroke", "black");
+</script>
+
+</body>
+</html>

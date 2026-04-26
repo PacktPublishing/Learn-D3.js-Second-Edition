@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Using TopoJSON</title>
+    <link rel="stylesheet" href="css/map.css"> <!-- styles were moved to separate file for cleaner code -->
+    <style>
+        .feature {
+            stroke: darkslategray;
+            stroke-width: .7px;
+        }
+    </style>
+</head>
+<body>
+<h1>Using TopoJSON</h1>
+<p>TopoJSON is a more compact and efficient format for spatial data. It removes redundant coordinates by encoding
+    shared boundaries between features as arcs and applies quantization that reduces file size. TopoJSON also
+    makes it easier to compute derived geometries meshes, merged features and neighbors. To use TopoJSON in D3
+    you need to convert its data to GeoJSON using the <code>topojson-client</code> library.</p>
+
+<p>This file is identical to <a href="10-choropleth.html">10-choropleth.html</a>, but uses a TopoJSON file
+    instead of GeoJSON to render the features. The TopoJSON data file is
+    <code><a href="../data/world/world-lowres.topojson">world-lowres.topojson</a></code>. It was generated from
+    the GeoJSON file using online services.
+</p>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as topojson from "https://cdn.skypack.dev/topojson-client@3"; // import the client library
+
+    // 1) load the TopoJSON file instead of GeoJSON
+    const tjdata = await d3.json('../data/world/world-lowres.topojson');
+
+    // The name of the object in the TopoJSON file that contains the features.
+    // Inspect the file to discover this name in the "objects" property.
+    const key = "world";
+
+    const data = topojson.feature(tjdata, tjdata.objects[key]); // convert to GeoJSON using the topojson-client library
+
+    // The rest of the code is the same, since now data is in GeoJSON format.
+
+    const dim = {width: 960, height: 500};
+    const svg = d3.select("body").append("svg").attr("width", dim.width).attr("height", dim.height);
+
+    const geoPath = d3.geoPath().projection(d3.geoMercator());
+
+    // Create an exponential scale to make the differences in population more visible.
+    const color = d3.scaleSequentialPow(d3.interpolateOranges).exponent(0.25)
+                    .domain(d3.extent(data.features, d => d.properties.pop));
+
+    drawMap(svg, data, geoPath); // we put the map in a function to make the code cleaner.
+
+    // FUNCTIONS
+    function drawFeatures(view, data, geoPath) {
+        view.selectAll("path.feature")
+            .data(data.features)
+            .join("path")
+            .attr("class", "feature")
+            .attr("d", geoPath)
+            .style("fill", d => color(d.properties.pop)) // use the color scale to set the fill color based on population;
+    }
+
+    function drawMap(view, data, geoPath) {
+        view.append("path").attr("class", "background") // styles were moved to CSS for cleaner code
+            .datum({type: "Sphere"})
+            .attr("d", geoPath);
+
+        drawFeatures(view, data, geoPath);
+
+        view.append("path").attr("class", "graticule")
+            .datum(d3.geoGraticule())
+            .attr("d", geoPath);
+    }
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Configuring major and minor graticules - extent</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<h1>Configuring major and minor graticules - extent</h1>
+<p>Graticules configured using
+<pre>d3.geoGraticule().extentMinor([[-180,30.1],[180,-30]])</pre>
+generate minor latitude lines only between 30.1°N and 30°S, full extent of longitude lines.</p>
+<script type="module">
+    import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+    import {map, createProjectionSwitcher, updateMap} from "./js/maps.js";
+
+    map.dim = {width: 960, height: 500};
+    map.view = d3.select("body").append("svg").attr("width", map.dim.width).attr("height", map.dim.height);
+    map.projection = d3.geoMercator();
+    map.geoPath = d3.geoPath().projection(map.projection);
+
+    createProjectionSwitcher((evt, projections) => {
+        map.projection = projections[+evt.target.value].config;
+        map.geoPath.projection(map.projection);
+        updateMap();
+    });
+    d3.select('#projection input[value="1"]').property("checked", true).dispatch("change"); // Orthographic
+
+    // background
+    map.view.append("path").attr("class","background")
+        .datum({type: "Sphere"})
+        .attr("d", map.geoPath);
+
+    // minor latitude lines only between 30.1°N and 30°S, full extent of longitude lines
+    map.view.append("path").attr("class","graticule")
+        .datum(d3.geoGraticule().extentMinor([[-180,30.1],[180,-30]]))
+        .attr("d", map.geoPath);
+</script>
+
+</body>
+</html>

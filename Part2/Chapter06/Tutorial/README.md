@@ -32,7 +32,7 @@ Now that we have successfully displayed one complete view, we can demonstrate th
 Create the `js/page.js` file and declare your imports as follows:
 
 ```js
-import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import {app} from "./common.js";
 import {configure} from "./config.js";
 import {draw} from "./view.js";
@@ -42,9 +42,9 @@ Now declare an `init()` function to set up the initial view:
 
 ```js
 export function init(plane) {
-   configure();
-   draw(plane);
-   // ...
+    configure();
+    drawFeatures(plane);
+    // ...
 }
 ```
 
@@ -86,12 +86,12 @@ Now attach an event listener to each button for the `'click'` event. It will use
 ```js
 export function init(plane) {
     const buttons = // ...
-    buttons.on("click", (event, d) => {
-        app.current.id = d.id;
-        configure();
-        draw(plane);
-    });
-    
+        buttons.on("click", (event, d) => {
+            app.current.id = d.id;
+            configure();
+            drawFeatures(plane);
+        });
+
     // ... 
 }
 ```

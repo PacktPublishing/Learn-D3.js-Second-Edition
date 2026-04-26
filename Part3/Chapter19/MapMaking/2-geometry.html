@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Madagascar GeoJSON feature</title>
+    <style>
+        svg {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+<h1>Rendering a GeoJSON geometry</h1>
+<p>Loading a and displaying a single GeoJSON geometry.
+    See <code><a href="../data/africa/medres-madagascar-geometry.geojson">data/africa/medres-madagascar-geometry.geojson</a></code>.
+    A simpler file is available in <code><a href="../data/africa/lowres-madagascar-geometry.geojson">data/africa/lowres-madagascar-geometry.geojson</a></code>.
+    Besides loading the geometry and displaying it, we also used projection methods to center the
+    projection (on the geometry's centroid) and scale it to make it larger.</p>
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    // Load the geometry
+    // Inspect this file - it contains a single object with type and coordinates properties.
+    const geometry = await d3.json('../data/africa/medres-madagascar-geometry.geojson');
+
+    // Set up the view port
+    const dim = {width: 960, height: 500};
+    const svg = d3.select("body").append("svg")
+                  .attr("width", dim.width).attr("height", dim.height);
+
+    // Get the centroid of the geometry (in [longitude, latitude] format)
+    const centroid = d3.geoCentroid(geometry);
+    console.log(centroid);
+
+    // Now configure the projection to center on the centroid and scale the shape
+    const projection = d3.geoMercator()
+                         .center(centroid)
+                         .scale(1500);
+
+    // Apply the configured (scaled and center) projection when creating the geoPath generator
+    const geoPath = d3.geoPath().projection(projection);
+
+    svg.append("path")
+       .datum(geometry)          // You can also use datum to bind the data to the path
+         .attr("d", geoPath)     // Calls the generator on the datum bound to this element
+         .style("fill", "green")
+         .style("stroke", "black");
+
+</script>
+
+</body>
+</html>

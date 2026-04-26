@@ -1,4 +1,4 @@
-import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 export function methodDemo(root) {
     // 2) value property before calling count() or sum() (undefined)

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Default graticule</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<h1>Default graticule</h1>
+<p>Graticule configured using <code>d3.geoGraticule().step([10,10])</code> generates parallels and meridians with a 10 degree interval. This is the default and equivalent to calling <code>d3.geoGraticule()()</code> or <code>d3.geoGraticule10()</code>.</p>
+<script type="module">
+    import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+    import {map, createProjectionSwitcher, updateMap} from "./js/maps.js";
+
+    map.dim = {width: 960, height: 500};
+    map.view = d3.select("body").append("svg").attr("width", map.dim.width).attr("height", map.dim.height);
+    map.projection = d3.geoMercator();
+    map.geoPath = d3.geoPath().projection(map.projection);
+
+    createProjectionSwitcher((evt, projections) => {
+        map.projection = projections[+evt.target.value].config;
+        map.geoPath.projection(map.projection);
+        updateMap();
+    });
+    d3.select('#projection input[value="1"]').property("checked", true).dispatch("change"); // Orthographic
+
+    // background
+    map.view.append("path").attr("class","background")
+        .datum({type: "Sphere"})
+        .attr("d", map.geoPath);
+
+    // graticule
+    map.view.append("path").attr("class","graticule")
+       .datum(d3.geoGraticule().step([10,10])) // default graticule
+           .attr('d', map.geoPath);
+</script>
+
+</body>
+</html>

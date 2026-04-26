@@ -1,4 +1,4 @@
-import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 const width = 400, height = 400;
 const svg = d3.select("body").append("svg").attr("width",width).attr("height",height);

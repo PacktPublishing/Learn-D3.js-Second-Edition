@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Default graticules and configuration methods</title>
+</head>
+<body>
+<h1>Default graticules applied to Mercator projection</h1>
+<p>See source code and open console for more results.</p>
+<script type="module">
+    import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+    const dim = {width: 960, height: 500};
+    const svg = d3.select("body").append("svg").attr("width", dim.width).attr("height", dim.height);
+
+    const grat = d3.geoGraticule(); // creates a graticule generator with default configuration values
+
+    // Print default configuration values
+    console.log(`extent(): [${grat.extent()}]`);
+    console.log(`extentMinor(): [${grat.extentMinor()}]`);
+    console.log(`extentMajor(): [${grat.stepMajor()}]`);
+    console.log(`step(): [${grat.step()}]`);
+    console.log(`stepMinor(): [${grat.extentMinor()}]`);
+    console.log(`stepMajor(): [${grat.stepMajor()}]`);
+
+    // Inspect the generated GeoJSON object
+    const geoGraticuleObject = grat();
+    console.log('Generated GeoJSON object:', geoGraticuleObject);
+
+    // Compare to the shortcut function
+    const geoGraticuleObjectShortcut = d3.geoGraticule10(); // pre-configured graticule generator
+    console.log('Generated GeoJSON object:', geoGraticuleObjectShortcut);
+
+    // Compare to the explicit configuration
+    const geoGraticuleObjectExplicit = grat.step([10,10])(); // explicitly configured graticule generator
+    console.log('Generated GeoJSON object:', geoGraticuleObjectExplicit);
+
+    // Setup the path generator
+    const geoPath = d3.geoPath()
+                      .projection(d3.geoMercator())      // comment both lines to see defaults with no projection
+             //       .projection(d3.geoOrthographic()); // uncomment to see defaults with orthographic projection
+
+    // Render the lines
+    svg.append("path").attr("class", "graticule")
+       .datum(geoGraticuleObject)
+          .attr('d', geoPath)
+            .style("fill", "none")
+            .style("stroke", "black");
+</script>
+</body>
+</html>

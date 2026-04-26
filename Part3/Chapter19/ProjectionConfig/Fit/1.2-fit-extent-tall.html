@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fitting a "tall" feature by extent</title>
+    <link rel="stylesheet" href="../css/projection-config.css">
+    <link rel="stylesheet" href="../../css/maps.css">
+</head>
+<body>
+<h1>Fitting a "tall" feature by extent</h1>
+<p>Using <code>fitExtent([[0,0], [dim.width, dim.height]], italy)</code>, where <code>italy</code> is the GeoJSON feature object that represents Italy,
+    to fit the feature by its extent (the largest dimension, which in this case is height).
+When using <code>fit</code> methods, explicit <code>scale</code> and <code>translate</code> methods are ignored.</p>
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+    const d3 = Object.assign({}, d3_all, d3_geo_projection);
+    import {map, loadTopoJSON, renderMap} from "../../js/maps.js";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../../data/world/world-medres.topojson";
+    const key  = "world";
+
+    map.projection = d3.geoMercator();
+    map.geoPath = d3.geoPath().projection(map.projection);
+
+    loadTopoJSON(file, key).then(() => {
+        // Gets the GeoJSON feature object that represents Italy.
+        const italy = map.data.features.filter(d => d.properties.ISO_A3 === "ITA")[0];
+        console.log(italy);
+
+        // Use fitExtent to automatically calculate the projection's translate and scale values.
+        map.projection.fitExtent([[0,0], [map.dim.width, map.dim.height]], italy);
+
+        renderMap();
+    });
+</script>
+
+</body>
+</html>

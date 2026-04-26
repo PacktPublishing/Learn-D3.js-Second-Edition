@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Resampled GeoJSON linestrings</title>
+    <link rel="stylesheet" href="css/hemispheres.css">
+</head>
+<body>
+<h1>Drawing resampled GeoJSON LineStrings as circles</h1>
+<p>This map draws circles using resampled GeoJSON <code>LineString</code> geometries (resampling uses interpolation
+    to add intermediate points so that the line can be adjusted to the projection).
+    See <a href="../js/wgs84_resampling.js">js/wgs84_resampling.js</a>. The file <code>3-hemispheres-shadows.html</code>
+    obtains the same effect using <code>d3.geoCircle()</code> (see <code>drawCircles()</code> in <a href="js/hemispheres.js">js/hemispheres.js</a>.</p>
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+    const d3 = Object.assign({}, d3_all, d3_geo_projection);
+    import * as hemispheres from "./js/hemispheres.js";
+    import {map, loadTopoJSON, updateMap, createProjectionSwitcher} from "../js/maps.js";
+    import {resample} from "../js/wgs84_resampling.js";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../data/world/world-medres.topojson";
+    const key  = "world";
+    map.projection = d3.geoMercator();
+    map.geoPath = d3.geoPath().projection(map.projection);
+    map.view = d3.select("body").append("svg")
+        .attr("width", map.dim.width).attr("height", map.dim.height);
+
+    // A blur filter for the shadow hemisphere.
+    hemispheres.addBlurFilter(map.view, );  // see code in hemispheres.js
+
+    loadTopoJSON(file, key).then(() => {
+        hemispheres.drawBackgroundCircle(map.view, map.geoPath);
+        hemispheres.drawGraticule(map.view, map.geoPath);
+
+        // Using GeoJSON LineStrings to draw circles and graticules
+        drawLineStringCircles(map.view, map.geoPath);
+
+        hemispheres.drawFeatures(map.view, map.geoPath, map.data.features);
+        hemispheres.drawForegroundOutline(map.view, map.geoPath);
+        hemispheres.drawShadow(map.view, map.geoPath);  // see code in hemispheres.js
+
+        createProjectionSwitcher((evt, projections) => {
+            map.projection = projections[+evt.target.value].config;
+            map.geoPath.projection(map.projection);
+            updateMap([".shadow", ".country", ".circle"]);
+        });
+    });
+
+    function drawLineStringCircles() {
+        // Equator, Prime and Antimeridian, Tropics and Polar Circles were defined as
+        // LineStrings with *two* points. To draw them, they need to be resampled to
+        // add intermediate points along the curve.
+        // See wgs84_resampling.js for the resample() function.
+        map.view.append("path").attr("class","tropic circle cancer")
+                .datum(resample({type: "LineString", coordinates: [[-179.9,23.5],[179.9,23.5]]}))
+                .attr("d", map.geoPath);
+
+        map.view.append("path").attr("class","tropic circle capricorn")
+                .datum(resample({type: "LineString", coordinates: [[-179.9,-23.5],[179.9,-23.5]]}))
+                .attr("d", map.geoPath);
+
+        map.view.append("path").attr("class","antarctic polar circle")
+                .datum(resample({type: "LineString", coordinates: [[-179.9,-66.5],[179.9,-66.5]]}))
+                .attr("d", map.geoPath);
+
+        map.view.append("path").attr("class","arctic polar circle")
+                .datum(resample({type: "LineString", coordinates: [[-179.9,66.5],[179.9,66.5]]}))
+                .attr("d", map.geoPath);
+
+
+        map.view.append("path").attr("class","graticule equator parallel") // adds single [0,0] point to the LineString
+                .datum(resample({type: "LineString", coordinates: [[-179.9,0],[179.9,0]]}))
+                .attr("d", map.geoPath);
+
+        map.view.append("path").attr("class","graticule prime meridian") // adds single [0,0] point to the LineString
+                .datum(resample({type: "LineString", coordinates: [[0,-90],[0,90]]}))
+                .attr("d", map.geoPath);
+
+        map.view.append("path").attr("class","graticule anti meridian") // adds single [0,0] point to the LineString
+                .datum(resample({type: "LineString", coordinates: [[180,-90],[180,90]]}))
+                .attr("d", map.geoPath);
+    }
+
+</script>
+</body>
+</html>

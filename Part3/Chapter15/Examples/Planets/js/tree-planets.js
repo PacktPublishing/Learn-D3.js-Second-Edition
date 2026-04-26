@@ -1,4 +1,4 @@
-import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 export function draw(data, container, scale) {
     drawLinks(container.append("g").attr("class", "links"), data.links());

@@ -20,7 +20,7 @@
 <h1>Horizontal layered partition: left to right</h1>
 <p>Horizontal layered partitions don't look like icicles or flames, but they may be more convenient in some visualizations. Swap vertical and horizontal coordinates to obtain this effect. This example draws the partitions from left to right. See commented source-code for details.</p>
 <script type="module">
-    import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+    import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
     import {cht, chart, root} from "./js/treedata-json.js";
 
     root.sort((a,b) => d3.ascending(a.height, b.height))

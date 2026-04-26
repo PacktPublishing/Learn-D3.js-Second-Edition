@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Using Tissot's indicatrix</title>
+    <link rel="stylesheet" href="../css/tissot.css">
+    <link rel="stylesheet" href="css/hemispheres.css">
+</head>
+<body>
+<h1>Using Tissot's indicatrix</h1>
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+    const d3 = Object.assign({}, d3_all, d3_geo_projection);
+    import * as tissot from '../js/tissot.js';
+
+    import {map, loadTopoJSON, renderMap, updateMap, createProjectionSwitcher} from "../js/maps.js";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../data/world/world-medres.topojson";
+    const key  = "world";
+    map.projection = d3.geoMercator();
+    map.geoPath = d3.geoPath().projection(map.projection);
+
+    loadTopoJSON(file, key).then(() => {
+        renderMap();
+        drawTissot();
+
+        createProjectionSwitcher((evt, projections) => {
+            map.projection = projections[+evt.target.value].config;
+            map.geoPath.projection(map.projection);
+            updateMap([".indicatrix", ".tissot"]);
+        });
+    });
+
+    // Functions for this file
+    function drawTissot() {
+        map.view.selectAll("path.tissot")
+           .data(tissot.makeIndicatrix(1.5,20))
+              .join("path")
+                .attr("d", map.geoPath)
+                .attr("class","tissot")
+    }
+</script>
+
+</body>
+</html>

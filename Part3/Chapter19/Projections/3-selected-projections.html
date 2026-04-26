@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Selected projections</title>
+    <link rel="stylesheet" href="../css/tissot.css">
+    <link rel="stylesheet" href="css/projections.css">
+</head>
+<body>
+<h1>Selected projections from <code>d3-geo-projection</code> and <code>d3-geo-polygon</code></h1>
+<p>Choose a projection from the list. Equator, prime and anti-meridian are highlighted in blue.
+Orange circles are Tissot's indicatrix and indicate changes in area and distortions.
+Orange latitude bands indicate secant zones (within two parallels).</p>
+<div class="container">
+    <div id="sidebar">
+        <ol></ol>
+    </div>
+    <svg id="map" width="960" height="500">
+        <defs/>
+    </svg>
+</div>
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+    import * as d3_geo_polygon from "https://cdn.skypack.dev/d3-geo-polygon@1";
+    const d3 = Object.assign({}, d3_all, d3_geo_projection, d3_geo_polygon);
+    import * as map from "./js/projections.js";
+
+    const width = 960, height = 500;
+    const dataFile = '../data/world/world-lowres.topojson';
+
+    const projections = [
+        {
+            name: "Equal Earth",
+            projection: d3.geoEqualEarth(),
+            tissot: {radius: 1.5, stepLon: 20}
+        },{
+            name: "Natural Earth",
+            projection: d3.geoNaturalEarth1(),
+            tissot: {radius: 1.5, stepLon: 20}
+        },{
+            name: "Mollweide",
+            projection: d3.geoMollweide(),
+            tissot: {radius: 1.5, stepLon: 20}
+        },{
+            name: "Satellite (rotated)",
+            projection: d3
+                    .geoSatellite()
+                    .distance(2).tilt(30)
+                    .rotate([50,0,-20])
+                    .angle(-60)
+                    .translate([600,600])
+                    .scale(1000),
+            tissot: {radius: 1.5, stepLon: 20}
+        },{
+            name: "Robinson",
+            projection: d3.geoRobinson(),
+            tissot: {radius: 1.5, stepLon: 20}
+        },{
+            name: "Hammer",
+            projection: d3.geoHammer(),
+            tissot: {radius: 2, stepLon: 30, stepLat: 10, maxLon: 180, maxLat: 90}
+        },{
+            name: "Homolosine",
+            projection: d3.geoInterruptedHomolosine()
+                    .fitExtent([[10,10], [width-20, height-20]], {type: "Sphere"}),
+            tissot: {radius: 2, stepLon: 30, stepLat: 10, maxLon: 180, maxLat: 90}
+        },{
+            name: "Winkel Tripel",
+            projection: d3.geoWinkel3()
+                    .fitExtent([[10,10], [width-20, height-20]], {type: "Sphere"}),
+            tissot: {radius: 2, stepLon: 30, stepLat: 10, maxLon: 180, maxLat: 90}
+        },{
+            name: "Peirce",
+            projection: d3.geoPeirceQuincuncial()
+                    .fitExtent([[10,10], [width-20, height-20]], {type: "Sphere"}).rotate([0, 0, 0]),
+            tissot: {radius: 2, stepLon: 30, stepLat: 10, maxLon: 180, maxLat: 90}
+        },{
+            name: "Polyhedral Waterman",
+            projection: d3.geoPolyhedralWaterman()
+                    .fitExtent([[10,10], [width-20, height-20]], {type: "Sphere"}),
+            tissot: {radius: 2, stepLon: 30, stepLat: 10, maxLon: 180, maxLat: 90}
+        },{
+            name: "Polyhedral Air Ocean",
+            projection: d3.geoAirocean()
+                    .fitExtent([[10,10], [width-20, height-20]], {type: "Sphere"}),
+            tissot: {radius: 2, stepLon: 30, stepLat: 10, maxLon: 180, maxLat: 90}
+        },{
+            name: "Polyhedral Cubic",
+            projection: d3.geoCubic()
+                    .fitExtent([[10,10], [width-20, height-20]], {type: "Sphere"}),
+            tissot: {radius: 2, stepLon: 30, stepLat: 10, maxLon: 180, maxLat: 90}
+        },{
+            name: "Polyhedral Dodecahedral",
+            projection: d3.geoDodecahedral()
+                    .fitExtent([[10,10], [width-20, height-20]], {type: "Sphere"}),
+            tissot: {radius: 2, stepLon: 30, stepLat: 10, maxLon: 180, maxLat: 90}
+        },{
+            name: "Polyhedral Icosahedral",
+            projection: d3.geoIcosahedral()
+                    .fitExtent([[10,10], [width-20, height-20]], {type: "Sphere"}),
+            tissot: {radius: 2, stepLon: 30, stepLat: 10, maxLon: 180, maxLat: 90}
+        }
+    ];
+
+    projections.map(p => {p.file = "world/world-medres.topojson"; p.key= "world"; return p;});
+
+    projections.forEach(function(d,i) {
+        d3.select("#sidebar ol")
+            .append("li")
+            .attr("id", "p"+i)
+            .on("mouseover", () => map.updateMap(d, i))
+            .text(d.name);
+    })
+
+    map.showMap(projections[0], 0);
+</script>
+
+</body>
+</html>

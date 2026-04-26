@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>World map - feature collection</title>
+    <style>
+        svg {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+<h1>Rendering a feature collection</h1>
+<p>Loading a and displaying a GeoJSON feature collection where each feature is a country.
+    See <code><a href="../data/world/world-lowres.geojson">data/world/world-lowres.geojson</a></code>.</p>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    // Load the feature collection
+    // Inspect this file - it contains an object with a features property that contains an array of feature objects.
+    const data = await d3.json('../data/world/world-lowres.geojson');
+
+    // Set up the view port
+    const dim = {width: 960, height: 500};
+    const svg = d3.select("body").append("svg")
+            .attr("width", dim.width).attr("height", dim.height);
+
+    // The default configuration for this projection fits the entire world
+    const geoPath = d3.geoPath().projection(d3.geoMercator());
+
+    svg.selectAll("path.feature")   // this time we use a data join, since we have multiple objects
+       .data(data.features)         // the array is in the features property
+         .join("path")
+           .attr("class", "feature")
+           .attr("d", geoPath)
+           .style("fill", "green")
+           .style("stroke", "black");
+
+    // Example of using properties. (Uncomment to view)
+    // This is buggy because the centroids don't always fall within the country (since features also include
+    // islands and exclaves and other territories), but it shows how to use feature properties.
+    /*
+    svg.selectAll("text")
+       .data(data.features)
+         .join("text")
+           .attr("transform", d => `translate(${geoPath.centroid(d)})`) // gets projected centroid (in pixels))
+           .text(d => d3.geoArea(d) > .01 ? d.id : '') // show id if area is large enough (in steradians)
+           .style("font-size", "8px")
+           .style("font-family", "Arial, sans-serif")
+           .style("fill", "black")
+           .style("text-anchor", "middle");
+     */
+</script>
+
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Clipping an Orthographic projection</title>
+    <link rel="stylesheet" href="../../css/maps.css">
+    <link rel="stylesheet" href="../css/projection-config.css">
+</head>
+<body>
+<h1>Clipping a Mercator projection</h1>
+<p>Using <code>clipAngle(degrees)</code> to apply clipping to an Mercator projection. Use values from 0 to 90.
+The center is selected with <code>rotate()</code>, which will be applied to the unprojected map.</p>
+<div id="switcher"></div>
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+    const d3 = Object.assign({}, d3_all, d3_geo_projection);
+    import {map, loadTopoJSON, renderMap} from "../../js/maps.js";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../../data/world/world-medres.topojson";
+    const key  = "world";
+
+    loadTopoJSON(file, key).then(() => {
+        drawClippedMap(90);     // This is the default (show only near hemisphere)
+        drawClippedMap(60);     // Clip 60 degrees radius on the near side
+    });
+
+    function drawClippedMap(angle, highlight = true) {
+        const dim = {width: map.dim.width/2, height: map.dim.height/2};
+        const extent = [[0,5],[dim.width, dim.height-10]];
+
+        let refPath = null;
+        if(highlight) {
+            const refProjection = d3.geoMercator().fitExtent(extent, {type: "Sphere"})
+            refPath = d3.geoPath().projection(refProjection);
+        }
+
+        const projection = d3.geoMercator().fitExtent(extent, {type: "Sphere"})
+                             .clipAngle(angle);
+
+        const geoPath = d3.geoPath().projection(projection);
+        const svg = d3.select("body").append("svg")
+                      .attr("width", map.dim.width/2).attr("height", map.dim.height/2)
+                      .style("margin-right", "10px");
+
+        renderMap(svg.append("g").attr("class", "underlay"), refPath, dim);
+        svg.selectAll("path").style("opacity", .25);
+
+        renderMap(svg.append("g").attr("class", "clipped"), geoPath, dim);
+
+        svg.append("text")
+           .attr("x", 5).attr("y", 15)
+           .text(`clipAngle: ${angle}°`);
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Clipping an Orthographic projection</title>
+    <link rel="stylesheet" href="../../css/maps.css">
+    <link rel="stylesheet" href="../css/projection-config.css">
+</head>
+<body>
+<h1>Clipping an Orthographic projection</h1>
+<p>Using <code>clipAngle(degrees)</code> to apply clipping to an Orthographic projection. By default, this
+projection is clipped at 90 degrees, so that only the part of the globe that would be visible
+to the viewer in perspective is shown. By expanding it, the opposite parts of the globe are shown.
+    By reducing it, you can clip a section of the globe (this example is centered on Iceland.)
+    The lighter map is the default projection (90 degree clipping), shown as a reference.</p>
+<div id="switcher"></div>
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+    const d3 = Object.assign({}, d3_all, d3_geo_projection);
+    import {map, loadTopoJSON, renderMap} from "../../js/maps.js";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../../data/world/world-medres.topojson";
+    const key  = "world";
+
+    loadTopoJSON(file, key).then(() => {
+        drawClippedMap(90);     // This is the default (show only near hemisphere)
+        drawClippedMap(180);    // Show entire globe (no clipping - show all points)
+        drawClippedMap(20);     // Clip 20 degrees radius on the near side
+    });
+
+    function drawClippedMap(angle, highlight = true) {
+        const dim = {width: map.dim.width/2, height: map.dim.height/2};
+        const rotate = [19,-65,0]; // Great Britain centroid
+        const extent = [[0,5],[dim.width, dim.height-10]];
+
+        let refPath = null;
+        if(highlight) {
+            const refProjection = d3.geoOrthographic().rotate(rotate)
+                                    .fitExtent(extent, {type: "Sphere"})
+            refPath = d3.geoPath().projection(refProjection);
+        }
+
+        const projection = d3.geoOrthographic()
+                             .fitExtent(extent, {type: "Sphere"})
+                             .rotate(rotate)
+                             .clipAngle(angle);
+
+        const geoPath = d3.geoPath().projection(projection);
+        const svg = d3.select("body").append("svg")
+                      .attr("width", dim.width).attr("height", dim.height)
+                      .style("margin-right", "10px");
+
+        renderMap(svg.append("g").attr("class", "underlay"), refPath, dim);
+        svg.selectAll("path").style("opacity", .25);
+
+        renderMap(svg.append("g").attr("class", "clipped"), geoPath, dim);
+
+        svg.append("text")
+           .attr("x", 5).attr("y", 15)
+           .text(`clipAngle: ${angle}°`);
+    }
+</script>
+
+</body>
+</html>

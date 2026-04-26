@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Drawing shadow hemispheres</title>
+    <link rel="stylesheet" href="css/hemispheres.css">
+</head>
+<body>
+<h1>Drawing shadow hemispheres</h1>
+<p>See the code for the circles and graticules in <code>js/hemispheres.js</code>, and CSS styles in <code>css/hemispheres.css</code></p>
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+    const d3 = Object.assign({}, d3_all, d3_geo_projection);
+    import * as hemispheres from "./js/hemispheres.js";
+    import {map, loadTopoJSON, updateMap, createProjectionSwitcher} from "../js/maps.js";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../data/world/world-medres.topojson";
+    const key  = "world";
+    map.projection = d3.geoMercator();
+    map.geoPath = d3.geoPath().projection(map.projection);
+    map.view = d3.select("body").append("svg")
+                 .attr("width", map.dim.width).attr("height", map.dim.height);
+
+    // A blur filter for the shadow hemisphere.
+    hemispheres.addBlurFilter(map.view, );  // see code in hemispheres.js
+
+    loadTopoJSON(file, key).then(() => {
+        hemispheres.drawBackgroundCircle(map.view, map.geoPath);
+        hemispheres.drawGraticule(map.view, map.geoPath);
+        hemispheres.drawCircles(map.view, map.geoPath);
+        hemispheres.drawFeatures(map.view, map.geoPath, map.data.features);
+        hemispheres.drawForegroundOutline(map.view, map.geoPath);
+        hemispheres.drawShadow(map.view, map.geoPath);  // see code in hemispheres.js
+
+        createProjectionSwitcher((evt, projections) => {
+            map.projection = projections[+evt.target.value].config;
+            map.geoPath.projection(map.projection);
+            updateMap([".shadow", ".country", ".hemisphere", ".circle"]);
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Projections focusing parts of the globe</title>
+    <link rel="stylesheet" href="../css/tissot.css">
+    <link rel="stylesheet" href="css/projections.css">
+</head>
+<body>
+<h1>Projections focusing parts of the globe</h1>
+<p>Choose a projection from the list. This selection includes projections adjusted to certain parts of the globe.
+Equator, prime and anti-meridian are highlighted in blue.
+Orange circles are Tissot's indicatrix and indicate changes in area and distortions.
+Orange latitude bands indicate secant zones (within two parallels).</p>
+<div class="container">
+    <div id="sidebar">
+        <ol></ol>
+    </div>
+    <svg id="map" width="960" height="500">
+        <defs/>
+    </svg>
+</div>
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+    import * as d3_geo_polygon from "https://cdn.skypack.dev/d3-geo-polygon@1";
+    const d3 = Object.assign({}, d3_all, d3_geo_projection, d3_geo_polygon);
+    import * as map from "./js/projections.js";
+
+    const width = 960, height = 500;
+    const projections = [
+        {
+            name: "Conic Albers",
+            projection: d3.geoAlbers().scale(350),
+            tissot: {radius: 1.5, stepLon: 20},
+        },{
+            name: "Conic Albers USA",
+            projection: d3.geoAlbersUsa(),
+            tissot: {radius: 1.5, stepLon: 20},
+            filter: d => d.properties.ISO_A3 === 'USA'
+        },{
+            name: "Chamberlin Trimetric Africa",
+            projection: d3.geoChamberlin([0, 22], [45, 22], [22.5, -22])
+                .scale(300),
+            tissot: {radius: 1.5, stepLon: 20}
+        },{
+            name: "Chamberlin Trimetric South America",
+            projection: d3.geoChamberlin([-79, -6],[-36, -7],[-70, -50])
+                .scale(300),
+            tissot: {radius: 1.5, stepLon: 20}
+        },{
+            name: "Two Point Azimuthal USA",
+            projection: d3.geoTwoPointAzimuthalUsa(),
+            tissot: {radius: 1.5, stepLon: 20}
+        },{
+            name: "Two Point Equidistant USA",
+            projection: d3.geoTwoPointEquidistantUsa().scale(500),
+            tissot: {radius: 1.5, stepLon: 20}
+        },{
+            name: "Modified Stereographic Alaska",
+            projection: d3.geoModifiedStereographicAlaska(),
+            tissot: {radius: 1.5, stepLon: 20}
+        },{
+            name: "Modified Stereographic GS 48",
+            projection: d3.geoModifiedStereographicGs48(),
+            tissot: {radius: 1.5, stepLon: 20}
+        }
+    ];
+
+    // If different file is used in a map, change it after this line
+    projections.map(p => {p.file = "world/world-medres.topojson"; p.key= "world"; return p;});
+
+    projections.forEach(function(d,i) {
+        d3.select("#sidebar ol")
+                .append("li")
+                .attr("id", "p"+i)
+                .on("mouseover", () => map.showMap(d, i))
+        .text(d.name);
+    })
+
+    map.showMap(projections[0], 0);
+</script>
+
+</body>
+</html>

@@ -64,7 +64,7 @@ const app = {
 The `js/view.js` file will contain the code for rendering the chart. For now, just import the D3 library and the `js/common.js` module and create the SVG with a single `<g>` container for the chart placed in the center:
 
 ```js
-import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import {app, dim} from "./common.js";
 
 d3.select("#limit").text(app.limit);        // update the title of the page
@@ -114,7 +114,7 @@ Now let’s load the data.
 Open `js/data.js`, import the D3 library, and the `app` and `data` objects from `js/common.js`. Then create a constant with the URL of the CSV file. The following assumes that you are loading the file from the local `data/` folder in your project:
 
 ```js
-import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import {app, data} from "./common.js";
 
 const file = "../data/gdp-world-bank-2022.csv";
@@ -198,7 +198,7 @@ We can now finally render the pie.
 Open `js/view.js` and add an import for the `data` object from `js/common.js`:
 
 ```js
-import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import {app, dim, data} from "./common.js";
 ```
 

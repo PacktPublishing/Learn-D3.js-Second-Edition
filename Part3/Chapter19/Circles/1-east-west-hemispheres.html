@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Drawing eastern and western globe hemispheres</title>
+    <link rel="stylesheet" href="css/hemispheres.css">
+</head>
+<h1>Drawing eastern and western globe hemispheres</h1>
+<body>
+<script type="module">
+        import * as d3_all from "https://cdn.skypack.dev/d3@7";
+        import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+        const d3 = Object.assign({}, d3_all, d3_geo_projection);
+
+        import {map, loadTopoJSON, updateMap, createProjectionSwitcher} from "../js/maps.js";
+
+        map.dim = {width: 960, height: 500};
+        const file = "../data/world/world-medres.topojson";
+        const key  = "world";
+        map.projection = d3.geoMercator();
+        map.geoPath = d3.geoPath().projection(map.projection);
+        map.view = d3.select("body").append("svg")
+                     .attr("width", map.dim.width).attr("height", map.dim.height);
+
+        loadTopoJSON(file, key).then(() => {
+            drawGraticule();
+            drawCircles();
+            drawFeatures();
+
+            createProjectionSwitcher((evt, projections) => {
+                map.projection = projections[+evt.target.value].config;
+                map.geoPath.projection(map.projection);
+                updateMap([".shadow", ".country", ".hemisphere"]);
+            });
+        });
+
+
+    function drawFeatures() {
+        map.view.selectAll("path.country")
+           .data(map.data.features)
+              .join("path").attr("class","country")
+                .attr("d", map.geoPath);
+    }
+
+    function drawGraticule() {
+        map.view.append("path").attr("class", "graticule")
+            .datum(d3.geoGraticule())
+            .attr("d", map.geoPath);
+    }
+
+    function drawCircles() {
+        map.view.append("path").attr("class", "eastern hemisphere")
+           .datum(d3.geoCircle().center([90, 0])) // eastern hemisphere [0,90] = northern
+               .attr("d", map.geoPath);
+        map.view.append("path").attr("class", "western hemisphere")
+           .datum(d3.geoCircle().center([-90.01, 0])) // western hemisphere [0,-90] = southern
+               .attr("d", map.geoPath);
+    }
+</script>
+
+</body>
+</html>

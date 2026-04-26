@@ -1,0 +1,31 @@
+.graticule {
+    fill: none;
+    stroke-width: 1;
+    stroke: gray;
+}
+.background {
+    fill: blue;
+    fill-opacity: .1;
+    stroke: gray;
+    stroke-width: .5;
+}
+
+.standard-parallels {
+    stroke: navy;
+    stroke-width: 2;
+    stroke-dasharray: 5 5;
+}
+.equator-meridians {
+    stroke-width: 3;
+}
+
+.equator {
+    stroke: red;
+    stroke-width: 2px;
+    fill: none;
+}
+.meridian {
+    stroke: blue;
+    stroke-width: 2px;
+    fill: none;
+}

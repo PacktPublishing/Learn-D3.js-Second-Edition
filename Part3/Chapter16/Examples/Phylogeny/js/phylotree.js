@@ -2,7 +2,7 @@
  * Simple Phylogenetic Tree Parser (for Newick TNT format)
  * This function takes a Newick format string and parses it into a hierarchical JavaScript object.
  */
-import * as d3 from "https://cdn.skypack.dev/d3@7.9.0";
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 export function parseTree(input) {
     let index = 0;

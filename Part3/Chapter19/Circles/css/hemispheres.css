@@ -1,0 +1,84 @@
+.background {
+    fill: hsl(190,100%,90%);
+}
+
+.shadow {
+    fill: rgba(0%,0%,0%,0.4);
+}
+
+.hemisphere {
+    stroke-width: 3;
+    stroke-opacity: .2;
+    fill-opacity: .3;
+}
+
+.southern {
+    stroke: green;
+    fill: green;
+}
+.northern {
+    stroke: orange;
+    fill: orange;
+}
+
+.eastern {
+    stroke: red;
+    fill: red;
+}
+.western {
+    stroke: blue;
+    fill: blue;
+}
+
+.opposite {
+    stroke: purple;
+    fill: purple;
+}
+
+.tropic {
+    fill: purple;
+    fill-opacity: .2;
+}
+.polar {
+    fill: hsl(240,100%,90%)
+}
+.circle {
+    fill: none;
+    stroke-width: 2;
+    stroke-dasharray: 5 5;
+    stroke-opacity: 1;
+    stroke: purple;
+}
+
+.country, .feature, .feature path {
+    stroke: white;
+    stroke-width: .25;
+    fill: gray;
+    fill-opacity: .7;
+}
+
+.graticule {
+    fill: none;
+    stroke-width: .5;
+    stroke: darkslategray;
+}
+.outline {
+    stroke-width: 3;
+    stroke: black;
+    fill: none;
+}
+
+.meridian, .parallel {
+    fill: none;
+    stroke-width: 3;
+    stroke-opacity: .5;
+}
+.equator {
+    stroke: blue;
+}
+.prime, .anti {
+    stroke: red;
+}
+
+
+

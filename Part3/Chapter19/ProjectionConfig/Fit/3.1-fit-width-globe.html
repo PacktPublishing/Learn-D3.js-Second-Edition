@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fitting in the viewport by width</title>
+    <link rel="stylesheet" href="../css/projection-config.css">
+    <link rel="stylesheet" href="../../css/maps.css">
+</head>
+<body>
+<h1>Fitting in the viewport by width</h1>
+<p>Using <code>fitWidth(dim.width, {type: "Sphere"}) to fit the globe by stretching its width to fit the viewport.</code></p>
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+    const d3 = Object.assign({}, d3_all, d3_geo_projection);
+    import {map, makeMap} from "../../js/maps.js";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../../data/world/world-medres.topojson";
+    const key  = "world";
+
+    map.projection = d3.geoMercator()
+                        .translate([120,45])  // these are ignored because of fitXXX
+                        .scale(300)           // these are ignored because of fitXXX
+                        .center([50,50])      // these are ignored because of fitXXX
+                        .fitWidth(map.dim.width, {type: "Sphere"});
+
+    map.geoPath = d3.geoPath().projection(map.projection);
+    makeMap(file, key);
+</script>
+
+</body>
+</html>

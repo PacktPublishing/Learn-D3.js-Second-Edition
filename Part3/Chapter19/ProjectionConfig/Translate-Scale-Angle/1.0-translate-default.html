@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Default translation (for Mercator)</title>
+    <link rel="stylesheet" href="../css/projection-config.css">
+    <link rel="stylesheet" href="../../css/maps.css">
+</head>
+<body>
+<h1>Default translation (for Mercator)</h1>
+<p>Default position for (0,0) degrees of (lon,lat) is the center of a standard viewport of 960x500 pixels (480,250).</p>
+
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+    const d3 = Object.assign({}, d3_all, d3_geo_projection);
+    import {map, renderMap, loadTopoJSON, drawViewportAxes} from "../../js/maps.js";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../../data/world/world-medres.topojson";
+    const key  = "world";
+
+    map.projection = d3.geoMercator()
+    //    .translate([480,250]); // default for Mercator (center is translated to middle of 960x500)
+
+    map.geoPath = d3.geoPath().projection(map.projection);
+    loadTopoJSON(file, key).then(() => {
+        renderMap();
+        drawViewportAxes(map);
+    });
+</script>
+
+</body>
+</html>

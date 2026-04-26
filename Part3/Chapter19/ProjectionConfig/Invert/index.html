@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Getting geo coordinates from pixel positions</title>
+    <link rel="stylesheet" href="../css/projection-config.css">
+    <link rel="stylesheet" href="../../css/maps.css">
+</head>
+<body>
+<h1>Getting geo coordinates from pixel positions</h1>
+<p>This code uses <code>projection.inverse()</code> to convert pixel positions to projected geographical coordinates.
+    Click anywhere in the map to view coordinates. View pixel results in JavaScript console.</p>
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+    const d3 = Object.assign({}, d3_all, d3_geo_projection);
+    import {map, renderMap, updateMap, loadTopoJSON, createProjectionSwitcher} from "../../js/maps.js";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../../data/world/world-medres.topojson";
+    const key  = "world";
+    map.projection = d3.geoMercator();
+    map.geoPath = d3.geoPath().projection(map.projection);
+
+    loadTopoJSON(file, key).then(() => {
+        renderMap(map.view);
+        createProjectionSwitcher((evt, projections) => {
+            map.projection = projections[+evt.target.value].config;
+            map.geoPath.projection(map.projection);
+            updateMap();
+        });
+
+        d3.selectAll('path').on('click', showCoords);       // see function below
+        map.view.append("rect").attr("height", 22)
+                .attr("width", 280).
+                style("fill", "white").style("opacity", .75);
+        map.view.append("text").attr("class", "coords")
+                .attr("x", 5).attr("y", 15).style("font", "14px sans-serif")
+                .text(`Click for coordinates.`);
+    });
+
+    // Using projection.invert() to obtain pixel positions
+    function showCoords(evt) {
+        const pixels = d3.pointer(evt);
+        const coords = map.projection.invert(d3.pointer(evt));
+
+        // Print to console
+        console.log('pixels', pixels);
+        console.log('coords', coords);
+
+        // Display on screen
+        const lon = Math.abs(coords[0].toFixed(2));
+        const lat = Math.abs(coords[1].toFixed(2));
+        map.view.select("text.coords")
+                .text(`Longitude: ${lon}° ${lat > 0 ? 'E' : 'W'}, Latitude: ${lat}° ${lat > 0 ? 'N' : 'S'}`);
+    }
+
+</script>
+
+</body>
+</html>

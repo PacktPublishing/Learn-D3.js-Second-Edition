@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>d3-geo-polygon</title>
+    <link rel="stylesheet" href="../css/tissot.css">
+    <link rel="stylesheet" href="css/projections.css">
+</head>
+<body>
+<h1>All projections from <code>d3-geo-polygon</code></h1>
+<p>Choose a projection from the list. Projections are using default parameters.</p>
+<div class="container">
+    <div id="sidebar">
+        <ol></ol>
+    </div>
+    <svg id="map" width="960" height="500">
+        <defs/>
+    </svg>
+</div>
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_polygon from "https://cdn.skypack.dev/d3-geo-polygon@2";
+    const d3 = Object.assign({}, d3_all, d3_geo_polygon);
+    import * as map from "./js/projections.js";
+
+    const width = 960, height = 500;
+    const dataFile = '../data/world/world-lowres.topojson';
+
+    const all = [
+        "geoPolyhedralVoronoi",
+        "geoCubic",
+        "geoDodecahedral",
+        //"geoRhombic",
+        //"geoDeltoidal",
+        "geoIcosahedral",
+        "geoAirocean",
+        "geoCahillKeyes",
+        "geoImago",
+        "geoTetrahedralLee",
+        "geoCox",
+        "geoComplexLog",
+        "geoPolyhedralButterfly",
+        "geoPolyhedralCollignon",
+        "geoPolyhedralWaterman",
+        "geoBerghaus",
+        "geoGingery",
+        "geoHealpix",
+        "geoInterruptedBoggs",
+        "geoInterruptedHomolosine",
+        "geoInterruptedMollweide",
+        "geoInterruptedMollweideHemispheres",
+        "geoInterruptedSinuMollweide",
+        "geoInterruptedSinusoidal",
+     //  "geoTwoPointEquidistant",
+        "geoTwoPointEquidistantUsa",
+    ];
+
+    const projections = all.map(p => {
+        return {
+            name: p.split("geo")[1],
+            projection: d3[p]().fitExtent([[10,10], [width-20, height-20]], {type: "Sphere"}),
+            tissot: {radius: 2, stepLon: 30, stepLat: 10, maxLon: 180, maxLat: 90}
+        }
+    });
+
+    projections.map(p => {p.file = "world/world-medres.topojson"; p.key= "world"; return p;});
+
+    projections.forEach(function(d,i) {
+        d3.select("#sidebar ol")
+                .append("li")
+                .attr("id", "p"+i)
+                .on("mouseover", () => map.updateMap(d, i))
+        .text(d.name);
+    })
+
+    map.showMap(projections[0], 0);
+</script>
+
+</body>
+</html>

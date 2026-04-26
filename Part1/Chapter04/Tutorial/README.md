@@ -73,16 +73,16 @@ const url = "world-lowres.geojson";
 Load the file and create a new `countries` array with the data. Extract `properties.name` and `id` from each `feature` object to get the names and three-letter codes of the countries. The following code creates a new `countries` array with objects containing `name` and `id` properties, and then calls a `draw()` function:
 
 ```javascript
-d3.json(url)  
-  .then(function(data) {  
-    const countries = data.features.map(obj => {  
-    return {  
-        name: obj.properties.name,  
-        id: obj.id  
-    };  
-  });  
-  draw(countries);  
-});
+d3.json(url)
+    .then(function (data) {
+        const countries = data.features.map(obj => {
+            return {
+                name: obj.properties.name,
+                id: obj.id
+            };
+        });
+        drawFeatures(countries);
+    });
 ```
 
 The `draw()` function selects the page’s `<body>`, adds an `<ol>` ordered list block, and appends an `<li>` list item containing each country’s name and ID:
