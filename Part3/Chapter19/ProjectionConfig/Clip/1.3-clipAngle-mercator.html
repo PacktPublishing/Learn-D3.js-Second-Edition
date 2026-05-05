@@ -22,8 +22,8 @@ The center is selected with <code>rotate()</code>, which will be applied to the 
     const key  = "world";
 
     loadTopoJSON(file, key).then(() => {
-        drawClippedMap(90);     // This is the default (show only near hemisphere)
-        drawClippedMap(60);     // Clip 60 degrees radius on the near side
+        drawClippedMap(90);
+        drawClippedMap(60);
     });
 
     function drawClippedMap(angle, highlight = true) {

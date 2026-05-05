@@ -3,14 +3,14 @@ path {
 }
 
 .graticule {
-    stroke: white;
+    stroke: green;
     stroke-width: 0.25;
     stroke-opacity: .5;
 }
 
 .graticule.major {
     stroke-width: 2;
-    stroke: blue
+    stroke: darkslategrey;
 }
 
 .outline {
@@ -19,15 +19,30 @@ path {
 }
 
 .background {
-    stroke: black;
-    fill: aquamarine;
-    fill-opacity: .5;
-    stroke-width: 2
+    fill: lightblue;
+    fill-opacity: 1;
 }
 
 .feature, .feature path {
     stroke: white;
-    fill: #363;
+    fill: gray;
     stroke-width: 0.5;
-    fill-opacity: 0.6;
+    fill-opacity: 1;
+}
+
+/* remove pointer events from tooltips */
+text, .tooltip rect, .graticule, .circle, .hemisphere {
+    pointer-events: none;
+}
+
+.merged {
+    fill: darkolivegreen;
+    stroke: darkslategray;
+    stroke-width: 4;
+}
+
+.mesh {
+    fill: none;
+    stroke: navajowhite;
+    stroke-width: 0.5;
 }

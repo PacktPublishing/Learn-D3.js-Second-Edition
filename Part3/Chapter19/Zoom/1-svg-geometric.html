@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple geometric SVG zoom</title>
+    <link rel="stylesheet" href="../css/maps.css">
+    <style>
+        svg {border: solid 1px gray;}
+    </style>
+</head>
+<body>
+<h1>Simple geometric SVG zoom</h1>
+<p>Use the <b>mouse wheel</b> or <b>double-click/shift-double-click</b> to zoom in and out, drag to pan.
+    This implementation uses geometric SVG zooming and panning (SVG transforms)
+to provide a very basic zooming and panning feature to a map.</p>
+<div id="rotate-controls">
+    Rotate the axis (yaw) <input type="number" name="yaw" id="yaw" min="-180" max="180" step="10" value="0">
+</div>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {map, renderMap, updateMap, loadTopoJSON, createProjectionSwitcher} from "../js/maps.js";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../data/world/world-medres.topojson";
+    const key  = "world";
+    map.projection = d3.geoMercator();
+    map.geoPath = d3.geoPath().projection(map.projection);
+
+    // Setup zoomable container in the SVG viewport as the main view
+    const svg = d3.select("body").append("svg")
+                  .attr("width", map.dim.width).attr("height", map.dim.height);
+    map.view = svg.append("g").attr("class", "globe");
+
+    // Setup zoom and connect to the view container.
+    const zoom = d3.zoom()
+        .scaleExtent([1, 40])
+        .translateExtent([[0, 0], [map.dim.width, map.dim.height]])
+        .extent([[0, 0], [map.dim.width, map.dim.height]])
+        .on('zoom', evt => map.view.attr("transform", evt.transform));
+
+    map.view.call(zoom);
+
+    // Load and render the map, and setup other interactive controls
+    await loadTopoJSON(file, key);
+    renderMap(map.view);
+    createProjectionSwitcher((evt, projections) => {
+        map.projection = projections[+evt.target.value].config;
+        map.geoPath.projection(map.projection);
+        updateMap();
+        d3.select("#yaw").node().value = map.projection.rotate()[0].toFixed(0);
+    });
+
+    // Interactive rotation
+    d3.select("#yaw").on("change", () => {
+        const value = +d3.select("#yaw").node().value;
+        if(Math.abs(value) === 180) {
+            d3.select("#yaw").node().value = -value;
+        }
+        const rotation = map.projection.rotate();
+        map.projection.rotate([+d3.select("#yaw").node().value, rotation[1], rotation[2]]);
+        updateMap(null, 0);
+    });
+
+</script>
+
+</body>
+</html>

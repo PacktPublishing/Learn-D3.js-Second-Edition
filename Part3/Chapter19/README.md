@@ -4,30 +4,60 @@ Files and exercises for chapter 19.
 
 ## 1) Description of each subfolder in this folder
 
-__`TODO/`__
+__`MapMaking/`__
 
-Description.
+A practical hands-on introduction to the `d3-geo` module, `d3.geoPath()`, and GeoJSON.
 
-__`TODO/`__
+__`Projections/`__
 
-Description.
+Interactive demonstrations of all the projections in D3.
 
-__`TODO/`__
+__`Graticules/`__
 
-Description.
+Examples using `d3.geoGraticule()`.
 
-__`TODO/`__
+__`Circles/`__
 
-Description.
+Examples using `d3.geoCircle()`.
 
-__`StepByStep/`__
+__`ProjectionConfig/`__
 
-Description.
+Examples using projection methods.
+
+__`PathGeometry/`__
+
+Examples using methods and functions to compute areas, lengths, centroids, bounds, containment, etc.
+
+__`Animation/`__
+
+Rotating globes.
+
+__`Zoom/`__
+
+Examples of interactive zoom implementations, using SVG transforms and projection methods.
+
+__`Drag/`__
+
+Examples of interactive map rotation using `d3.drag`, `d3.zoom`, `versor` and `d3-inertia` libraries.
+
+__`Examples/`__
+
+Examples using the `d3-geo` library.
+
+__`Exercises/`__
+
+Exercise templates and solutions.
 
 __`data/`__
 
-Description.
+Data used in the examples.
 
-Resources used by examples and exercises in the other folders (they are loaded using relative URLs).
+__`js/`__
+
+Scripts and modules used in several examples.
+
+__`css/`__
+
+Style sheets used in several examples.
 
 

@@ -16,13 +16,10 @@ __`Chapter18/`__
 Code for Chapter 18 - Force-directed networks.
 
 __`Chapter19/`__
-Code for Chapter 19 - Using geographical data.
+Code for Chapter 19 - Geographical visualizations.
 
 __`Chapter20/`__
-Code for Chapter 20 - Geographical visualizations.
-
-__`Chapter21/`__
-Code for Chapter 21 - Applications.
+Code for Chapter 21 - Applications - online chapter.
 
 ## 2) CodePen links to selected examples
 

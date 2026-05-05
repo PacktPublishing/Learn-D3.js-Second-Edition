@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Computing areas</title>
+    <link rel="stylesheet" href="../css/maps.css">
+    <style>
+        svg {border: solid 1px gray;}
+        text {
+            font-family: "Arial Narrow", sans-serif;
+            font-size: 12px;
+        }
+        .selected {
+            stroke-width: 1px !important;
+            fill: orange !important;
+        }
+    </style>
+</head>
+<h1>Computing areas</h1>
+<p>Use <code>d3.geoArea()</code> to obtain the projection-independent area of a feature in steradians (square radians).
+You can obtain the value in square km or square miles from it. Use <code>geoPath.area(feature)</code> to
+obtain the displayed area in pixels. This value is projection and viewport-dependent.</p>
+<p>See code in <code>js/geometry.js</code>. Compare using different projections.</p>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {map, renderMap, updateMap, loadTopoJSON, createProjectionSwitcher} from "../js/maps.js";
+    import {showArea, hide, setupTooltip} from "./js/geometry.js";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../data/world/world-lowres.topojson";
+    const key  = "world";
+    map.projection = d3.geoMercator().scale(80); // Full Mercator
+    map.geoPath = d3.geoPath().projection(map.projection).pointRadius(2); // radius of the airports
+
+    await loadTopoJSON(file, key);
+
+    // Show country name if it is short, otherwise show the id (ISO_A3 code)
+    map.data.features.map(d => d.id = d.properties.name.length > 15 ? d.id : d.properties.name);
+
+    renderMap(map.view);
+    createProjectionSwitcher((evt, projections) => {
+        map.projection = projections[+evt.target.value].config;
+        map.geoPath.projection(map.projection);
+        if(projections[+evt.target.value].name === 'Mercator') {
+           map.projection.scale(80); // Full Mercator
+        }
+        updateMap();
+    });
+
+    d3.selectAll(".feature path")
+        .on('mouseenter', showArea)
+        .on('mouseleave', hide);
+
+    setupTooltip(map, 100, 80, 3);
+</script>
+
+</body>
+</html>

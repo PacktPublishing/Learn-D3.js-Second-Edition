@@ -30,7 +30,7 @@ Equator, prime and anti-meridian are highlighted in blue.
     const dim = {width: 960, height: 500};
     const dataFile = '../data/world/world-lowres.topojson';
 
-    const projections = [
+    const azimuthal = [
         {
             name: "Azimuthal Equidistant",
             projection: d3.geoAzimuthalEquidistant(),
@@ -52,7 +52,7 @@ Equator, prime and anti-meridian are highlighted in blue.
             projection: d3.geoStereographic().scale(100).clipAngle(170),
             tissot: {radius: 2.5, stepLon: 30, stepLat: 10, maxLon: 180, maxLat: 90}
         },{
-            name: "Azimuthal Conformal (Stereographic) South Pole",
+            name: "Azimuthal Conformal (Stereographic) S. Pole",
             projection: d3.geoStereographic().rotate([0,90,0]),
             tissot: {radius: 2.5, stepLon: 20, stepLat: 10, maxLon: 180, maxLat: 90}
         },{
@@ -74,9 +74,11 @@ Equator, prime and anti-meridian are highlighted in blue.
                     // .scale(140) // default
                     .rotate([0,-90,0]),
             tissot: {}, // use defaults
-            file: "world-lowres.topojson",
-            key: "world"
-        },{
+        }
+    ];
+
+    const conic = [
+        {
             name: "Conic Equidistant (0,60)",
             projection: d3.geoConicEquidistant().fitExtent([[0,0],[dim.width, dim.height]], {type: 'Sphere'}),
             tissot: {radius: 1.5, stepLon: 20}
@@ -115,7 +117,10 @@ Equator, prime and anti-meridian are highlighted in blue.
                     //.parallels([-30,-30]), // default parallels inverted
                     .parallels([-50,10]),
             tissot: {radius: 1.5, stepLon: 20}
-        },{
+        }
+        ];
+    const cylindrical = [
+        {
             name: "Cylindrical Equidistant (Plate Carree)",
             projection: d3.geoEquirectangular(),
             tissot: {radius: 1.5, stepLon: 20}
@@ -164,15 +169,24 @@ Equator, prime and anti-meridian are highlighted in blue.
         }
     ];
 
-    projections.map(p => {p.file = "world/world-medres.topojson"; p.key= "world"; return p;});
+    const projections = [
+        {group: azimuthal, type: "Azimuthal"},
+        {group: conic, type: "Conic"},
+        {group: cylindrical, type: "Cylindrical"}
+    ];
 
-    projections.forEach(function(d,i) {
-        d3.select("#sidebar ol").append("li").attr("id", "p"+i)
-            .on("mouseover", () => map.updateMap(d, i))
-            .text(d.name);
-    })
+    projections.forEach(obj => {
+        obj.group.forEach(p => {p.file = dataFile; p.key= "world"; return p;});
 
-    map.showMap(projections[0], 0);
+        d3.select("#sidebar ol").append("h2").text(obj.type);
+        obj.group.forEach(function(d,i) {
+            d3.select("#sidebar ol").append("li").attr("id", "p"+i)
+                .on("click", () => map.updateMap(d, i))
+                .text(d.name);
+        });
+    });
+
+    map.showMap(azimuthal[0], 0);
 </script>
 
 </body>

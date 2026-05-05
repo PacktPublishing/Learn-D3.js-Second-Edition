@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Zoom to projected feature</title>
+    <link rel="stylesheet" href="../css/maps.css">
+    <style>
+        svg {border: solid 1px gray;}
+        .selected path {
+            fill-opacity: 1;
+            fill: orange;
+            stroke: navy;
+            stroke-width: 1px;
+        }
+        .feature text {
+            font-family: sans-serif;
+            fill-opacity: 1;
+            opacity: 1;
+            font-size: 20px;
+            fill: white;
+        }
+    </style>
+</head>
+<body>
+<h1>Zoom to projected feature</h1>
+<p>This example fits a selected feature, as projected, in the viewport. The projection is unchanged, so
+the feature is scaled up as it appears in the current projection (it may be distorted or incomplete
+if near the edges of the map). <b>Click</b> on any country to zoom to it. <b>Double-click</b> anywhere to unzoom.</p>
+<p>Note that a feature may include objects that are distant from the clicked shape (e.g. France also
+    includes French Guyana, so clicking on France will select a large area of the Atlantic ocean).</p>
+<div id="rotate-controls">
+    Rotate the axis (yaw) <input type="number" name="yaw" id="yaw" min="-180" max="180" step="10" value="0">
+</div>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {map, renderMap, updateMap, loadTopoJSON, createProjectionSwitcher} from "../js/maps.js";
+    import {isValid} from "../js/brush-utils.js";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../data/world/world-medres.topojson";
+    const key  = "world";
+    map.projection = d3.geoMercator();
+    map.geoPath = d3.geoPath().projection(map.projection);
+
+    // An object to save initial projection parameters
+    const initial = {
+        scale: map.projection.scale(),
+        translate: map.projection.translate()
+    }
+
+    // Set up SVG viewport and zoom container inside it as the main view
+    const svg = d3.select("body").append("svg")
+                  .attr("width", map.dim.width).attr("height", map.dim.height);
+    map.view = svg.append("g").attr("class", "globe");
+
+    // Load and render the map
+    await loadTopoJSON(file, key);
+    renderMap(map.view);
+
+    // Will zoom in to feature when clicked
+    d3.selectAll(".feature").on("click", featureZoom);
+
+    // A text element to show the name of the selected feature
+    d3.selectAll(".feature").append("text").attr("text-anchor", "middle")
+
+    // Click anywhere to unzoom - instead of reverting to the initial scale and translate
+    // we are fitting the whole globe in the viewport
+    map.view.on("dblclick", function(evt) {
+        evt.stopPropagation();
+        map.projection
+            // .scale(initial.scale).translate(initial.translate)
+            .fitSize([map.dim.width, map.dim.height], {type: "Sphere"}); // fitting the globe
+        updateMap();
+        resetDetails();
+    });
+
+    // set up other interactive controls
+    createProjectionSwitcher((evt, projections) => {
+        map.projection = projections[+evt.target.value].config;
+        map.geoPath.projection(map.projection);
+        updateMap();
+        d3.select("#yaw").node().value = map.projection.rotate()[0].toFixed(0);
+        resetDetails();
+    });
+
+    // Interactive rotation
+    d3.select("#yaw").on("change", () => {
+        const value = +d3.select("#yaw").node().value;
+        if(Math.abs(value) === 180) {
+            d3.select("#yaw").node().value = -value;
+        }
+        const rotation = map.projection.rotate();
+        map.projection.rotate([+d3.select("#yaw").node().value, rotation[1], rotation[2]]);
+        updateMap(null, 0);
+        resetDetails();
+    });
+
+    // Fit a feature in the current projection when clicked and print its name
+    function featureZoom(evt, feature) {
+        map.projection.fitSize([map.dim.width, map.dim.height], feature);
+
+        resetDetails();
+
+        d3.select(this).classed("selected", true);
+        d3.select(this).raise().select("text")
+            .attr("transform", `translate(${map.geoPath.centroid(feature)})`)
+            .text(feature.properties.NAME);
+
+        updateMap(null, 250);    // uses a 500ms transition for a smooth change
+    }
+
+    function resetDetails() {
+        d3.selectAll(".feature").classed("selected", false).select("text").text("");
+    }
+
+</script>
+
+</body>
+</html>

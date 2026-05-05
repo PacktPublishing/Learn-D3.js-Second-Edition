@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="css/projections.css">
 </head>
 <body>
-<h1>Selected projections from <code>d3-geo-projection</code> and <code>d3-geo-polygon</code></h1>
+<h1>Selected projections from <code>d3-geo</code>, <code>d3-geo-projection</code> and <code>d3-geo-polygon</code></h1>
 <p>Choose a projection from the list. Equator, prime and anti-meridian are highlighted in blue.
 Orange circles are Tissot's indicatrix and indicate changes in area and distortions.
 Orange latitude bands indicate secant zones (within two parallels).</p>
@@ -109,7 +109,7 @@ Orange latitude bands indicate secant zones (within two parallels).</p>
         d3.select("#sidebar ol")
             .append("li")
             .attr("id", "p"+i)
-            .on("mouseover", () => map.updateMap(d, i))
+            .on("click", () => map.updateMap(d, i))
             .text(d.name);
     })
 

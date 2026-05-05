@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rotation implemented with d3.geoInertiaDrag</title>
+    <link rel="stylesheet" href="../css/maps.css">
+    <style>
+        svg {border: solid 1px gray;}
+    </style>
+</head>
+<body>
+<h1>Rotation implemented with <code>d3.geoInertiaDrag</code></h1>
+<p><b>Drag the mouse</b> to rotate the globe with an inertial effect. Zooming is supported using the <b>mouse wheel</b> only.</p>
+<p>This is a quaternion-based inertial implementation using the <code>d3.geoInertiaDrag</code> function
+    from the <code>d3-inertia</code> library, by Philippe Rivière.
+    This library is based on the <code>versor</code> library and very easy to use.
+    It is available from<a href="https://github.com/Fil/d3-inertia">this GitHub repository</a>.
+</p>
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import {map, renderMap, updateMap, loadTopoJSON, createProjectionSwitcher} from "../js/maps.js";
+    import * as d3_inertia from 'https://cdn.jsdelivr.net/npm/d3-inertia@0.4.0/+esm';  // See https://github.com/Fil/d3-inertia
+    const d3 = Object.assign({}, d3_all, d3_inertia);
+
+    map.dim = {width: 960, height: 500};
+    const file = "../data/world/world-medres.topojson";
+    const key  = "world";
+    map.projection = d3.geoMercator();
+    map.geoPath = d3.geoPath().projection(map.projection);
+
+    // Transform parameters
+    let currentTransform = d3.zoomIdentity;
+    const initial = {
+        scale: map.projection.scale(),
+        translate: map.projection.translate()
+    }
+
+    // Setup zoomable container in the SVG viewport as the main view
+    const svg = d3.select("body").append("svg")
+                  .attr("width", map.dim.width).attr("height", map.dim.height);
+    map.view = svg.append("g").attr("class", "globe");
+
+    // Setup zoom behavior (using the mouse wheel) and connect to the view container.
+    const zoom = d3.zoom().filter((event) => event.type === 'wheel')
+                  .scaleExtent([.5,40])
+                  .on("zoom", evt => {
+                        const t = evt.transform;
+                        map.projection.scale(initial.scale * t.k)
+                        t.x = currentTransform.x;
+                        t.y = currentTransform.y;
+                        requestAnimationFrame(() => {
+                           updateMap(null, 0);
+                        });
+                  });
+    map.view.call(zoom);
+
+    // Add the inertia drag behavior
+    d3.geoInertiaDrag(map.view, () => updateMap(null, 0), map.projection);
+
+    // Load and render the map, and setup other interactive controls
+    await loadTopoJSON(file, key);
+    renderMap(map.view);
+    createProjectionSwitcher((evt, projections) => {
+        map.projection = projections[+evt.target.value].config;
+        map.geoPath.projection(map.projection);
+        updateMap(null, 0);
+        d3.geoInertiaDrag(map.view, () => updateMap(null, 0), map.projection);
+    });
+
+</script>
+
+</body>
+</html>

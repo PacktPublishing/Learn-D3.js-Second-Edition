@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Loxodrome</title>
+    <link rel="stylesheet" href="../css/maps.css">
+    <style>
+        svg {border: solid 1px gray;}
+        text {
+            font-family: "Arial Narrow", sans-serif;
+            font-size: 12px;
+        }
+        .route {
+            fill: none;
+            stroke-opacity: .7;
+        }
+        .selected {
+            stroke-width: 8 !important;
+            stroke: white !important;
+            stroke-opacity: 1 !important
+        }
+    </style>
+</head>
+<body>
+<h1>Loxodrome and orthodrome</h1>
+<p>Demonstrating "straight lines" in different projections. The blue line (orthodrome) is a great circle - the shortest
+    distance between Los Angeles and London, but it appears as a curve in regular cylindrical projections (Mercator, Natural
+    Earth, Plate Carée, Equal Area).</p>
+<p>If you use it for navigation, you need to adjust the bearing at every point. The red line (loxodrome), a straight line in
+    Mercator, has a constant bearing, but it is a longer route. You can rotate the globe so that this specific line appears
+    straight (press the <b>rotate([60, -60, 0]</b>) button. In the Gnomonic projection, all great circles (orthodromes) are straight lines,
+    but loxodromes are not. The Gnomonic projection projects the shortest distance as a straight line. </p>
+<p>To render the red line, it must be resampled so that its points are projected correctly on the map. </p>
+<p><button id="rotate" disabled>rotate([60, -60, 0]).scale(600)</button></p>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {map, renderMap, updateMap, loadTopoJSON, createProjectionSwitcher} from "../js/maps.js";
+    import {showMeasure, hide, setupTooltip} from "./js/geometry.js";
+    import {resample} from "../js/wgs84_resampling.js";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../data/world/world-lowres.topojson";
+    const key  = "world";
+    map.projection = d3.geoMercator().scale(380).center([-60,45]);
+    map.geoPath = d3.geoPath().projection(map.projection).pointRadius(3);
+
+    // Load map and render
+    await loadTopoJSON(file, key);
+    renderMap(map.view);
+    createProjectionSwitcher((evt, projections) => {
+        map.projection = projections[+evt.target.value].config;
+
+        // Fitting Gnomonic projection to show straight lines between airports
+        if (projections[+evt.target.value].name === 'Gnomonic') {
+            map.projection.scale(400).rotate([70, -90, -20]).translate([620, -30]).clipAngle(80);
+            d3.select("#rotate").property("disabled", true);
+        }
+        // Fitting Mercator projection to show straight lines between airports
+        else if (projections[+evt.target.value].name === 'Mercator') {
+            map.projection.scale(380).center([-60, 45]);
+            d3.select("#rotate").property("disabled", true);
+        } else {
+            d3.select("#rotate").property("disabled", false);
+        }
+        map.geoPath.projection(map.projection);
+        updateMap([".orthodrome", ".loxodrome"]);
+        map.view.selectAll(".airport text")
+            .attr("transform", d => map.geoPath.centroid(d).some(isNaN)
+                ? `translate(-100,-100)`
+                : `translate(${map.geoPath.centroid(d)})`);
+        map.view.select(".tooltip").style("opacity", 0);
+
+        // Click to rotate the globe to change the appearance of the orthodrome and loxodrome
+        d3.select("#rotate").on("click", () => {
+            const rotation = map.geoPath.projection().rotate();
+            const scale = map.geoPath.projection().scale();
+            map.geoPath.projection().rotate([60, -60, 0]).scale(600);
+            updateMap([".orthodrome", ".loxodrome"]);
+            setTimeout(() => {
+                map.geoPath.projection().rotate(rotation).scale(scale);
+                updateMap([".orthodrome", ".loxodrome"])
+            }, 2000);
+        });
+    });
+    setupTooltip(map);
+
+    const airports = [
+        {
+            id:"LHR",
+            name:"London Heathrow Airport",
+            city:"London",
+            passengers:78014598,
+            coordinates:[-0.461941,51.4706]
+        },{
+            id:"LAX",
+            name:"Los Angeles International Airport",
+            city:"Los Angeles",
+            passengers:84557968,
+            coordinates:[-118.4079971,33.94250107]
+        }];
+
+    const route = {
+        id:"LHR-LAX",
+        source: airports[0],
+        target: airports[1],
+    };
+
+    const lineString = route => ({
+            id: route.id,
+            type: "LineString",
+            coordinates: [
+                route.source.coordinates,
+                route.target.coordinates
+            ]
+    })
+
+    map.view.append("path").attr("class","orthodrome")
+        .datum(lineString(route))
+        .attr("d", map.geoPath)
+        .style("fill", 'none')
+        .style("stroke", 'blue')
+        .style('stroke-width', 5)
+        .on('mouseenter', showMeasure)
+        .on('mouseleave', hide)
+
+    map.view.append("path").attr("class","loxodrome")
+        .datum(resample(lineString(route)))
+        .attr("d", map.geoPath)
+        .style("fill", 'none')
+        .style("stroke", 'red')
+        .style('stroke-width', 5)
+        .on('mouseenter', showMeasure)
+        .on('mouseleave', hide)
+
+    // Update the map and tooltips after projection change or rotation
+    function update() {
+        updateMap([".airport path", ".route"]);
+        map.view.selectAll(".airport text")
+            .attr("transform", d => map.geoPath.centroid(d).some(isNaN)
+                ? `translate(-100,-100)`
+                : `translate(${map.geoPath.centroid(d)})`);
+        map.view.select(".tooltip").style("opacity", 0);
+    }
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Measuring distances and finding points on a great arc</title>
+    <link rel="stylesheet" href="../css/maps.css">
+    <style>
+        svg {border: solid 1px gray;}
+        text {
+            font-family: "Arial Narrow", sans-serif;
+            font-size: 12px;
+        }
+        .route {
+            fill: none;
+            stroke-opacity: .7;
+        }
+        .selected {
+            stroke-width: 8 !important;
+            stroke: white !important;
+            stroke-opacity: 1 !important
+        }
+    </style>
+</head>
+<body>
+<h1>Measuring distances and finding points on a great arc</h1>
+<p>You can measure geographical distances in radians (and convert to km or miles) between two points using <code>geoDistance([a,b])</code>
+    or compute the length of a GeoJSON Polygon or Linestring using <code>geoLength(object)</code>. You can also find the point at a given
+    position along the great arc between two points using <code>geoInterpolate([a,b])</code>, which returns a function that takes a parameter
+    between 0 and 1, and returns the coordinates of the point at that position along the great arc. For example <code>geoInterpolate([a,b])(0.5)</code>
+    gets the midpoint. To get the pixel distance, use <code>geoPath.measure(object)</code>, which returns the projection-dependent length of the path in pixels.</p>
+<p>This example measures the length of the route, and prints (console) the coordinates of the midpoint, in geo coords and in pixel coords.
+    The tooltip, placed at the midpoint, shows the distance in pixels (depends on the projection) and km and miles (which don't
+    depend on the projection). Try different projections.</p>
+<p>See code in <code>js/geometry.js</code> (measures and middle point). Open your browser's console for more results.</p>
+<div id="rotate-controls">
+    Rotate the axis (yaw) <input type="number" name="yaw" id="yaw" min="-180" max="180" step="10" value="0">
+</div>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {map, renderMap, updateMap, loadTopoJSON, createProjectionSwitcher} from "../js/maps.js";
+    import {drawAirportRoutes} from "./js/airports.js";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../data/world/world-lowres.topojson";
+    const key  = "world";
+    map.projection = d3.geoMercator();
+    map.geoPath = d3.geoPath().projection(map.projection).pointRadius(3);
+
+    const airportsFile = '../data/world/airports-selected.json';
+    const routesFile = '../data/world/routes-selected.json';
+
+    // Load map and render
+    await loadTopoJSON(file, key);
+    renderMap(map.view);
+    createProjectionSwitcher((evt, projections) => {
+        map.projection = projections[+evt.target.value].config;
+
+        // Fitting Gnomonic projection to show straight lines between airports
+        if(projections[+evt.target.value].name === 'Gnomonic') {
+            map.projection.rotate([-35, -75, 40]).clipAngle(75);
+        }
+        // Fitting Stereographic projection to show more airports
+        else if(projections[+evt.target.value].name === 'Stereographic') {
+            map.projection.rotate([-30, -70, 0]).scale(500).translate([350,350]);
+        }
+        map.geoPath.projection(map.projection);
+
+        d3.select("#yaw").node().value = map.projection.rotate()[0].toFixed(0);
+        update(250);
+    });
+
+    // Load airports and routes data, then draw
+    const [airports, routes] = await Promise.all([d3.json(airportsFile), d3.json(routesFile)]);
+
+    // Draw the airports and routes over the map
+    drawAirportRoutes(map, airports, routes.filter(k => k.source && k.target), true); // true = setup tooltips
+
+    // Interactive rotation
+    d3.select("#yaw").on("change", () => {
+        const value = +d3.select("#yaw").node().value;
+        if(Math.abs(value) === 180) {
+            d3.select("#yaw").node().value = -value;
+        }
+        const rotation = map.projection.rotate();
+        map.projection.rotate([+d3.select("#yaw").node().value, rotation[1], rotation[2]]);
+        update(0);
+    });
+
+    // Update the map and tooltips after projection change or rotation
+    function update(transitionDuration = 0) {
+        updateMap([".airport path", ".route"], transitionDuration);
+        map.view.selectAll(".airport text").transition().duration(transitionDuration)
+            .attr("transform", d => map.geoPath.centroid(d).some(isNaN)
+                ? `translate(-100,-100)`
+                : `translate(${map.geoPath.centroid(d)})`);
+        map.view.select(".tooltip").style("opacity", 0);
+    }
+
+</script>
+
+</body>
+</html>

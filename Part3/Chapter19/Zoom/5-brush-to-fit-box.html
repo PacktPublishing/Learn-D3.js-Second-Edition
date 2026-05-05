@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Zoom to bounding box using a brush</title>
+    <link rel="stylesheet" href="../css/maps.css">
+    <style>
+        svg {border: solid 1px gray;}
+    </style>
+</head>
+<body>
+<h1>Zoom to bounding box using a brush</h1>
+<p><b>Draw a rectangle with the mouse</b> to zoom in to it. This example uses <code>d3.brush</code> to obtain
+    a pair of coordinates used to create a <code>MultiPoint</code> GeoJSON object and fit it in the viewport.
+<b>Double-click</b> anywhere to return to the initial scale.</p>
+<div id="rotate-controls">
+    Rotate the axis (yaw) <input type="number" name="yaw" id="yaw" min="-180" max="180" step="10" value="0">
+</div>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {map, renderMap, updateMap, loadTopoJSON, createProjectionSwitcher} from "../js/maps.js";
+    import {isValid} from "../js/brush-utils.js";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../data/world/world-medres.topojson";
+    const key  = "world";
+    map.projection = d3.geoMercator();
+    map.geoPath = d3.geoPath().projection(map.projection);
+
+    // An object to save initial projection parameters
+    const initial = {
+        scale: map.projection.scale(),
+        translate: map.projection.translate()
+    }
+
+    // Set up SVG viewport and brush container inside it as the main view
+    const svg = d3.select("body").append("svg")
+                  .attr("width", map.dim.width).attr("height", map.dim.height);
+    map.view = svg.append("g").attr("class", "globe");
+
+    // Load and render the map
+    await loadTopoJSON(file, key);
+    renderMap(map.view);
+
+    // Set up brush and connect to the view container
+    const brush = d3.brush()
+                    .extent([[0,0], [map.dim.width, map.dim.height]])
+                    .on("end", boxZoom);
+    map.view.call(brush, boxZoom);
+
+    // Click anywhere to unzoom
+    map.view.on("dblclick", function(evt) {
+        evt.stopPropagation();
+        map.projection.scale(initial.scale).translate(initial.translate)
+        updateMap();
+    });
+
+    // set up other interactive controls
+    createProjectionSwitcher((evt, projections) => {
+        map.projection = projections[+evt.target.value].config;
+        map.geoPath.projection(map.projection);
+        updateMap();
+        d3.select("#yaw").node().value = map.projection.rotate()[0].toFixed(0);
+    });
+
+    // Interactive rotation
+    d3.select("#yaw").on("change", () => {
+        const value = +d3.select("#yaw").node().value;
+        if(Math.abs(value) === 180) {
+            d3.select("#yaw").node().value = -value;
+        }
+        const rotation = map.projection.rotate();
+        map.projection.rotate([+d3.select("#yaw").node().value, rotation[1], rotation[2]]);
+        updateMap(null, 0);
+    });
+
+    // Create a GeoJSON bounding box from the brush selection and zoom to it using projection methods
+    function boxZoom(evt) {
+        if (!isValid(evt)) return;
+        const selection = evt.selection;
+        if(selection){
+            // Bounding object is a GeoJSON MultiPoint with the two corners of the brush selection.
+            const boundingObject = {
+                type: 'MultiPoint',
+                coordinates: [map.projection.invert(selection[0]), map.projection.invert(selection[1])]
+            };
+            // Fit the projected object in the viewport
+            map.projection.fitSize([map.dim.width, map.dim.height], boundingObject);
+            updateMap();
+            map.view.call(brush.move, null);
+        }
+    }
+
+</script>
+
+</body>
+</html>

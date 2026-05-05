@@ -69,7 +69,7 @@
         d3.select("#sidebar ol")
                 .append("li")
                 .attr("id", "p"+i)
-                .on("mouseover", () => map.updateMap(d, i))
+                .on("click", () => map.updateMap(d, i))
         .text(d.name);
     })
 

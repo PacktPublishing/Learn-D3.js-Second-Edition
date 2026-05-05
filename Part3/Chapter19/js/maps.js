@@ -58,23 +58,22 @@ export function renderMap(view = null, geoPath = null, dim = null) {
         drawFeatures(view, geoPath);
     }
     drawGraticule(view, geoPath);
-
 }
 
 // Update map after changes in geoPath or projection
-export function updateMap(selectors = null) {
-    map.view.selectAll("g.feature").selectAll("path").attr('d', map.geoPath);
-    map.view.selectAll(".graticule, .outline, .background").attr('d', map.geoPath);
+export function updateMap(selectors = null, duration = 250) {
+    map.view.selectAll("g.feature").selectAll("path").transition().duration(duration).attr('d', map.geoPath);
+    map.view.selectAll(".graticule, .outline, .background").transition().duration(duration).attr('d', map.geoPath);
     if(map.optimize) {
-        map.view.selectAll(".merged").attr('d', map.geoPath);
-        map.view.selectAll(".mesh").attr('d', map.geoPath);
+        map.view.selectAll(".merged").transition().duration(duration).attr('d', map.geoPath);
+        map.view.selectAll(".mesh").transition().duration(duration).attr('d', map.geoPath);
     }
     if(selectors) {
         if(typeof selectors === "string") {
             selectors = [selectors];
         }
         selectors.forEach(selector => {
-            map.view.selectAll(selector).attr('d', map.geoPath);
+            map.view.selectAll(selector).transition().duration(duration).attr('d', map.geoPath);
         });
     }
 }
