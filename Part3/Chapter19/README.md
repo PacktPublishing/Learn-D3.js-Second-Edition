@@ -30,7 +30,7 @@ Examples using methods and functions to compute areas, lengths, centroids, bound
 
 __`Animation/`__
 
-Rotating globes.
+Rotating globe animations using different techniques (euler angles and quaternions).
 
 __`Zoom/`__
 

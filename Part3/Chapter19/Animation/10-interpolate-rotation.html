@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Animating points on the surface of a sphere</title>
+    <link rel="stylesheet" href="../css/maps.css">
+    <style>
+        svg {border: solid 1px gray;}
+        text {
+            font-family: "Arial Narrow", sans-serif;
+            font-size: 12px;
+        }
+        .route {
+            fill: none;
+            stroke-opacity: .2;
+        }
+        .selected {
+            stroke-width: 2 !important;
+            stroke: white !important;
+            stroke-opacity: 1 !important
+        }
+        .airplane {
+            fill: white;
+            stroke: black;
+            stroke-width: .75;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+<h1>Animating points using <code>d3.geoInterpolate()</code></h1>
+<p>This example demonstrates the use of <code>d3.geoInterpolate()</code> to rotate points on the globe. All points are moving at the same speed.</p>
+<div id="rotate-controls">
+    Yaw <input type="number" name="yaw" id="yaw" min="-180" max="180" step="10" value="0">
+    Pitch <input type="number" name="pitch" id="pitch" min="-90" max="90" step="5" value="0">
+    Roll <input type="number" name="roll" id="roll" min="-180" max="180" step="5" value="0">
+</div><p></p>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {map, renderMap, updateMap, loadTopoJSON, createProjectionSwitcher} from "../js/maps.js";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../data/world/world-lowres.topojson";
+    const key  = "world";
+    map.projection = d3.geoMercator();
+    map.geoPath = d3.geoPath().projection(map.projection).pointRadius(3);
+    map.rotation = [0, 0, 0];
+
+    const airportsFile = "../data/world/airports-selected.json";
+    const routesFile = "../data/world/routes-selected.json";
+
+    let airplanes = [];
+    let animationElapsed = 0;
+    let currentProjectionName = "Mercator";
+
+    // Load map and render
+    await loadTopoJSON(file, key);
+    renderMap(map.view);
+
+    createProjectionSwitcher((evt, projections) => {
+        const selected = projections[+evt.target.value];
+        currentProjectionName = selected.name;
+        map.projection = selected.config;
+        map.rotation = map.projection.rotate(); // Reset rotation to default
+
+        // Fitting Gnomonic projection to show straight lines between airports
+        if(selected.name === "Gnomonic") {
+            map.rotation = [-35, -75, 40];
+            map.projection.rotate(map.rotation).clipAngle(75);
+        }
+        // Fitting Stereographic projection to show more airports
+        else if(selected.name === "Stereographic") {
+            map.rotation = [-35, -75, 40];
+            map.projection.rotate(map.rotation).scale(500).translate([350,350]);
+        }
+
+        updateRotationControls();
+        map.geoPath.projection(map.projection);
+
+        d3.select("#yaw").node().value = map.projection.rotate()[0].toFixed(0);
+        update(250);
+    });
+
+    // Load airports and routes data, then draw
+    const [airports, routes] = await Promise.all([d3.json(airportsFile), d3.json(routesFile)]);
+    const validRoutes = routes.filter(route => route.source && route.target);
+
+    // Utility GEoJSON objects for the routes and airports, to be used with geoPath generator
+    // Lines for the routes
+    const lineString = route => ({
+        id: route.id,
+        properties: { airline_count: route.airlines },
+        type: "LineString",
+        coordinates: [route.source.coordinates, route.target.coordinates]
+    });
+
+    // Points for the airports
+    const point = airport => ({
+        id: airport.id,
+        type: "Point",
+        coordinates: airport.coordinates
+    });
+
+    // Draw the airports and routes over the map
+    drawAirportRoutes(airports, validRoutes);
+
+    // Add one airplane marker per route, each moving back and forth.
+    const triangle = d3.symbol().type(d3.symbolTriangle).size(20);
+    airplanes = validRoutes.map((route, i) => {
+        const mover = createRouteMover(route.source.coordinates, route.target.coordinates, 10); // 10 degrees per second
+        const marker = map.view.append("path")
+                          .attr("class", "airplane")
+                          .attr("d", triangle());
+
+        const start = map.projection(route.source.coordinates);
+        if(start && !start.some(Number.isNaN)) {
+            marker.attr("transform", `translate(${start[0]},${start[1]}) rotate(90)`);
+        } else {
+            marker.style("display", "none");
+        }
+
+        return { marker, mover, phaseOffsetMs: i * 120 }; // Use a different phase offset for each airplane to spread them out along the route
+    });
+
+    d3.timer(elapsed => {
+        animationElapsed = elapsed;
+        updateAirplanes(animationElapsed);
+    });
+
+    function drawAirportRoutes(airports, routes) {
+        // color and width scales
+        const color = d3.scaleLog().range(["yellow", "red"]).domain(d3.extent(routes, d => +d.airlines));
+        const width = d3.scaleLinear().range([2, 8]).domain(color.domain());
+
+        map.view.selectAll(".route")
+                .data(routes)
+                  .join("path").attr("class","route")
+                    .datum(lineString)
+                      .attr("d", map.geoPath)
+                      .style("stroke", d => color(d.properties.airline_count))
+                      .style("stroke-width", d => width(d.properties.airline_count));
+
+        // Only show airports that are part of the routes
+        const selectedAirports =
+            airports.filter(d => routes.filter(k => k.id.split("-")[0] === d.id ||
+                k.id.split("-")[1] === d.id).length > 0);
+        map.view.selectAll("g.airport")
+            .data(selectedAirports)
+            .join("g").attr("class","airport")
+            .datum(point)
+            .each(function(d) {
+                d3.select(this).append("path").attr("d", map.geoPath)
+                    .style("fill", "yellow").style("stroke", "black");
+                d3.select(this).append("text").text(d.id).attr("x", 7)
+                    .attr("transform", `translate(${map.geoPath.centroid(d)})`);
+            });
+    }
+
+    // Create a mover for the shortest path (great-circle), matching the rendered route.
+    // Using d3.geoInterpolate for this example.
+    function createRouteMover(source, target, degreesPerSecond) {
+        const toDeg = rad => rad * 180 / Math.PI;
+        const interpolate = d3.geoInterpolate(source, target);
+        const routeLengthDeg = toDeg(d3.geoDistance(source, target));
+        const cycleLengthDeg = routeLengthDeg * 2;
+
+        return elapsedMs => {
+            const traveledDeg = (elapsedMs / 1000) * degreesPerSecond;
+            if(routeLengthDeg <= 0) {
+                return interpolate(1);
+            }
+            const phase = traveledDeg % cycleLengthDeg;
+            const t = phase <= routeLengthDeg ? phase / routeLengthDeg : (cycleLengthDeg - phase) / routeLengthDeg;
+            return interpolate(t);
+        };
+    }
+
+    function updateAirplanes(elapsedMs) {
+        airplanes.forEach(airplane => {
+            const t = elapsedMs + airplane.phaseOffsetMs;
+            const coord = airplane.mover(t);
+            const projected = map.projection(coord);
+
+            if(!projected || projected.some(Number.isNaN) || !isVisibleOnProjection(coord)) {
+                airplane.marker.style("display", "none");
+                return;
+            }
+
+            // Estimate heading for the triangle marker
+            const nextCoord = airplane.mover(t + 80);
+            const nextProjected = map.projection(nextCoord);
+            const angle = nextProjected && !nextProjected.some(Number.isNaN)
+                ? Math.atan2(nextProjected[1] - projected[1], nextProjected[0] - projected[0]) * 180 / Math.PI + 90
+                : 0;
+
+            airplane.marker.style("display", null)
+                    .attr("transform", `translate(${projected[0]},${projected[1]}) rotate(${angle})`);
+        });
+    }
+
+    // Hide points on the hidden side for clipped globe projections (e.g., Orthographic).
+    function isVisibleOnProjection(coord) {
+        // Only globe-like projections hide the far side. For world/cylindrical projections,
+        // clipAngle does not represent hemisphere visibility.
+        if(currentProjectionName !== "Orthographic" && currentProjectionName !== "Gnomonic") {
+            return true;
+        }
+
+        const clipAngle = map.projection.clipAngle && map.projection.clipAngle();
+        if(clipAngle == null) {
+            return true;
+        }
+
+        const centerPx = [map.dim.width / 2, map.dim.height / 2];
+        const centerGeo = map.projection.invert(centerPx);
+        if(!centerGeo || centerGeo.some(Number.isNaN)) {
+            return true;
+        }
+
+        const angularDistanceDeg = d3.geoDistance(centerGeo, coord) * 180 / Math.PI;
+        return angularDistanceDeg <= clipAngle + 1e-6;
+    }
+
+    // Map: Interactive rotation
+    d3.selectAll("#rotate-controls input").on("change", () => {
+        const yaw = +d3.select("#yaw").node().value;
+        if(Math.abs(yaw) === 180) {
+            d3.select("#yaw").node().value = -yaw;
+        }
+        map.rotation[0] = +d3.select("#yaw").node().value;
+        map.rotation[1] = +d3.select("#pitch").node().value;
+        map.rotation[2] = +d3.select("#roll").node().value;
+        map.projection.rotate(map.rotation);
+        update(0);
+    });
+
+    // Update the input controls to reflect the current rotation of the projection
+    function updateRotationControls() {
+        const [yaw, pitch, roll] = map.projection.rotate();
+        map.rotation = [yaw, pitch, roll];
+        d3.select("#yaw").node().value = yaw.toFixed(0);
+        d3.select("#pitch").node().value = pitch.toFixed(0);
+        d3.select("#roll").node().value = roll.toFixed(0);
+    }
+
+    // Update the map after projection change or rotation
+    function update(transitionDuration = 0) {
+        updateMap([".airport path", ".route"], transitionDuration);
+        map.view.selectAll(".airport text").transition().duration(transitionDuration)
+            .attr("transform", d => map.geoPath.centroid(d).some(isNaN)
+                ? "translate(-100,-100)"
+                : `translate(${map.geoPath.centroid(d)})`);
+        map.view.select(".tooltip").style("opacity", 0);
+
+        updateAirplanes(animationElapsed);
+    }
+</script>
+
+</body>
+</html>

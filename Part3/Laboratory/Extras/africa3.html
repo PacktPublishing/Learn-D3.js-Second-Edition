@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+    <script src="https://unpkg.com/topojson-client"></script>
+    <style>
+        .country {
+            stroke-width: .5;
+            stroke: black;
+        }
+        svg {
+            border: solid 1px;
+            fill: none;
+        }
+    </style>
+</head>
+<body>
+<script>
+    const width = 450;
+    const height = 450;
+
+    const svg = d3.select("body").append("svg")
+            .attr("width", width).attr("height", height);
+    const projection = d3.geoChamberlinAfrica().scale(300).translate([200,225]).center([13,3]);
+    const geoPath = d3.geoPath().projection(projection);
+
+    const data = {}
+
+    d3.json('Data/world3.topojson')
+    .then(countries => {
+        //data.features = countries.features.filter(d => d.properties.CONTINENT == "Africa");
+        const geodata = topojson.feature(countries, countries.objects["world2"]);
+        svg.append("path").attr("class","country").style("fill-opacity", .4);
+        data.geomesh = topojson.mesh(countries);
+        drawCountries();
+
+        // merge not africa
+        // africa topojson
+    });
+
+    function drawCountries() {
+        svg.append("path")
+                .datum(data.geomesh)
+                .attr("class","country")
+                    .attr('d', geoPath)
+    }
+</script>
+
+</body>
+</html>

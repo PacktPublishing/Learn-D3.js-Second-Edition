@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Taxa de cesarianas no Estado de São Paulo: 2000-2015</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://d3js.org/topojson.v1.min.js"></script>
+    <script src="https://d3js.org/queue.v1.min.js"></script>
+    <script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
+
+    <style>
+
+        #graticule {
+            stroke: gray;
+            stroke-width: .2;
+        }
+
+        .municipio {
+            stroke: orange;
+            stroke-width: .2;
+            fill: gray;
+        }
+
+        svg {
+            background: #e1edf7;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        #map-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 500px;
+            width: 900px;
+        }
+
+        /* TEXT */
+
+        text {
+            font-family: sans-serif;
+        }
+
+        text.tooltip {
+            font-size: 9pt;
+            fill: black;
+            stroke: none;
+            font-weight: bold;
+            pointer-events: none;
+        }
+
+        text.title {
+            font-weight: bold;
+            font-size: 14pt;
+        }
+        text#avg {
+            font-size: 12pt;
+        }
+
+        text.year {
+            font-size: 18px;
+            fill: black;
+        }
+        text.source {
+            font-size: 9px;
+        }
+
+        tspan {
+            cursor: pointer;
+        }
+
+        tspan.selected {
+            font-weight: bold;
+            fill: red;
+            font-size: 26px;
+            cursor: default;
+        }
+
+        .enabled {
+            fill: red;
+            cursor: pointer;
+        }
+
+        .entry rect {
+            stroke: orange;
+            stroke-width: .2;
+        }
+
+        .entry text {
+            font-size: 9px;
+        }
+
+        /* MAP ELEMENT SELECTED VIA TABLE */
+
+        g.selected path {
+            opacity: 1;
+            fill-opacity: 1;
+            fill: blue !important;
+            stroke: white;
+            stroke-opacity: 1;
+        }
+
+        /* TABLES */
+
+        caption {
+            font-size: 10pt;
+        }
+
+        table {
+            position: absolute;
+            font-family: sans-serif;
+            font-size: 8pt;
+            border: solid 1px gray;
+            background: white;
+            box-shadow: 5px 5px 20px gray;
+        }
+
+        tr.selected {
+            background: lightblue;
+        }
+
+        td {
+            padding: 0 10px;
+        }
+
+        #min {
+            bottom: 50px;
+            left: 20px;
+        }
+
+        #max {
+            top: 20px;
+            right: 20px;
+        }
+
+        tbody {
+            border-top: solid 1px black;
+            padding-top: 10px;
+        }
+        
+        #loading {
+            position: absolute;
+            top: 45%;
+            left: 45%;
+            font-family: sans-serif;
+        }
+
+    </style>
+</head>
+<body>
+<script>
+
+    var width = 900;
+    var height = 500;
+    var yearIdx = 0;
+    var dados, mapas;
+    var minYear = 2000;
+    var maxYear = 2015;
+
+    // Scales
+    var opacity = d3.scaleLinear()
+            .domain([0, 100])
+            .range([.5, 1]);
+
+    var color = d3.scaleLinear()
+            .domain([20, 100])
+            .range(["gold", "darkred"]);
+
+    function parseNumber(numberStr) {
+        return parseInt(numberStr.replace(",", ""));
+    }
+
+    var decimal2d = d3.format(".2f");
+    
+    d3.select("body")
+      .append("div")
+      .attr("id", "loading")
+      .text("Loading data...");
+
+    Promise.all([
+        fetch("partos_cesareos_2000_a_2015.csv").then(response => response.text()),
+        fetch("sp-topo.json").then(response => response.text())
+    ]).then(([csvData, jsonData]) => {
+
+        d3.select("#loading").remove();
+
+        var arrayDados = function (d) {
+            var array = [];
+            for (var ano = minYear; ano <= maxYear; ano++) {
+                var obj = {
+                    ano: ano,
+                    cesareas: parseNumber(d["Parto Cesárea " + ano]),
+                    nascidos: parseNumber(d["Nascidos Vivos " + ano]),
+                    taxa: +d["Taxa Cesárea " + ano]
+                };
+                array.push(obj);
+            }
+            return array;
+        }
+
+        var entries = d3.csvParse(csvData);
+
+        var reduced = entries.map(d => ({
+            id: d.IBGE,
+            municipio: d.MUNICIPIO,
+            dados: arrayDados(d)
+        }));
+
+        console.log(reduced);
+
+        dados = d3.map(reduced, d => d.id);
+
+        mapas = JSON.parse(jsonData);
+
+        makeMap();
+
+    });
+
+    function calculateGeoBounds(feature, path) {
+        var obj = {};
+        var bounds = path.bounds(feature);
+        obj.x1 = bounds[0][0];
+        obj.y1 = bounds[0][1];
+        obj.x2 = bounds[1][0];
+        obj.y2 = bounds[1][1];
+        obj.dx = obj.x2 - obj.x1;
+        obj.dy = obj.y2 - obj.y1;
+        obj.centroid = d3.geoCentroid(feature);
+        return obj;
+    }
+
+    function makeMap() {
+        var sp = topojson.feature(mapas, mapas.objects.sp);
+        var municipios = sp.features;
+        var projection = d3.geoMercator();
+        var path = d3.geoPath()
+                .projection(projection);
+        var geoBounds = calculateGeoBounds(sp, path);
+
+        var graticule = d3.geoGraticule()
+                .step([1, 1]);
+
+        projection.center(geoBounds.centroid);
+
+        var hscale = projection.scale() * width / geoBounds.dx;
+        var vscale = projection.scale() * height / geoBounds.dy;
+        var scale = Math.min(hscale, vscale) * .8; // map occupies 80% of area
+        var offset = [(width - geoBounds.dx) / 2, (height - geoBounds.dy) / 2 - 20];
+
+        // initial zoom to bounds
+        projection.scale(scale).translate(offset);
+        var path = d3.geoPath()
+                .projection(projection);
+
+
+        // Draw svg
+        var svg = d3.select("body")
+                .append("div")
+                .attr("id", "map-container")
+                .append("svg")
+                .attr("id", "map-canvas")
+                .attr("viewBox", "0 0 " + width + " " + height);
+
+        // Graticule layer
+        svg.append("g").attr("id", "graticule")
+                .append("path")
+                .datum(graticule)
+                .attr("d", path);
+
+
+        // Title
+        svg.append("text")
+                .attr("class", "title")
+                .text("Taxa de cesarianas no Estado de São Paulo")
+                .attr("x", 20).attr("y", 30)
+                .append("tspan")
+                .text(" (2000 a 2015)");
+
+        // Source
+        svg.append("text")
+                .attr("class", "source")
+                .attr("y", 40)
+                .selectAll("tspan")
+                .data(["Fonte:", "Secretaria Estadual de Saúde/SP - FSEADE/SINASC", "http://www.saude.sp.gov.br/links/matriz"])
+                .enter().append("tspan")
+                .attr("dy", 10).attr("x", 20)
+                .text(function(d) {
+                    return d;
+                });
+
+        // Year labels
+        svg.append("text")
+                .attr("class", "year")
+                .style("text-anchor", "middle")
+                .attr("transform", "translate(445, 490)")
+                .selectAll("tspan")
+                .data(d3.range(minYear, maxYear + 1))
+                .enter()
+                .append("tspan").attr("dx", 10)
+                .attr("id", function(d) { return "year-label-"+d; })
+                .text(function(d) { return d; })
+                .on("mouseover", function(d) {
+                    if((minYear + yearIdx) != d) {
+                        d3.select(this).style("text-decoration", "underline");
+                    }
+                })
+                .on("mouseout", function(d) {
+                    d3.select(this).style("text-decoration", "none");
+                })
+                .on("click", function(d) {
+                    yearIdx = d - minYear;
+                    update();
+                });
+
+        // Avg label
+        svg.append("text").attr("id", "avg")
+                .attr("transform", "translate(660,410)");
+
+        // Color key
+        svg.append("g")
+                .selectAll(".entry")
+                .data([10,30,50,70,90])
+                .enter()
+                .append("g").attr("class", "entry")
+                .attr("transform", "translate(20,100)")
+                .each(function(d,i) {
+                    d3.select(this)
+                            .append("rect")
+                            .attrs({height: 10, width: 10})
+                            .attr("y", i * 15)
+                            .attr("fill", color(d))
+                            .attr("fill-opacity", opacity(d));
+                    d3.select(this)
+                            .append("text")
+                            .attr("y", i * 15 + 9.5)
+                            .attr("x", 18)
+                            .text(function() {
+                                if(d == 10) return " menos de 20%";
+                                if(d == 90) return " mais de 80%"
+                                return " entre " + d + " e " +(d+20) + "%";
+                            })
+                });
+
+
+
+        // Arrows
+        svg.append("polygon").attr("id", "up")
+                .attr("points", "0,0 9,9 0,18")
+                .attr("transform", "translate(870, 472)")
+                .attr("fill", "gray").attr("opacity", .5)
+                .on("click", function(d) {
+                    if (yearIdx < (maxYear - minYear)) {
+                        ++yearIdx;
+                        update();
+                    }
+                });
+
+        svg.append("polygon").attr("id", "down")
+                .attr("points", "9,0 0,9 9,18")
+                .attr("transform", "translate(30, 472)")
+                .attr("fill", "gray").attr("opacity", .5)
+                .on("click", function(d) {
+                    if (yearIdx > 0) {
+                        --yearIdx;
+                        update();
+                    }
+                });
+
+        // Tables
+        makeTable("max").append("caption").html("Municípios com as 10 maiores taxas");
+        makeTable("min").append("caption").html("Municípios com as 10 menores taxas");
+
+        // Map layer
+        svg.append("g").attr("id", "map")
+                .selectAll(".municipio")
+                .data(municipios)
+                .enter()
+                .append("g")
+                .attr("class", "municipio")
+                .attr("id", function(d) { return "mun-" + d.id; })
+                .append("path")
+                .attr("d", path)
+                .attr("opacity", 0);
+
+        d3.selectAll(".municipio")
+                .on("mouseover", function (d) {
+                    var text = d3.select(this).append("text")
+                            .attr("height", 20)
+                            .attr("width", 250)
+                            .attr("x", path.centroid(d)[0])
+                            .attr("y", path.centroid(d)[1])
+                            .attr("id", "label-" + d.id)
+                            .attr("class", "tooltip")
+                            .text(function () {
+                                var id = d3.select(this).attr("id").split("label-")[1];
+                                var mun = dados.get(id);
+                                return mun.municipio + ": " + mun.dados[yearIdx].taxa + "% (" + mun.dados[yearIdx].cesareas + ")";
+                            });
+                    svg.node().appendChild(text.node());
+                    d3.select("#tr-"+d.id).classed("selected", true);
+
+                })
+                .on("mouseout", function (d) {
+                    d3.select("#label-" + d.id).remove();
+                    d3.select("#tr-"+d.id).classed("selected", false);
+                });
+
+        //setInterval(update, 2000);
+        update();
+    }
+
+    function makeTable(selector) {
+        var table = d3.select("#map-container")
+                .append("table").attr("id", selector);
+        table.append("tbody")
+                .selectAll("tr")
+                .data(["Posição", "Município", "Taxa", "Total"])
+                .enter()
+                .append("th")
+                .html(function (d) {
+                    return d;
+                });
+        table.style("opacity", 0);
+        return table;
+    }
+
+    function tableRow(parent, d, i) {
+        d3.select(parent).append("td").text(function (d) {
+            return i + 1 + "º";
+        });
+        d3.select(parent).append("td").text(function (d) {
+            return d.value.municipio;
+        });
+        d3.select(parent).append("td").text(function (d) {
+            return decimal2d(d.value.dados[yearIdx].taxa) + "%";
+        });
+        d3.select(parent).append("td").text(function (d) {
+            return d.value.dados[yearIdx].cesareas;
+        }).style("text-align", "right");
+        d3.select(parent)
+                .style("cursor", "default")
+                .on("mouseover", function(d) {
+                    d3.select(this).classed("selected", true);
+                    d3.select("#mun-"+d.value.id).classed("selected", true);
+                })
+                .on("mouseout", function(d) {
+                    d3.select(this).classed("selected", false);
+                    d3.select("#mun-"+d.value.id).classed("selected", false);
+                });
+    }
+
+    function update() {
+
+        d3.select("#up").filter(function(d) {
+            if (yearIdx == (maxYear - minYear)) {
+                d3.select(this).classed("enabled", false);
+            } else {
+                d3.select(this).classed("enabled", true);
+            }
+        });
+
+        d3.select("#down").filter(function(d) {
+            if (yearIdx == 0) {
+                d3.select(this).classed("enabled", false);
+            } else {
+                d3.select(this).classed("enabled", true);
+            }
+        });
+
+        d3.selectAll(".year tspan").classed("selected", false);
+        d3.selectAll("#year-label-"+(minYear + yearIdx)).classed("selected", true);
+
+        var entries = dados.entries().filter(function(d) {
+            return !(d.key == "3588888" || d.key == "3599999");
+        });
+
+        var max10 = entries.sort(function (a, b) {
+            return d3.descending(a.value.dados[yearIdx].taxa, b.value.dados[yearIdx].taxa);
+        }).slice(0, 10);
+
+        var min10 = entries.sort(function (a, b) {
+            return d3.ascending(a.value.dados[yearIdx].taxa, b.value.dados[yearIdx].taxa);
+        }).slice(0, 10);
+
+        var state = dados.entries().filter(function(d) {
+            return d.key == "3599999";
+        })[0].value.dados;
+
+        d3.select("#avg")
+                .text(function(d) {
+                    return "Média estadual: " + decimal2d(state[yearIdx].taxa) + "%";
+                });
+
+        d3.selectAll("table").style("opacity", 1);
+
+        d3.select("#max tbody").selectAll("tr").remove();
+        d3.select("#max tbody")
+                .selectAll("tr")
+                .data(max10)
+                .enter()
+                .append("tr").attr("id", function(d) { return "tr-" + d.value.id; })
+                .each(function (d, i) {
+                    tableRow(this, d, i);
+                });
+
+        d3.select("#min tbody").selectAll("tr").remove();
+        d3.select("#min tbody")
+                .selectAll("tr")
+                .data(min10)
+                .enter()
+                .append("tr").attr("id", function(d) { return "tr-" + d.value.id; })
+                .each(function (d, i) {
+                    tableRow(this, d, i);
+                });
+
+        d3.selectAll(".municipio path")
+                .attr("opacity", 1)
+                .attr("fill-opacity", function (d) {
+                    var mun = dados.get(d.id);
+                    var taxa = mun.dados[yearIdx].taxa;
+                    return opacity(taxa);
+                })
+                .attr("fill", function (d) {
+                    var mun = dados.get(d.id);
+                    var taxa = mun.dados[yearIdx].taxa;
+                    return color(taxa);
+                });
+        d3.selectAll(".tooltip")
+                .text(function () {
+                    var id = d3.select(this).attr("id").split("label-")[1];
+                    var mun = dados.get(id);
+                    return mun.municipio + ": " + mun.dados[yearIdx].taxa + "% (" + mun.dados[yearIdx].cesareas + ")";
+                });
+
+
+    }
+</script>
+</body>
+</html>

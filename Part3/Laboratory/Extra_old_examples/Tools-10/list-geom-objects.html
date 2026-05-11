@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://unpkg.com/topojson-client"></script>
+    <style>
+        svg {border: solid 1px gray;}
+    </style>
+</head>
+<body>
+
+<table id="topo-objects" border>
+    <thead><tr><td>File</td><td>Geometry objects</td></tr></thead>
+    <tbody></tbody>
+</table>
+
+<script>
+    const width = 960;
+    const height = 500;
+
+    const files = [
+        'africa',
+        'africa-simple',
+        'border-example',
+        'europe-russia',
+        'european-russia',
+        'mars',
+        'ny-counties',
+        'nyc','russia',
+        'world-lowres',
+        'world-medres'
+    ]
+
+    Promise.all(files.map(f => d3.json(`../Data/${f}.topojson`)))
+           .then(function(topologies) {
+
+        const table = d3.select("#topo-objects tbody");
+        topologies.forEach(function(topology,i) {
+            const tr = table.append("tr")
+            tr.append("td").text(`File: ${files[i]}.topojson`);
+            const geoms = [];
+            for(const key in topology.objects) {
+                geoms.push(key);
+            }
+            tr.append("td").text(geoms.join());
+        });
+    });
+
+
+</script>
+
+</body>
+</html>

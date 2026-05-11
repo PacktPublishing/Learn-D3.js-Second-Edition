@@ -1,0 +1,72 @@
+<html>
+<head>
+  <title>List example</title>
+  <meta charset="utf-8" />
+<script src="../d3/d3.min.js" type="text/JavaScript"></script>
+</head>
+<style>
+</style>
+<body>
+
+<svg height="1000000" width="900"></svg>
+
+<script>
+    var width = 900;
+    var nformat = d3.format(",");
+
+    d3.tsv("cities5000.tsv",function(error,data) {
+
+        data.sort(function(a,b) {
+            return d3.descending(+a.population,+b.population);
+        })
+        console.log(data);
+
+        var bar_scale = d3.scale.linear()
+                .range([0,width - 300])
+                .domain([0, d3.max(data, function(d) {
+                    return +d.population;
+                })])
+
+        var bar = d3.select("svg").selectAll("g.cities")
+                .data(data)
+                .enter()
+                .append("g")
+                .attr("class","cities");
+
+        bar.append("rect")
+                .attr("height", "10")
+                .attr("x", 100)
+                .attr("y", function(d, i) {
+                    return i*11 + 50;
+                })
+                .attr("fill", "red")
+                .attr("width", function(d) {
+                    return bar_scale(d.population);
+                });
+
+        bar.append("text")
+                .text(function(d, i) { return i+1 + ". " + d.name + " - " + d.country_code})
+                .attr("x", 0)
+                .attr("y", function(d, i) {
+                    return i*11 + 60;
+                })
+                .style("font-size", 9);
+
+        bar.append("text")
+                .text(function(d) { return nformat(d.population)})
+                .attr("x", function(d) {
+                    return bar_scale(d.population) + 10 + 100;
+                })
+                .attr("y", function(d, i) {
+                    return i*11 + 60;
+                })
+                .style("font-size", 9);
+
+    });
+
+</script>
+
+</body>
+
+
+</html>

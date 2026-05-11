@@ -1,0 +1,58 @@
+    {
+            "id":"a134340",
+            "name":"Pluto",
+            "number":134340,
+            "yearOfDiscovery":1930,
+            "category":"plutino",
+            "semiMajorAxisAU":39.481,
+            "excentricity":0.249,
+            "periheliumAU":29.658,
+            "apheliumAU":49.305,
+            "inclination":17.1,
+            "diameterKm":2306,
+            "orbitalPeriodD":90613,
+            "ascendingNodeLong":110.3,
+            "periheliumArgument":113.763,
+            "equatorialGravity":0.6,
+            "density":2.0,
+            "volume":6.33e9,
+            "meanAnomaly":14.86,
+            "massKg":1.31e22,
+            "massGM":874.163,
+            "discoveredBy":"Clyde W. Tombaugh"
+    ,
+            "satellites":[
+                {
+                    "id":"s134340.1",
+                    "name":"Charon",
+                    "diameterKm":1212,
+                    "semiMajorAxisKm":17530,
+                    "massKg":1.52e21,
+                    "category":"round",
+                    "equatorialGravity":0.28,
+                    "volume":9.2e8,
+                    "density":1.65,
+                    "massGM":101.43,
+                    "orbitalPeriodD":6.387,
+                    "yearOfDiscovery":1978,
+                    "discoveredBy":"James W. Christy"
+                },
+                {
+                    "id":"s134340.2",
+                    "name":"Nyx",
+                    "diameterKm":88,
+                    "semiMajorAxisKm":48708,
+                    "yearOfDiscovery":2005,
+                    "discoveredBy":"HST Pluto Companion Search Team"
+                },
+                {
+                    "id":"s134340.3",
+                    "name":"Hydra",
+                    "diameterKm":72,
+                    "semiMajorAxisKm":64749,
+                    "yearOfDiscovery":2005,
+                    "discoveredBy":"HST Pluto Companion Search Team"
+                }
+            ]
+        }
+    

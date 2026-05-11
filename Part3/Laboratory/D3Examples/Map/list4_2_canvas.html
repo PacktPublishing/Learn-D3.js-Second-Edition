@@ -1,0 +1,214 @@
+<html>
+<head>
+  <title>List example</title>
+  <meta charset="utf-8" />
+<script src="../d3/d3.min.js" type="text/JavaScript"></script>
+</head>
+<style>
+    .axis path,
+    .axis line {
+        fill: none;
+        stroke: #aaf;
+        shape-rendering: crispEdges;
+    }
+    .axis text {
+        font-size: 8pt;
+        fill: #aaf;
+    }
+    text {
+        font-size: 8pt;
+        fill: #aaf;
+    }
+    svg {
+        background: transparent;
+    }
+    canvas {
+        background: #211a46;
+    }
+    svg, canvas {
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        height: 500px;
+        width: 900px;
+        border: solid 1px red;
+    }
+</style>
+<body>
+
+<canvas height="500" width="900"></canvas>
+<svg></svg>
+
+<script>
+    var width = 900, height = 500;
+    var nformat = d3.format(",");
+    var color = d3.scale.category20();
+
+    d3.tsv("cities1000.tsv",function(error,data) { // data from cities < 1000 hab
+
+        data.sort(function(a,b) {
+            return d3.descending(+a.population,+b.population);
+        });
+        data = data.filter(function(d) {
+            return +d.latitude && +d.longitude && +d.population > 0;
+        });
+
+        var c1000 = d3.nest()
+                .key(function(d) {return d.geonameid;})
+                .rollup(function(d) {
+                    return {
+                        name: d[0].name,
+                        latitude: d[0].latitude,
+                        longitude: d[0].longitude,
+                        population: d[0].population
+                    };
+                })
+                .map(data);
+
+        d3.tsv("cities15000.tsv",function(error,data2) { // get some 500 cities which are missing
+
+            data2.sort(function (a, b) {
+                return d3.descending(+a.population, +b.population);
+            });
+
+            data2 = data2.filter(function (d) {
+                return +d.latitude && +d.longitude && +d.population > 0;
+            });
+
+            var c15000 = d3.nest()
+                    .key(function(d) {return d.geonameid;})
+                    .rollup(function(d) {
+                        return {
+                            name: d[0].name,
+                            latitude: d[0].latitude,
+                            longitude: d[0].longitude,
+                            population: d[0].population
+                        };
+                    })
+                    .map(data2);
+
+            for (var key in c15000) {
+                if(!(key in c1000)) {
+                    c1000[key] = c15000[key];
+                }
+            }
+
+            // All the cities
+            var cities = d3.entries(c1000).map(function(d) { return d;});
+
+            // cities with population > 200000 will be objects
+            var bigCities = cities.filter(function(d) {
+                return d.value.population > 300000;
+            });
+
+            console.log(bigCities.length)
+
+            // all other cities will be drawn in canvas
+            var smallerCities = cities.filter(function(d) {
+                return d.value.population <= 300000;
+            });
+
+
+            var x_scale = d3.scale.linear()
+                    .range([50,width - 50])
+                    .domain(d3.extent(cities, function(d) {
+                        return +d.value.longitude;
+                    }));
+
+            var y_scale = d3.scale.linear()
+                    .range([50,height - 50])
+                    .domain(d3.extent(cities, function(d) {
+                        return -d.value.latitude;
+                    }));
+
+            var a_scale = d3.scale.linear()
+                    .range([.03,10])
+                    .domain([0, d3.max(cities, function(d) {
+                        return +d.value.population;
+                    })]);
+
+            var o_scale = d3.scale.linear()
+                    .range([.8,.3])
+                    .domain([0, d3.max(cities, function(d) {
+                        return +d.value.population;
+                    })]);
+
+            var xAxis = d3.svg.axis().scale(x_scale);
+            var yAxis = d3.svg.axis().scale(y_scale);
+
+            d3.select("svg").append("g")
+                    .attr("class", "x axis")
+                    .attr("transform", "translate(0,"+(height-50)+")")
+                    .call(xAxis);
+            d3.select("svg").append("g")
+                    .attr("class", "y axis")
+                    .call(yAxis)
+                    .attr("transform", "translate(50,0) rotate(90)");
+
+            // draw smaller cities in canvas
+            var ctx = d3.select("canvas").node().getContext("2d");
+            smallerCities.forEach(function(d) {
+                ctx.beginPath();
+                ctx.arc(x_scale(d.value.longitude),
+                        y_scale(-d.value.latitude),
+                        a_scale(d.value.population),
+                        0, 2 * Math.PI);
+                ctx.fillStyle = color(a_scale(d.value.population) - 1);
+                ctx.globalAlpha = o_scale(d.value.population);
+                ctx.fill();
+                ctx.closePath();
+            });
+
+            // draw ion SVG only large cities
+            var dot = d3.select("svg").selectAll("g.city")
+                    .data(bigCities)
+                    .enter()
+                    .append("g")
+                    .attr("class","city")
+                    .attr("id", function(d) {
+                        return "city_" + d.id;
+                    });
+
+            dot.append("circle")
+                    .attr("cx", function(d) {
+                        return x_scale(d.value.longitude);
+                    })
+                    .attr("cy", function(d) {
+                        return y_scale(-d.value.latitude);
+                    })
+                    .attr("fill", function(d) {
+                        return color(a_scale(d.value.population) - 1);
+                    })
+                    .attr("fill-opacity", function(d) {
+                        return o_scale(d.value.population);
+                    })
+                    .attr("stroke", "white")
+                    .attr("stroke-width", ".01")
+                    .attr("r", function(d) {
+                        return a_scale(d.value.population);
+                    });
+
+            dot.on("click", function(d) {
+                d3.selectAll(".city text").remove();
+                d3.select(this).append("text")
+                        .text(function(e) {
+                            return e.value.name;
+                        })
+                        .attr("x", x_scale(d.value.longitude))
+                        .attr("y", y_scale(-d.value.latitude))
+                        .style("fill", "white");
+            });
+
+
+        });
+
+    });
+
+
+
+</script>
+
+</body>
+
+
+</html>

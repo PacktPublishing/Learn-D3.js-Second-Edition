@@ -1,8 +1,6 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import {showMeasure, hide, setupTooltip} from "./geometry.js";
 
-
-
 let map = {}; // store view and geoPath
 
 // Utility GEoJSON objects for the routes and airports, to be used with geoPath generator

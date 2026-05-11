@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stack</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+</head>
+<body>
+<script>
+    const width  = 800;
+    const height = 400;
+
+    let data = [];
+
+    d3.dsv(';', 'Data/Americas_population.csv').then(function(result) {
+        data = result.map(function(d) {
+            let popArray = [];
+            for(let i = 1950; i < 2010; i += 10) {
+                let entry = {year: i, population: +d[i]};
+                popArray.push(entry);
+            }
+            return {
+                country: d['Country or region'],
+                continent: d.Continent,
+                population: popArray
+            }
+        });
+
+        const pre = d3.select("body").append("pre");
+        let string = '[';
+        data.forEach(function(d) {
+            let list = '';
+            d.population.forEach(function(d) {
+                list += '{"year": '+d.year +', "population": '+d.population+'}, '
+            });
+            list = list.substring(0, list.length-2);
+            string += '\n    {"country": "' + d.country + '", '
+                       + '"continent": "' + d.continent + ' America", '
+                       + '"population": [' + list + ']},';
+        });
+        string = string.substring(0,string.length-1);
+        pre.text(string + '\n]');
+    });
+
+</script>
+</body>
+</html>

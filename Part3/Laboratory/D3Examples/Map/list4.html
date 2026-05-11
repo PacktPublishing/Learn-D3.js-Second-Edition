@@ -1,0 +1,110 @@
+<html>
+<head>
+  <title>List example</title>
+  <meta charset="utf-8" />
+<script src="../d3/d3.min.js" type="text/JavaScript"></script>
+</head>
+<style>
+    .axis path,
+    .axis line {
+        fill: none;
+        stroke: #aaf;
+        shape-rendering: crispEdges;
+    }
+    .axis text {
+        font-size: 8pt;
+        fill: #aaf;
+    }
+    svg {
+        background: #211a46;
+    }
+</style>
+<body>
+
+<svg height="500" width="900"></svg>
+
+<script>
+    var width = 900; var height=500;
+    var nformat = d3.format(",");
+
+    var color = d3.scale.category10();
+
+    d3.tsv("cities1000.tsv",function(error,data) {
+
+        data.sort(function(a,b) {
+            return d3.descending(+a.population,+b.population);
+        })
+      //  data = data.filter(function(d) {
+      //      return d.elevation;
+      //  })
+
+        var x_scale = d3.scale.linear()
+                .range([50,width - 50])
+                .domain(d3.extent(data, function(d) {
+                    return +d.longitude;
+                }));
+
+        var y_scale = d3.scale.linear()
+                .range([50,height - 50])
+                .domain(d3.extent(data, function(d) {
+                    return -d.latitude;
+                }));
+
+        var a_scale = d3.scale.linear()
+                .range([.1,10])
+                .domain([0, d3.max(data, function(d) {
+                    return +d.population;
+                })]);
+
+        var o_scale = d3.scale.linear()
+                .range([.8,.3])
+                .domain([0, d3.max(data, function(d) {
+                    return +d.population;
+                })]);
+
+        var xAxis = d3.svg.axis().scale(x_scale);
+        var yAxis = d3.svg.axis().scale(y_scale);
+
+        d3.select("svg").append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0,"+(height-50)+")")
+                .call(xAxis);
+        d3.select("svg").append("g")
+                .attr("class", "y axis")
+                .call(yAxis)
+                .attr("transform", "translate(50,0) rotate(90)");
+
+        var dot = d3.select("svg").selectAll("g.city")
+                .data(data)
+                .enter()
+                .append("g")
+                .attr("class","city");
+
+        dot.append("circle")
+                .attr("cx", function(d) {
+                    return x_scale(d.longitude);
+                })
+                .attr("cy", function(d) {
+                    return y_scale(-d.latitude);
+                })
+                .attr("fill", function(d) {
+                    return color(a_scale(d.population) - 1);
+                })
+                .attr("fill-opacity", function(d) {
+                    return o_scale(d.population);
+                })
+                .attr("stroke", "white")
+                .attr("stroke-width", ".01")
+                .attr("r", function(d) {
+                    return a_scale(d.population);
+                });
+
+
+    });
+
+</script>
+
+</body>
+
+
+</html>

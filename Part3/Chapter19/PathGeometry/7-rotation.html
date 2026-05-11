@@ -15,8 +15,8 @@
 <body>
 <h1>Example using d3.rotation()</h1>
 <p>Choose a viewport position (Longitude, Latitude) and a rotation (yaw, pitch, roll) and press the button.
-    In 500ms a circle will be  drawn at the position, after 500ms a blue circle will be drawn at the rotated
-    position, and after another 500ms a blue circle will be drawn at the inverse position (opposite rotation).</p>
+    In 500ms three circles will be  drawn at the position. After 500ms a blue circle will move to the rotated
+    position, and after another 500ms the red circle will move to the inverse of the original position (opposite rotation).</p>
 <div id="rotate-controls">
 <p>Position: [<input type="number" name="lon" id="lon" min="0" max="960" step="10" value="-8">,
               <input type="number" name="lat" id="lat" min="0" max="500" step="10" value="35">]</p>
@@ -52,13 +52,18 @@
     }, projectionList);
 
     const position = [0, 0];
+
+    // creating a rotation function with initial angles of 0 for yaw, pitch, and roll
     let rotation = d3.geoRotation([0, 0, 0]);
 
     d3.select("#draw-circles").on("click", () => {
         d3.selectAll("circle").remove();
         position[0] = +d3.select("#lon").node().value;
         position[1] = +d3.select("#lat").node().value;
-        rotation = d3.geoRotation([+d3.select("#yaw").node().value, +d3.select("#pitch").node().value, +d3.select("#roll").node().value]);
+        // setting new values for the rotation function.
+        rotation = d3.geoRotation([+d3.select("#yaw").node().value,
+                                   +d3.select("#pitch").node().value,
+                                   +d3.select("#roll").node().value]);
         drawCirclesRotate();
     });
 
@@ -66,9 +71,9 @@
         // draw circle 1 after 500ms
         setTimeout(drawCircleInitialPosition, 500);
         // draw circle 2 after 1500ms
-        setTimeout(drawCircleAfterRotation, 1500);
+        setTimeout(moveCircleAfterRotation, 1500);
         // draw circle 3 after 2500ms
-        setTimeout(drawCircleInverseRotation, 2500);
+        setTimeout(moveCircleInverseRotation, 2500);
     }
 
     function drawCircleInitialPosition() {
@@ -87,14 +92,14 @@
                 .attr("transform", `translate(${map.projection(position)})`)
     }
 
-    function drawCircleAfterRotation() {
+    function moveCircleAfterRotation() {
         const rotatedPosition = rotation(position)
         console.log("Rotated position", rotatedPosition)
         map.view.select("#first").transition()
                 .attr("transform", `translate(${map.projection(rotatedPosition)})`)
     }
 
-    function drawCircleInverseRotation() {
+    function moveCircleInverseRotation() {
         const rotatedPosition = rotation.invert(position)
         console.log("Inverse rotated position", rotatedPosition)
         map.view.select("#second").transition()

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://d3js.org/d3-selection.v1.min.js"></script>
+    <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
+    <script src="https://d3js.org/d3-collection.v1.min.js"></script>
+    <script src="https://d3js.org/d3-scale.v2.min.js"></script>
+    <script src="https://d3js.org/d3-array.v1.min.js"></script>
+    <script src="https://d3js.org/d3-fetch.v1.min.js"></script>
+    <script src="https://d3js.org/d3-color.v1.min.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <style>
+        .orbit {
+            stroke-width: 2px;
+            fill: none
+        }
+        .sun {
+            fill: red;
+        }
+        text {
+            font-family: sans-serif;
+            font-size: 8pt;
+            padding: 1px;
+        }
+    </style>
+</head>
+<body>
+
+<script>
+    let width = 700;
+    let height = 700;
+
+    let centerX = width/2;
+    let centerY = height/2 -10;
+
+    d3.json("../Data/sol_2016.json").then(function(data) {
+        draw(data.planets);
+    });
+
+    function calculateRy(e, sMa) {
+        let aspectRatio = Math.sqrt(1 - (e * e));
+        return sMa * aspectRatio;
+    }
+
+    let colors = d3.scaleOrdinal(d3.schemeCategory10);
+
+    function draw(orbits) {
+
+        orbits.sort(function(a,b) {
+            return d3.ascending(a.semiMajorAxisAU, b.semiMajorAxisAU);
+        });
+
+        orbits = orbits.filter(function(d, i) {
+            return i <= 5;
+        })
+
+        let scale = d3.scaleLinear()
+                .domain([0, d3.max(orbits, function(d) {
+                    return d.semiMajorAxisAU * 2;
+                })])
+                .range([0, d3.min([height-25, width-25])]);
+
+        let svg = d3.select('body')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+
+        svg.append('circle')
+                .attr('class', 'sun')
+                .attr('r', 2)
+                .attr('cx', centerX)
+                .attr('cy', centerY);
+
+        svg.selectAll('ellipse')
+                .data(orbits)
+                .enter()
+                .append('ellipse')
+                .attr('id', function(d) {
+                    return d.id.replace(/\./, '-');
+                })
+                .attr('class', 'orbit')
+                .attr('rx',function(d) {
+                    return scale(d.semiMajorAxisAU);
+                })
+                .attr('ry',function(d) {
+                    return scale(calculateRy(d.eccentricity, d.semiMajorAxisAU));
+                })
+                .attr('cx', function(d) {
+                    return centerX - scale(d.semiMajorAxisAU - d.apheliumAU);
+                })
+                .attr('cy', centerY)
+                .style('stroke', function(d, i) {
+                    let color = d3.hsl(colors(i));
+                    color.l = .8;
+                    return color;
+                })
+                .attr('transform', function(d) {
+                    return 'rotate('+d.ascendingNodeLong+' '+centerX+' '+centerY+')'
+                });
+
+        svg.selectAll('text')
+                .data(orbits)
+                .enter()
+                .append('text')
+                .attr('x', function(d) {
+                    let dim = d3.select("#" + d.id.replace(/\./, '-')).node().getBBox();
+                    return dim.x + dim.width/2;
+                })
+                .attr('y', function(d) {
+                    let dim = d3.select("#" + d.id.replace(/\./, '-')).node().getBBox();
+                    return dim.y + dim.height - 5;
+                })
+                .text(function(d) {
+                    return d.name;
+                }).style("fill", function(d, i) {
+                    return colors(i);
+                }).attr('transform', function(d) {
+                    let dim = this.getBBox();
+                    return 'rotate('+(d.ascendingNodeLong)+' '+centerX+' '+centerY+') rotate(-'+(d.ascendingNodeLong)+' '+(dim.x+dim.width/2)+' '+(dim.y+dim.height)+')';
+                });
+    }
+
+
+</script>
+
+</body>
+</html>

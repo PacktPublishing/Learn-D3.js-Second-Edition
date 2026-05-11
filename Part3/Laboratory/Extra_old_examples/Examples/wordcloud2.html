@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://d3js.org/d3-queue.v3.min.js"></script>
+    <script src="../JavaScript/d3.layout.cloud.js"></script>
+    <script src="../JavaScript/commonWords.js"></script>
+    <style>
+        form {
+            width: 100%;
+            text-align: center;
+        }
+        button {
+            font-family: impact;
+            color: white;
+            background: black;
+            font-size: 24pt;
+        }
+        div p {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div width="960" height="500" id="cloud"><p>Loading word database...</p></div>
+<form>
+    <button type="button" id="next">Next</button>
+</form>
+<script>
+    const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+    const width = 960, height = 500;
+
+    let wordsMap;
+    let words = [];
+    let data = [];
+    const books = ["Alice in Wonderland","Dracula","Frankenstein","Great Expectations",
+        "Moby Dick","Pride and Prejudice","The Legend of Sleepy Hollow",
+        "The Picture of Dorian Gray","The Strange Case of Dr Jekyll and Mr Hyde",
+        "The Wonderful Wizard of Oz","A Tale of Two Cities",
+        "Dubliners","Emma","Heart of Darkness","Jane Eyre","The Adventures of Tom Sawyer",
+        "The Importance of Being Earnest","The Time Machine","Treasure Island"];
+
+    const fontScale = d3.scaleLog().range([12, 100]);
+    let book = 0;
+
+    const cloudLayout = d3.layout.cloud()
+            .spiral('archimedean')
+            .size([width, height])
+            .font('impact')
+            .fontSize(function(d) {
+                return fontScale(d.count);
+            })
+            .text(function(d) {
+                return d.word;
+            });
+
+    const wordCloud = d3.select("#cloud").append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .append("g")
+            .attr("transform", "translate(" + [width /2, height /2] + ")");
+
+    d3.select("#next").on("click", function() {
+        book = (book < books.length-1) ? ++book : 0;
+        wordCloud.selectAll('*').remove();
+        draw(data[book].stats);
+    });
+
+    const queue = d3.queue(1);
+    books.forEach(function(title) {
+        queue.defer(loadFile, title);
+    })
+    queue.await(function(error, files) {
+        d3.select("#cloud p").remove();
+        draw(data[book].stats);
+    });
+
+    function draw(stats) {
+        fontScale.domain([stats[stats.length-1].count, stats[0].count]);
+        cloudLayout.words(stats).start();
+        wordCloud.selectAll("text")
+            .data(stats, function(d) {
+                return d.text;
+            }).enter().append("text")
+            .attr("text-anchor", "middle")
+            .attr("transform", function(d) {
+                return "translate(" + [d.x, d.y] + ") rotate(" + d.rotate + ")";
+            })
+            .style("font-size", function(d) {
+                return d.size + "px";
+            })
+            .style("font-family", function(d) {
+                return d.font;
+            })
+            .style("fill", function(d, i) {
+                return colorScale(i);
+            })
+            .text(function(d) {
+                return d.text;
+            })
+            .on("click", function(d) {
+                alert(d.percent + "%");
+            });
+    }
+
+    function loadFile(title, callback) {
+        d3.text("../Data/Books/"+title+".txt").then(function(text) {
+            words = text.replace(/[^A-Za-z\s]/g,' ')
+                            .split(/\b/)
+                            .filter(word=>word.trim()!='' && word.length > 2);
+            wordsMap = makeWordsMap(true, 50);
+            data.push(makeStats(title));
+            callback(null);
+        });
+    }
+
+    function makeWordsMap(filterCommonWords, limit) {
+        let map = new Map();
+        let bookWords = words;
+        if(filterCommonWords) {
+            bookWords = words.filter(word => !commonWords.includes(word.toLowerCase()));
+        }
+        for (word of bookWords) {
+            if (map.has(word.toLowerCase())) {
+                map.set(word.toLowerCase(), map.get(word.toLowerCase()) + 1);
+            } else {
+                map.set(word.toLowerCase(), 1);
+            }
+        }
+        let kvArray = [...map.entries()].sort((a, b) => b[1] - a[1]);
+        if(limit) {
+            kvArray = kvArray.slice(0,limit);
+        }
+        return new Map(kvArray);
+    }
+
+    function makeStats(title) {
+        let stats = [];
+        wordsMap.forEach(function(value,key) {
+            stats.push(
+                    {
+                        word: key,
+                        count: value,
+                        percent: (value / words.length) * 100
+                    });
+        });
+        return {title: title, stats: stats};
+    }
+
+</script>
+</body>
+</html>

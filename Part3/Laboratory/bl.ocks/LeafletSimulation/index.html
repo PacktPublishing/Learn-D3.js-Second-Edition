@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+    <script src="jquery-3.6.3.slim.min.js" integrity="sha256-ZwqZIVdD3iXNyGHbSYdsmWP//UBokj2FHAxKuSBKDSo=" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>
+
+    <style>
+        #map {
+            height: 720px;
+            border: solid 1px red;
+        }
+    </style>
+    <script>
+        // PATH SIMPLIFICATION ALGORITHM
+        // Douglas Peucker path simplification algorithm
+        // This code is based on https://gist.github.com/adammiller/826148
+
+        var Line = function( p1, p2 ) {
+            this.p1 = p1;
+            this.p2 = p2;
+
+            this.distanceToPoint = function( point ) {
+                // slope
+                var m = ( this.p2[0] - this.p1[0]  ) / ( this.p2[1]  - this.p1[1]  ),
+                // y offset
+                        b = this.p1[0]  - ( m * this.p1[1]  ),
+                        d = [];
+                // distance to the linear equation
+                d.push( Math.abs( point[0]  - ( m * point[1]  ) - b ) / Math.sqrt( Math.pow( m, 2 ) + 1 ) );
+                // distance to p1
+                d.push( Math.sqrt( Math.pow( ( point[1] - this.p1[1] ), 2 ) + Math.pow( ( point[0]  - this.p1[0]  ), 2 ) ) );
+                // distance to p2
+                d.push( Math.sqrt( Math.pow( ( point[1] - this.p2[1] ), 2 ) + Math.pow( ( point[0]  - this.p2[0]  ), 2 ) ) );
+                // return the smallest distance
+                return d.sort( function( a, b ) {
+                    return ( a - b ); //causes an array to be sorted numerically and ascending
+                } )[0];
+            };
+        };
+
+        var simplify = function(points, tolerance) {
+            var douglasPeucker = function( points, tolerance ) {
+                if ( points.length <= 2 ) {
+                    return [points[0]];
+                }
+                var returnPoints = [],
+                // make line from start to end
+                        line = new Line( points[0], points[points.length - 1] ),
+                // find the largest distance from intermediate poitns to this line
+                        maxDistance = 0,
+                        maxDistanceIndex = 0,
+                        p;
+                for( var i = 1; i <= points.length - 2; i++ ) {
+                    var distance = line.distanceToPoint( points[ i ] );
+                    if( distance > maxDistance ) {
+                        maxDistance = distance;
+                        maxDistanceIndex = i;
+                    }
+                }
+                // check if the max distance is greater than our tollerance allows
+                if ( maxDistance >= tolerance ) {
+                    p = points[maxDistanceIndex];
+                    line.distanceToPoint( p, true );
+                    // include this point in the output
+                    returnPoints = returnPoints.concat( douglasPeucker( points.slice( 0, maxDistanceIndex + 1 ), tolerance ) );
+                    // returnPoints.push( points[maxDistanceIndex] );
+                    returnPoints = returnPoints.concat( douglasPeucker( points.slice( maxDistanceIndex, points.length ), tolerance ) );
+                } else {
+                    // ditching this point
+                    p = points[maxDistanceIndex];
+                    line.distanceToPoint( p, true );
+                    returnPoints = [points[0]];
+                }
+                return returnPoints;
+            };
+            var result = douglasPeucker( points, tolerance );
+            // always have to push the very last point on so it doesn't get left off
+            result.push( points[points.length - 1 ] );
+            return result;
+        };
+        </script>
+</head>
+<body>
+<div id="map"></div>
+<form>
+    Simplify path
+    <input type="range" id="tolerance" name="tolerance" value="0" min="0.0000000001" max=".005" step=".0000001">
+    <button type="button" id="btn_save">Save to database</button>
+    <button type="button" id="btn_load">Load from database</button>
+</form>
+
+<script>
+    $(document).ready(function () {
+        //var MAPBOX_ACCESS_TOKEN = "PLACE_YOUR_TOKEN_HERE";
+
+
+        // GLOBAL VARS
+        var mapCenter = [-23.5400239, -46.6793203]; // for this example
+
+        // original points (ajax load this from a file or database)
+        var original = [];
+
+        // load the map and original track
+        var points = cloneCoords(original); // this will locally store points after editing and simplification
+        var simplified = cloneCoords(original); // this will locally store points during simplification
+
+        var track; // this will be the L.polyline containing the points
+        $("#tolerance").prop("disabled", true);
+
+        console.log("original points length", points.length)
+
+
+        // MAP SETUP AND CONFIGURATION
+        var map = L.map('map')
+            .setView(mapCenter, 15);
+
+        //L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+        L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+            maxZoom: 18,
+            //id: 'mapbox.streets',
+            //accessToken: MAPBOX_ACCESS_TOKEN
+        }).addTo(map);
+
+        // Add the editable layer
+        var trackLayer = new L.FeatureGroup();
+        map.addLayer(trackLayer);
+
+        // Setup editing controls
+        var drawControl = new L.Control.Draw({
+            edit: {featureGroup: trackLayer, remove: false},
+            draw: false
+        });
+        map.addControl(drawControl);
+
+        // Editing events
+        map.on('draw:editstart', function (e) {
+            console.log("started editing")
+            points = cloneCoords(simplified);
+            $("#tolerance").prop("disabled", true);
+        });
+
+        map.on('draw:edited', function (e) {
+            console.log("finished editing")
+            var editedPoints = [];
+            var coords = track._latlngs;
+            for (var i = 0; i < coords.length; i++) {
+                var obj = coords[i];
+                editedPoints.push([obj.lat, obj.lng]);
+            }
+            console.log("edited points length", editedPoints.length)
+
+            points = cloneCoords(editedPoints);
+        });
+
+        map.on('draw:editstop', function (e) {
+            console.log("saved or cancelled")
+            $("#tolerance").prop("disabled", false);
+        });
+
+
+        // FUNCTIONS
+        function cloneCoords(sourceArray) {
+            var destArray = [];
+            for (var i = 0; i < sourceArray.length; i++) {
+                destArray.push([sourceArray[i][0], sourceArray[i][1]]);
+            }
+            return destArray;
+        }
+
+        // Apply simplification algorithm using specified tolerance & redraw shape
+        // Save points in memory
+        function simplifyPath() {
+            var tolerance = $('#tolerance').val();
+            simplified = simplify(points, tolerance);
+
+            console.log("simplified points length", simplified.length)
+
+            // change the array for the path & redraw
+            track.setLatLngs(simplified);
+        }
+
+        // Revert shape to original points
+        function loadFromDatabase() {
+            if (points.length == 0 || confirm("Reset all changes and revert to original path?")) {
+                // mock data - load points from database into this variable
+                original = [[-23.5399944, -46.6779631], [-23.5399501, -46.6778719], [-23.5398518, -46.6778183], [-23.5397633, -46.6777754], [-23.5396895, -46.6777164], [-23.5396206, -46.6776359], [-23.5395272, -46.6775984], [-23.5394436, -46.6775501], [-23.53936, -46.6775018], [-23.5392665, -46.677416], [-23.5391633, -46.6773355], [-23.5390649, -46.6772443], [-23.5389616, -46.6771853], [-23.5388682, -46.6771102], [-23.53876, -46.6770566], [-23.5388239, -46.6768849], [-23.5389075, -46.6767454], [-23.5390206, -46.6766596], [-23.53906, -46.6765684], [-23.5391288, -46.6764665], [-23.5391878, -46.6763484], [-23.5392616, -46.6762787], [-23.5393108, -46.6761822], [-23.5393796, -46.6761178], [-23.5395567, -46.6759408], [-23.5396354, -46.6757476], [-23.5397436, -46.6755652], [-23.5398419, -46.675458], [-23.5399501, -46.6755223], [-23.5401173, -46.6755652], [-23.5402649, -46.6756618], [-23.5403731, -46.6757047], [-23.5405206, -46.6757905], [-23.5406682, -46.6758764], [-23.5407665, -46.67593], [-23.5408747, -46.6760159], [-23.5409927, -46.6760373], [-23.5411993, -46.6761017], [-23.5412977, -46.6761553], [-23.5414157, -46.6762412], [-23.5417993, -46.6763484], [-23.542055, -46.6763592], [-23.5422419, -46.6764128], [-23.542537, -46.6764557], [-23.5427534, -46.6764665], [-23.5430091, -46.6765201], [-23.5432255, -46.6764987], [-23.5433927, -46.6765201], [-23.5436583, -46.6765523], [-23.5438353, -46.6765416], [-23.5440222, -46.6765523], [-23.5442091, -46.6765416], [-23.5443664, -46.6765738], [-23.5446713, -46.6766381], [-23.5448287, -46.6766381], [-23.5452025, -46.6766703], [-23.5455074, -46.6766918], [-23.5459696, -46.676681], [-23.5460778, -46.676724], [-23.5463237, -46.6767669], [-23.5465303, -46.6767883], [-23.5465991, -46.6767991], [-23.5469925, -46.6767883], [-23.5471794, -46.6767991], [-23.5473466, -46.6768527], [-23.5476122, -46.6768527], [-23.547799, -46.6768956], [-23.5481039, -46.67696], [-23.5482515, -46.67696], [-23.548399, -46.6769707], [-23.5485662, -46.6769707], [-23.5487629, -46.6769922], [-23.5489596, -46.6770136], [-23.5491661, -46.6770673], [-23.549471, -46.6770673], [-23.5496186, -46.6771102], [-23.5498153, -46.6771638], [-23.550012, -46.6772175], [-23.5501595, -46.6772604], [-23.5503857, -46.6773462], [-23.5506414, -46.6774213], [-23.5508283, -46.6774642], [-23.5509955, -46.6775501], [-23.5513102, -46.6777325], [-23.5515266, -46.677947], [-23.5517528, -46.6781294], [-23.5519889, -46.6783011], [-23.5521757, -46.6784835], [-23.5523429, -46.6787302], [-23.5524118, -46.6788912], [-23.5521659, -46.679374], [-23.5520479, -46.679492], [-23.55192, -46.6795886], [-23.551743, -46.6796422], [-23.5516348, -46.6797066], [-23.5515069, -46.679846], [-23.5513397, -46.680007], [-23.551143, -46.6800606], [-23.5513397, -46.6798675], [-23.5515758, -46.6800714], [-23.5515954, -46.6799641], [-23.5513594, -46.679728], [-23.5512611, -46.6794813], [-23.5511332, -46.6792989], [-23.5510447, -46.6790736], [-23.5509365, -46.6789234], [-23.5508283, -46.6788161], [-23.5508578, -46.6786659], [-23.5510348, -46.67858], [-23.551143, -46.6785371], [-23.5512512, -46.6784728], [-23.5514479, -46.6783333], [-23.5516348, -46.6782796], [-23.5519003, -46.6780221], [-23.5519889, -46.6779149], [-23.5521856, -46.6778183], [-23.5523429, -46.6776788], [-23.5524609, -46.677593], [-23.552579, -46.6774642], [-23.5525298, -46.6773462], [-23.5524118, -46.6770995], [-23.5522839, -46.6769063], [-23.5521659, -46.6767669], [-23.552038, -46.6765523], [-23.5517036, -46.6764772], [-23.5515463, -46.6765523], [-23.5514184, -46.6767454], [-23.5512709, -46.6769707], [-23.5510939, -46.6772175], [-23.5510545, -46.6773784], [-23.5508578, -46.6775393], [-23.5507693, -46.6776681], [-23.5507103, -46.6777539], [-23.5505431, -46.6780221], [-23.5503464, -46.6782904], [-23.5502185, -46.6785264], [-23.5501497, -46.6787088], [-23.5500218, -46.6790199], [-23.5499136, -46.6793311], [-23.5498251, -46.6795564], [-23.5496186, -46.679846], [-23.549412, -46.6800177], [-23.5491071, -46.6802001], [-23.5488514, -46.6802645], [-23.5484482, -46.6802967], [-23.5480843, -46.6802001], [-23.5477203, -46.6800392], [-23.5472679, -46.6799963], [-23.5469532, -46.6799963], [-23.5465106, -46.6803396], [-23.5462057, -46.680522], [-23.5459893, -46.6805863], [-23.5472778, -46.6801035], [-23.5457729, -46.6805971], [-23.5455565, -46.6806078], [-23.5456352, -46.6805005], [-23.5455565, -46.6803825], [-23.54535, -46.6803396], [-23.5450746, -46.6803396], [-23.5448779, -46.6803825], [-23.5446812, -46.68064], [-23.5444451, -46.6808438], [-23.5441894, -46.6809833], [-23.543855, -46.6810584], [-23.5435501, -46.6810799], [-23.5432353, -46.6811442], [-23.5430583, -46.6812944], [-23.5428321, -46.6813374], [-23.5426747, -46.6814339], [-23.5425271, -46.6815948], [-23.5419173, -46.6819489], [-23.5413272, -46.6822171], [-23.5410518, -46.6823351], [-23.5407173, -46.6824746], [-23.5403928, -46.6822922], [-23.5399108, -46.681906], [-23.5395567, -46.6816914], [-23.5395174, -46.6816163], [-23.539596, -46.6813481], [-23.5397633, -46.6810584], [-23.5399108, -46.6808331], [-23.5400092, -46.6806614], [-23.5401173, -46.6805112], [-23.5401075, -46.6802537], [-23.540196, -46.680007], [-23.5403239, -46.6798139], [-23.5403731, -46.6796207]];
+
+                points = cloneCoords(original);
+                if (!track) {
+                    track = L.polyline(points)
+                        .addTo(trackLayer);
+                } else {
+                    track.setLatLngs(points);
+                }
+                $("#tolerance").val(0);
+                $("#tolerance").prop("disabled", false);
+            }
+        }
+
+        function saveToDatabase() {
+            alert("Save path to database")
+            // insert here ajax call to send to server.
+        }
+
+
+        // HTML BINDINGS
+        $('#tolerance').on("input", simplifyPath);
+        $('#btn_load').on("click", loadFromDatabase);
+        $('#btn_save').on("click", saveToDatabase);
+
+    });
+
+</script>
+
+</body>
+</html>

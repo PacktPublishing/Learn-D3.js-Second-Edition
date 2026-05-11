@@ -2,14 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Earth rotating in all directions</title>
+    <title>Earth rotating on all axes at the same speed</title>
     <link rel="stylesheet" href="css/animations.css">
     <style>
         svg {background-color:black;}
     </style>
 </head>
 <body>
-<h1>Earth rotating in all directions</h1>
+<h1>Earth rotating on all axes at the same speed</h1>
+<p>Animating all angles in <code>projection.rotate([yaw, pitch, roll])</code>
+to make the globe rotate on all three axes.</p>
 <script type="module">
     import * as d3_all from "https://cdn.skypack.dev/d3@7";
     import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
@@ -33,15 +35,18 @@
             updateMap(null, 0); // null = No extra selectors to update, 0 = Update without transition
         });
 
-        let i = 0;
-        d3.interval(function() {
-            if(i === 180) i = -180;
-            map.projection.rotate([i++, i++, i++])
-            map.view.selectAll("path").attr('d', map.geoPath)
-        }, 60);
+        const degreesPerSecond = 1000 / 60; // 1 degree every 60ms
+        const initialRotation = [...map.rotation];
+
+        d3.timer((elapsed) => {
+            const angle = (elapsed * degreesPerSecond) / 1000;
+            map.rotation[0] = (initialRotation[0] + angle) % 360;
+            map.rotation[1] = (initialRotation[1] + angle) % 360;
+            map.rotation[2] = (initialRotation[2] + angle) % 360;
+            map.projection.rotate(map.rotation);
+            map.view.selectAll("path").attr("d", map.geoPath);
+        });
     });
 </script>
-
-
 </body>
 </html>

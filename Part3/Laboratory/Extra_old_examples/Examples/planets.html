@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Worlds that are larger than the moon of Makemake</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <style>
+        text {
+            font-size: 10pt;
+            font-family: sans-serif;
+            fill: white;
+        }
+
+        svg {
+            background: black;
+        }
+
+        h1 {
+            font-family: sans-serif;
+            color: white;
+            text-align: center;
+            font-size: 16pt;
+        }
+
+        body {
+            background: black;
+        }
+
+        #info {
+            background: white;
+            opacity: .8;
+            position: absolute;
+            left: 10px;
+            width: 300px;
+            border-radius: 20px;
+            border-top-right-radius: 0px;
+            box-shadow: 0px 0px 20px #888844;
+            pointer-events: none;
+        }
+
+        #info table {
+            border-radius: 20px;
+            width: 100%;
+        }
+
+        td {
+            padding-left: 10px;
+            text-align: right;
+            font-size: 8pt;
+            font-family: sans-serif;
+        }
+
+        td:nth-child(even) {
+            padding-left: 10px;
+            text-align: left;
+        }
+        table col {
+            width: 50%;
+        }
+
+        .gaseous {
+            fill: orange;
+            background: orange;
+        }
+        .rocky {
+            fill: forestgreen;
+            background: forestgreen;
+        }
+        .centaur {
+            fill: lightgray;
+            background: lightgray;
+        }
+        .dwarf {
+            fill: olive;
+            background: olive;
+        }
+        .satellite {
+            fill: coral;
+            background: coral;
+        }
+        .tno {
+            fill: gray;
+            background: gray;
+        }
+        .asteroid {
+            fill: deepskyblue;
+            background: deepskyblue;
+        }
+        #key {
+            color: white;
+            font-family: sans-serif;
+            font-size: 10px;
+            text-align: center;
+        }
+        #key div {
+            height: 10px;
+            width: 10px;
+            display: inline-block;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+<h1><span class="number"></span> worlds that have a diameter of <span class="diameter"></span> km or more</h1>
+
+<div id="key">
+    <div class="gaseous key"></div> Gaseous planet
+    <div class="rocky key"></div> Rocky planet
+    <div class="dwarf key"></div> Dwarf planet
+    <div class="asteroid key"></div> Asteroid
+    <div class="centaur key"></div> Centaur
+    <div class="tno key"></div> Trans-Neptunian Object (TNO)
+    <div class="satellite key"></div> Satellite
+</div>
+
+<div id="info" style="display:none">
+    <table width="100%"><col/><col/><tbody></tbody></table>
+</div>
+
+<script>
+    var width = 1000;
+    var height = 12850;
+    var space = 15;
+
+    var maxDiameter = 900;
+
+    var scale_n, scale_d, coord_n;
+
+    d3.json("../Data/sol_2016.json")
+      .then(function (data) {
+          drawObjects(d3.merge([data.planets, data.tnos, data.asteroids, data.centaurs]));
+    });
+
+    var dwarf = new Set(["Ceres", "Pluto", "Eris", "Makemake", "Haumea"]);
+
+    var daysToYearsAndDays = function(totalDays) {
+        if (totalDays > 400) {
+            var years = Math.round(totalDays / 365.25);
+            var days  = Math.round(totalDays % 365.25);
+            return years + " years and " + days + " days";
+        } else {
+            return totalDays + " days";
+        }
+    };
+
+    var category = function (d) {
+        if (d.category == "gaseous" || d.category == "rocky" || d.category == "centaur") {
+            return d.category;
+        } else if (dwarf.has(d.name))  {
+            return "dwarf";
+        }
+        else if (d.planet) {
+            return "satellite";
+        }
+        else if (d.semiMajorAxisAU > 30.1) {
+            return "tno";
+        }
+        else {
+            return "asteroid";
+        }
+    };
+
+    var colors = {
+        "gaseous": "orange",
+        "rocky": "forestgreen",
+        "centaur": "lightgray",
+        "dwarf": "olive",
+        "satellite": "coral",
+        "tno": "gray",
+        "asteroid": "deepskyblue"
+    };
+
+    var showInfo = function (d, i) {
+        var info = d3.select("#info");
+        var table = info.select("table tbody");
+        var tr = table.append("tr")
+                .append("td").attr("colspan", 2).style("text-align", "center")
+                .html("<b>"+d.name+"</b>");
+        tr = table.append("tr")
+        tr.append("td").html("Diameter")
+        tr.append("td").html(d.diameterKm + " km");
+        if (d.planet) { // is satellite
+            tr = table.append("tr")
+            tr.append("td").html("Mean distance from " + d.planet)
+            tr.append("td").html(d.semiMajorAxisKm + " km");
+        } else {
+            tr = table.append("tr")
+            tr.append("td").html("Mean distance from Sun")
+            tr.append("td").html(d.semiMajorAxisAU + " AU");
+
+            if (d.orbitalPeriodD) {
+                tr = table.append("tr")
+                tr.append("td").html("Duration of year")
+                tr.append("td").html(daysToYearsAndDays(d.orbitalPeriodD));
+            }
+            if (d.siderealRotationPeriodH) {
+                tr = table.append("tr")
+                tr.append("td").html("Duration of day")
+                tr.append("td").html(d.siderealRotationPeriodH + " hours");
+            }
+        }
+
+
+        if (d.equatorialGravity) {
+            tr = table.append("tr")
+            tr.append("td").html("Gravity")
+            tr.append("td").html(d.equatorialGravity + " m/s<sup>2</sup>");
+        }
+        if (d.massKg) {
+            tr = table.append("tr")
+            tr.append("td").html("Mass")
+            tr.append("td").html(d.massKg + " kg");
+        }
+        if (d.volume) {
+            tr = table.append("tr")
+            tr.append("td").html("Volume")
+            tr.append("td").html(d.volume + " km<sup>3</sup>");
+        }
+        if (d.density) {
+            tr = table.append("tr")
+            tr.append("td").html("Density")
+            tr.append("td").html(d.density + " g/cm<sup>3</sup>");
+        }
+        if (d.yearOfDiscovery || d.discoveredBy) {
+            tr = table.append("tr")
+            var text = "Discovered";
+            if (d.yearOfDiscovery) {
+                text += " in " + d.yearOfDiscovery;
+            }
+            if (d.discoveredBy) {
+                text += " by " + d.discoveredBy;
+            }
+            tr.append("td").attr("colspan", 2).style("text-align", "center").html(text);
+        }
+
+        info.transition().style("display", "block");
+        info.style("top", function () {
+            var circle = d3.select("#" + d.id.replace(/\./g, "_")).select("circle");
+            var pos = circle.node().getBoundingClientRect().top + window.scrollY + "px";
+            return pos;
+        });
+    };
+
+    var hideInfo = function (d) {
+        var info = d3.select("#info")
+        info.transition().style("display", "none");
+        info.select("table tbody").html("");
+    };
+
+
+    var drawObjects = function (planets) {
+
+        var satellites = [];
+        planets.forEach(function (d) {
+            if (d.satellites) {
+                d.satellites.forEach(function (e) {
+                    e["planet"] = d.name;
+                });
+                satellites = d3.merge([satellites, d.satellites]);
+            }
+        });
+
+        var objects = d3.merge([planets, satellites]).filter(function (d) {
+            return d.diameterKm >= maxDiameter;
+        });
+
+        var objectsTotal = objects.length;
+        var objectsLarger = objects.filter(function (d) {
+            return d.diameterKm > maxDiameter;
+        }).length;
+
+        d3.selectAll(".number").html(function () {
+            return objectsLarger;
+        });
+
+        d3.selectAll(".diameter").html(function () {
+            return maxDiameter;
+        });
+
+        objects.sort(function (a, b) {
+            return d3.descending(a.diameterKm, b.diameterKm);
+        })
+
+        scale_d = d3.scaleLinear()
+                .domain([0, d3.max(objects, function (d) {
+                    return d.diameterKm;
+                })])
+                .range([0, width * .8 - space]);
+
+        scale_n = d3.scaleLinear()
+                .domain([0, d3.sum(objects, function (d) {
+                    return d.diameterKm;
+                })])
+                .range([space, height - objects.length * space]);
+
+        coord_n = function (d, i) {
+            var previousDiameters = d3.sum(objects, function (d, j) {
+                if (j < i) return d.diameterKm;
+            })
+            return space + i * space + scale_d(d.diameterKm / 2) + scale_d(previousDiameters);
+        }
+
+        height = coord_n(objects[objects.length-1], objects.length-1)
+                      + scale_d(objects[objects.length -1].diameterKm/2)
+                      + 20;
+
+        var svg = d3.select("body")
+                .append("div")
+                .attr("width", width)
+                .attr("height", height)
+                .append("svg")
+                .attr("viewBox", "0 0 " + width + " " + height);
+
+        var defs = svg.append("defs");
+
+        var gradient = defs.selectAll("radialGradient")
+                .data(objects)
+                .enter()
+                .append("radialGradient")
+                .attr("cx", .2).attr("cy", .3).attr("r", .9)
+                .attr("id", function (d) {
+                    return "gradient-" + d.id.replace(/\./g, "_");
+                });
+        gradient.append("stop")
+                .attr("stop-color", function(d) {
+                    return d3.hsl(colors[category(d)]).brighter();
+                })
+                .attr("offset", "0%")
+        gradient.append("stop")
+                .attr("stop-color", function(d) {
+                    return colors[category(d)];
+                })
+                .attr("offset", "33%")
+                .attr("stop-opacity", .8)
+        gradient.append("stop")
+                .attr("stop-color", function(d) {
+                    return d3.hsl(colors[category(d)]).darker();
+                })
+                .attr("offset", "66%")
+                .attr("stop-opacity", .6)
+        gradient.append("stop")
+                .attr("stop-color", function(d) {
+                    return d3.hsl(colors[category(d)]).darker().darker();
+                })
+                .attr("offset", "100%")
+                .attr("stop-opacity", .1);
+
+        var entries = svg
+                .selectAll(".entry")
+                .data(objects)
+                .enter()
+                .append("g")
+                .attr("id", function (d) {
+                    return d.id.replace(/\./g, "_");
+                })
+                .attr("class", "entry");
+
+        entries.append("circle")
+                .attr("cx", function(d) { return width/2; })
+                .attr("cy", function(d, i) { return coord_n(d, i); })
+                .attr("r", function(d) { return scale_d(d.diameterKm / 2); })
+                .attr("fill", function(d,i) {
+                    return "url(#gradient-" + d.id.replace(/\./g, "_") + ")";
+                });
+
+        entries.append("text")
+                .text(function (d) {
+                    if (dwarf.has(d.name)) {
+                        return d.name;
+                    } else if (d.semiMajorAxisAU > 30.1) {
+                        return d.name + " " + (d.designation == d.name ? "" : d.designation);
+                    } else if (d.planet) {
+                        return d.name + " (Satellite of " + d.planet + ")";
+                    } else return d.name;
+                })
+                .attr("x", function (d) {
+                    return width / 2 + scale_d(d.diameterKm / 2) + 20;
+                })
+                .attr("y", function (d, i) {
+                    return coord_n(d, i) + 5;
+                })
+                .attr("class", function(d) {
+                    return "name " + category(d);
+                });
+
+        entries.append("text")
+                .style("text-anchor", "end")
+                .text(function (d) {
+                    return d.diameterKm + " km";
+                })
+                .attr("x", function (d) {
+                    return width / 2 - scale_d(d.diameterKm / 2) - 20;
+                })
+                .attr("y", function (d, i) {
+                    return coord_n(d, i) + 5;
+                })
+                .attr("class", function(d) {
+                    return "diameter " + category(d);
+                });
+
+        entries.on("mouseover", function (d, i) {
+                    if (scale_d(d.diameterKm / 2) < width / 100) {
+                        d3.select(this).select("circle")
+                                .transition()
+                                .attr("r", width / 100);
+                    }
+                    d3.select(this).selectAll("text")
+                            .style("font-size", "13pt")
+                            .style("font-weight", "bold");
+                    showInfo(d, i);
+                })
+                .on("mouseout", function (d) {
+                    d3.select(this).select("circle")
+                            .transition()
+                            .attr("r", scale_d(d.diameterKm / 2));
+                    d3.select(this).selectAll("text")
+                            .style("font-size", "10pt")
+                            .style("font-weight", "normal");
+                    hideInfo();
+                });
+
+    }
+
+</script>
+</body>
+</html>

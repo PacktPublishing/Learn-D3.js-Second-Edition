@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Earth rotating on its axis</title>
+    <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+<h1>Earth rotating on its axis</h1>
+<p>Animating changes in <code>projection.rotate([yaw, pitch, roll])</code> with fixed pitch and roll values
+to produce a globe rotating on its axis.</p>
+<div id="rotate-controls">
+    <p>Change pitch or roll.
+    Pitch <input type="number" name="pitch" id="pitch" min="-90" max="90" step="1" value="0">
+    Roll <input type="number" name="roll" id="roll" min="-180" max="180" step="1" value="0">
+</div>
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+    const d3 = Object.assign({}, d3_all, d3_geo_projection);
+    import {map, loadTopoJSON, renderMap, updateMap, createProjectionSwitcher} from "../js/maps.js";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../data/world/world-medres.topojson";
+    const key  = "world";
+    map.projection = d3.geoMercator();
+    map.geoPath = d3.geoPath().projection(map.projection);
+    map.optimize = true;
+    map.rotation = [0, 0, 0];
+
+    loadTopoJSON(file, key).then(() => {
+        renderMap(map.view);
+        createProjectionSwitcher((evt, projections) => {
+            map.projection = projections[+evt.target.value].config;
+            map.projection.rotate(map.rotation); // Apply current rotation
+            map.geoPath.projection(map.projection);
+            updateMap(null, 0); // null = No extra selectors to update, 0 = Update without transition
+        });
+
+        const paths = map.view.selectAll("path");
+        const yawPerSecond = 20;
+        const initialYaw = map.rotation[0];
+
+        d3.timer((elapsed) => {
+            map.rotation[0] = (initialYaw + (elapsed * yawPerSecond) / 1000) % 360;
+            map.projection.rotate(map.rotation);
+            paths.attr("d", map.geoPath);
+        });
+    });
+
+    // Interactive rotation
+    d3.selectAll("#rotate-controls input").on("change", changeRotation);
+
+    function changeRotation(evt) {
+        map.rotation[1] = +d3.select("#pitch").node().value;
+        map.rotation[2] = +d3.select("#roll").node().value;
+        map.projection.rotate(map.rotation);
+        updateMap(null, 0);
+    }
+</script>
+</body>
+</html>

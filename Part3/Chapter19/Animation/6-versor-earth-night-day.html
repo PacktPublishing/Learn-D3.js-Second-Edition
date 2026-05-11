@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rotating Earth night and day</title>
+    <link rel="stylesheet" href="css/animations.css">
+    <style>
+        svg {background-color:black;}
+        .background {fill: slategray;}
+        input[type="range"] {
+            width: 750px;
+            margin-left: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+<h1>Rotating Earth night and day</h1>
+<div id="rotate-controls">
+    <p>Yaw (shadow) <input type="number" name="yaw" id="yaw" min="-180" max="180" step="1" value="0">
+        Pitch <input type="number" name="pitch" id="pitch" min="-90" max="90" step="1" value="0">
+        Roll <input type="number" name="roll" id="roll" min="-180" max="180" step="1" value="0">
+    </p>
+</div>
+<div id="season"></div>
+<p></p>
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+    const d3 = Object.assign({}, d3_all, d3_geo_projection);
+    import {map, loadTopoJSON, renderMap, updateMap, createProjectionSwitcher} from "../js/maps.js";
+    import {createDateSwitcher} from "./js/animations.js";
+    import versor from "https://cdn.skypack.dev/versor@0.2";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../data/world/world-medres.topojson";
+    const key  = "world";
+
+    map.optimize = true;
+    map.projection = d3.geoMercator();
+    map.geoPath = d3.geoPath().projection(map.projection);
+
+    map.rotation = [0, 0, 0];
+    map.shadow = { feature: null }; // Store shadow as a GeoJSON feature to be drawn after the base map
+    map.yaw = {spin: 0, viewer: 0}; // spinYaw drives day/night progression (animation); userYaw is camera/view rotation.
+    map.tilt = 23.5; // Earth's axial tilt is 23.5 degrees - shadow tilts from -23.5 to +23.5 during the year
+
+    // Quaternion state — shared by the interval and the inputs
+    let q      = versor(map.rotation);   // current orientation
+    const step = versor([1, 0, 0]);      // 1° yaw increment per tick
+
+    let currentDate = new Date();
+    let currentDayOfYear = d3.utcDay.count(d3.utcYear(currentDate), currentDate);
+
+    await loadTopoJSON(file, key);
+    renderMap();
+
+    // Shadow implementation in SVG
+    drawShadow(map.view);
+
+    // Interactive rotation
+    d3.selectAll("#rotate-controls input")
+        .on("change", () => {
+            map.yaw.viewer = +d3.select("#yaw").node().value;
+            map.rotation[1] = +d3.select("#pitch").node().value;
+            map.rotation[2] = +d3.select("#roll").node().value;
+            redraw();
+        });
+
+    // Projection switcher
+    createProjectionSwitcher((evt, projections) => {
+        map.projection = projections[+evt.target.value].config;
+        if(map.projection.name === "Orthographic" || map.projection.name === "Gnomonic") {
+            map.projection.config.fitExtent([[0,25],[map.dim.width, map.dim.height-25]], {type: 'Sphere'});
+        }
+        map.geoPath.projection(map.projection);
+        redraw();
+    });
+
+    // Date switcher
+    createDateSwitcher(currentDate, currentDayOfYear, dayOfYear => {
+        currentDayOfYear = dayOfYear;
+        redraw();
+    });
+
+    // Animation
+    d3.interval(function() {
+        q = versor.multiply(step, q);            // rotate by 1° yaw via quaternion multiply
+        map.rotation = versor.rotation(q);       // convert back to Euler angles [yaw, pitch, roll]
+        map.yaw.spin = (map.yaw.spin + 1) % 360;
+        redraw();
+    }, 60);
+
+    // FUNCTIONS
+    function redraw() {
+        map.rotation[0] = map.yaw.spin + map.yaw.viewer;
+        q = versor(map.rotation);                    // re-sync quaternion state
+        map.projection.rotate(map.rotation);
+        updateShadow(currentDayOfYear);
+        updateMap(null, 0); // see ../js/maps-canvas.js
+    }
+
+    // Get tilt angle for day of year (23.5 degree tilt and March equinox at day 80).)
+    function getTilt(dayOfYear) {
+        return -map.tilt * Math.sin(2 * Math.PI * (dayOfYear - 80) / 365);
+    }
+
+    function updateShadow(dayOfYear) {
+        const centerLon = -90 - map.yaw.spin;
+        map.shadow.feature = d3.geoCircle().center([centerLon, getTilt(dayOfYear)])();
+        d3.select(".shadow")
+            .datum(map.shadow.feature)
+            .attr('d', map.geoPath);
+    }
+
+    // SVG shadow implementation
+    export function drawShadow(view) {
+        view.append("defs").append("filter")
+            .attr("id","blur")
+            .append("feGaussianBlur")
+            .attr("in", "SourceGraphic")
+            .attr("stdDeviation", 5);
+        view.append("path")
+            .attr("class","shadow")
+            .attr("filter", "url(#blur)")
+            .style("fill", "rgb(0,0,0,.7)");
+    }
+
+</script>
+
+</body>
+</html>

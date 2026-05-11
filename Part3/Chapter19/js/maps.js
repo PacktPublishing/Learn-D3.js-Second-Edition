@@ -22,7 +22,8 @@ export const map = {
     data: {},                           // {topology, geometries, features} object
     geoPath: null,                      // the current geoPath
     projection: null,                   // the current projection {name, config}
-    optimize: false                     // whether to use topojson.merge and topojson.mesh for rendering (faster but less flexible)
+    optimize: false,                     // whether to use topojson.merge and topojson.mesh for rendering (faster but less flexible)
+    onAfterDraw: null                   // optional callback(ctx, map) for app-specific overlays
 };
 
 // Loads a topoJSON file and stores in map.data
@@ -62,30 +63,44 @@ export function renderMap(view = null, geoPath = null, dim = null) {
 
 // Update map after changes in geoPath or projection
 export function updateMap(selectors = null, duration = 250) {
-    map.view.selectAll("g.feature").selectAll("path").transition().duration(duration).attr('d', map.geoPath);
-    map.view.selectAll(".graticule, .outline, .background").transition().duration(duration).attr('d', map.geoPath);
+    const apply = selection => duration > 0
+        ? selection.transition().duration(duration)
+        : selection;
+
+    apply(map.view.selectAll("g.feature path")).attr("d", map.geoPath);
+    apply(map.view.selectAll(".graticule, .outline, .background")).attr("d", map.geoPath);
+
     if(map.optimize) {
-        map.view.selectAll(".merged").transition().duration(duration).attr('d', map.geoPath);
-        map.view.selectAll(".mesh").transition().duration(duration).attr('d', map.geoPath);
+        apply(map.view.selectAll(".merged")).attr("d", map.geoPath);
+        apply(map.view.selectAll(".mesh")).attr("d", map.geoPath);
     }
+
     if(selectors) {
         if(typeof selectors === "string") {
             selectors = [selectors];
         }
         selectors.forEach(selector => {
-            map.view.selectAll(selector).transition().duration(duration).attr('d', map.geoPath);
+            apply(map.view.selectAll(selector)).attr("d", map.geoPath);
         });
+    }
+
+    if(typeof map.onAfterDraw === "function") {
+        map.onAfterDraw(map.view, map.geoPath);
     }
 }
 
 // Feature shapes are located by `g.feature path`
 export function drawFeatures(view, geoPath) {
-    view.selectAll("g.feature")
-             .data(map.data.features)
-               .join("g").attr("class","feature")
-                 .append("path")
-                    .attr('d', geoPath)
-                    .attr("fill", "gray");  // default (override with style in maps.css)
+    const features = view.selectAll("g.feature")
+        .data(map.data.features)
+        .join("g")
+        .attr("class", "feature");
+
+    features.selectAll("path")
+        .data(d => [d])
+        .join("path")
+        .attr("d", geoPath)
+        .attr("fill", "gray");  // default (override with style in maps.css)
 }
 
 export function drawMesh(view, geoPath) {

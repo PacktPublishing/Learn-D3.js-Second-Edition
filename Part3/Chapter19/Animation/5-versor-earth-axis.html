@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Earth rotating on its axis - using quaternions</title>
+    <link rel="stylesheet" href="../css/animations.css">
+    <style>
+        svg {background-color:black;}
+    </style>
+</head>
+<body>
+<h1>Earth rotating on its axis - using quaternions</h1>
+<p>An implementation using the <code>versor</code> library to rotate the globe using
+    quaternions.</p>
+<div id="rotate-controls">
+    <p>Change pitch or roll.
+    Pitch <input type="number" name="pitch" id="pitch" min="-90" max="90" step="1" value="0">
+    Roll <input type="number" name="roll" id="roll" min="-180" max="180" step="1" value="0">
+</div>
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+    const d3 = Object.assign({}, d3_all, d3_geo_projection);
+    import {map, loadTopoJSON, renderMap, updateMap, createProjectionSwitcher} from "../js/maps.js";
+    import versor from "https://cdn.skypack.dev/versor@0.2";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../data/world/world-medres.topojson";
+    const key  = "world";
+    map.projection = d3.geoMercator();
+    map.geoPath = d3.geoPath().projection(map.projection);
+    map.optimize = true;
+    map.rotation = [0, 0, 0];
+    const increment = 1; // degrees per tick
+
+    // Creating quaternion from Euler angles
+    let q     = versor(map.rotation);   // current orientation
+    const step = versor([increment, 0, 0]);     // yaw increment per tick
+
+    loadTopoJSON(file, key).then(() => {
+        renderMap(map.view);
+        createProjectionSwitcher((evt, projections) => {
+            map.projection = projections[+evt.target.value].config;
+            map.projection.rotate(map.rotation); // Apply current rotation
+            map.geoPath.projection(map.projection);
+            updateMap(null, 0);
+        });
+
+        d3.interval(function() {
+            q = versor.multiply(step, q);            // rotate by increment degrees yaw via quaternion multiply
+            map.rotation = versor.rotation(q);       // convert back to Euler angles [yaw, pitch, roll]
+            map.projection.rotate(map.rotation);
+            map.view.selectAll("path").attr('d', map.geoPath);
+        }, 60);
+    });
+
+    // Interactive rotation
+    d3.selectAll("#rotate-controls input").on("change", changeRotation);
+
+    function changeRotation(evt) {
+        const pitch = +d3.select("#pitch").node().value;
+        const roll  = +d3.select("#roll").node().value;
+        // Rebuild quaternion preserving the current yaw from ongoing animation
+        map.rotation = [map.rotation[0], pitch, roll];
+        q = versor(map.rotation);                    // re-sync quaternion state
+        map.projection.rotate(map.rotation);
+        updateMap(null, 0);
+    }
+</script>
+</body>
+</html>

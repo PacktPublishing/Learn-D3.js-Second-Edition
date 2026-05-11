@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+    <style>
+        text {
+            font-family: "Yanone Kaffeesatz", sans-serif;
+        }
+        text.parallels, text.meridians {
+            font-size: 12px;
+            fill-opacity: .4
+        }
+        .highlight, .highlight path {
+            fill: lightgreen;
+            fill-opacity: 1;
+        }
+        .country {
+            stroke-width: .1;
+            stroke: white;
+        }
+    </style>
+</head>
+<body>
+<h4 id="label">1</h4>
+<button id="previous">Previous</button>
+<button id="next">Next</button>
+<button id="name">Name</button>
+<script>
+    const width = 500;
+    const height = 500;
+
+    const svg = d3.select("body").append("svg")
+            .attr("width", width).attr("height", height);
+    const projection = d3.geoMercator().scale(300).translate([250,250]).center([13,3]);
+    const geoPath = d3.geoPath().projection(projection);
+
+    const data = {}
+    let index = 0;
+
+    d3.json('Data/world.geojson')
+    d3.json('Data/ne_10m_admin_0_countries.json')
+    .then(countries => {
+        data.features = countries.features.filter(d => d.properties.REGION_UN == "Africa");
+        d3.shuffle(data.features);
+        svg.append("path").attr("class","country").style("fill-opacity", .4)
+        showCountry()
+        //drawCountries();
+    });
+
+    function showCountry() {
+        projection.fitSize([width, height], data.features[index]);
+        svg.select(".country")
+                .datum(data.features[index])
+                .attr('d', geoPath);
+    }
+
+    d3.select("#next")
+            .on("click", () => {
+                d3.select("#label").text(index+1);
+                if(index < data.features.length-1)
+                    ++index;
+                showCountry();
+            });
+
+    d3.select("#previous")
+            .on("click", () => {
+                d3.select("#label").text(index+1);
+                if(index > 0)
+                    --index;
+                showCountry();
+            });
+
+    d3.select("#name")
+            .on("click", () => {
+            d3.select("#label").text(data.features[index].properties.NAME)
+    });
+
+    function drawCountries() {
+        svg.selectAll("g.country")
+                .data(data.features)
+                .enter()
+                .append("g")
+                .attr("class","country")
+                .style("fill-opacity", .4)
+                .append("path")
+                    .attr('d', geoPath)
+    }
+</script>
+
+</body>
+</html>

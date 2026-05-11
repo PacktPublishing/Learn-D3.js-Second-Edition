@@ -14,25 +14,29 @@ export const projectionList = [
     {name: "Plate Carée", config: d3.geoEquirectangular()},
     {name: "Equal Area", config: d3.geoCylindricalEqualArea()},
     {name: "Gnomonic", config: d3.geoGnomonic()},
-    {name: "Azimuthal Equidistant", config: d3.geoAzimuthalEquidistant().rotate([30,-80,-20]).center([0,0]).scale(300)},
+    {name: "Azimuthal Equidistant", config: d3.geoAzimuthalEquidistant().rotate([30, -80, -20]).center([0, 0]).scale(300)}
 ];
 
-// Creates a radio-button control panel to toggle projections in a #switcher HTML container
-// Callback is required.
-// Overridable defaults use projectionList, Mercator (index = 0) and places before first <svg> element.
-export function createProjectionSwitcher(callback, projections = projectionList, index = 0, svgSelector = "svg") {
-    const form = d3.select("body")
-                   .insert("div", svgSelector).attr("id", "switcher")
-                      .append("form").attr("id", "projection");
-    projections.forEach((p,i) => {
-        const entry = form.append("label")
+// Creates a radio-button control panel to toggle projections in a #switcher HTML container.
+// Overridable defaults use projectionList, Mercator (index = 0)
+export function createProjectionSwitcher(callback, projections = projectionList, index = 0) {
+    let container = d3.select("#switcher");
+    if (container.empty()) {
+        container = d3.select("body").append("div").attr("id", "switcher");
+    }
+
+    container.html("");
+    const form = container.append("form").attr("id", "projection");
+
+    projections.forEach((p, i) => {
+        const entry = form.append("label");
         entry.append("input")
             .attr("type", "radio")
             .attr("name", "projection")
             .attr("value", i)
             .property("checked", i === index)
-            .on("change", (evt => callback(evt, projections)));
+            .on("change", evt => callback(evt, projections));
         entry.append("span")
-            .html(p.name + '&nbsp;&nbsp;&nbsp;');
-    })
+            .html(p.name + "&nbsp;&nbsp;&nbsp;");
+    });
 }

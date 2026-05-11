@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rotating Titan</title>
+    <style>
+        svg {background-color:black;}
+        .background {fill: brown;}
+        .merged {fill: #CD5408FF; stroke: #cd540880
+        }
+        .mesh {stroke: darkorange}
+        .major {stroke: orange; stroke-width: 1px; fill: none;}
+    </style>
+</head>
+<body>
+<h1>Rotating Titan</h1>
+<div id="rotate-controls">
+    <p>Change pitch or roll.
+        Pitch <input type="number" name="pitch" id="pitch" min="-90" max="90" step="1" value="0">
+        Roll <input type="number" name="roll" id="roll" min="-180" max="180" step="1" value="0">
+</div>
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+    const d3 = Object.assign({}, d3_all, d3_geo_projection);
+    import {map, loadTopoJSON, renderMap, updateMap, createProjectionSwitcher} from "../js/maps.js";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../data/space/titan-rivers.topojson";
+    const key  = "titan-rivers";
+
+    map.optimize = true;
+    map.projection = d3.geoMercator();
+    map.geoPath = d3.geoPath().projection(map.projection);
+    map.rotation = [0, 0, 0];
+
+    loadTopoJSON(file, key).then(() => {
+        renderMap();
+
+        d3.interval(function() {
+            map.rotation[0] = (map.rotation[0] + 1) % 360;
+            map.projection.rotate(map.rotation);
+            map.view.selectAll("path.mesh, .merged, .graticule").attr('d', map.geoPath)
+        }, 60);
+
+    });
+
+    createProjectionSwitcher((evt, projections) => {
+        map.projection = projections[+evt.target.value].config;
+        if(map.projection.name === "Orthographic" || map.projection.name === "Gnomonic") {
+            map.projection.config.fitExtent([[0,0+25],[map.dim.width, map.dim.height-25]], {type: 'Sphere'})
+                .rotate([0, -maxTilt, 0]);
+        }
+        map.geoPath.projection(map.projection);
+        updateMap(null, 0);
+    });
+
+    // Interactive rotation
+    d3.selectAll("#rotate-controls input").on("change", changeRotation);
+
+    function changeRotation(evt) {
+        map.rotation[1] = +d3.select("#pitch").node().value;
+        map.rotation[2] = +d3.select("#roll").node().value;
+        map.projection.rotate(map.rotation);
+        updateMap(null, 0);
+    }
+</script>
+
+</body>
+</html>

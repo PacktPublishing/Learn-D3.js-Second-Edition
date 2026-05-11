@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://d3js.org/d3-selection.v1.min.js"></script>
+    <style>
+        .orbit {
+            line-width: 1;
+            fill: none
+        }
+    </style>
+</head>
+<body>
+
+<svg width="800" height="600">
+
+    <circle r="10" fill="none"
+             stroke="red" stroke-width="1"
+             cx="500" cy="300"></circle>
+
+    <ellipse id="orbit-1" rx="100" ry="95" fill="none"
+             stroke="green" stroke-width="1"
+             cx="469" cy="300" transform="rotate(20 500 300)"></ellipse>
+
+    <ellipse id="orbit-2" rx="200" ry="190" fill="none"
+             stroke="blue" stroke-width="1"
+             cx="438" cy="300" transform="rotate(350 500 300)"></ellipse>
+
+    <ellipse id="orbit-3" rx="300" ry="250" fill="none"
+             stroke="red" stroke-width="1"
+             cx="334" cy="300" transform="rotate(15 500 300)"></ellipse>
+
+</svg>
+
+</body>
+</html>

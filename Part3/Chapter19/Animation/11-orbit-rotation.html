@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Satellite orbit with d3-geoRotation()</title>
+    <link rel="stylesheet" href="css/animations.css">
+    <style>
+        .satellite {
+            fill: yellow;
+            stroke: red;
+            stroke-width: 0.7;
+            pointer-events: none;
+        }
+        .launch {
+            fill: cyan;
+            stroke: white;
+            stroke-width: 0.7;
+        }
+    </style>
+</head>
+<body>
+<h1>Satellite orbit with d3-geoRotation()</h1>
+<p>This example demonstrates an object moving over the globe. The object leaves a place on the Earth
+    (Baikonur, Kazakhstan) and then orbits at 51.6 degrees inclination, drifting 20 degrees of latitude
+    eastward every time. The launch from the initial site, the orbit, and the drift are all implemented
+    with <code>d3.geoRotation()</code>.
+</p>
+<div id="rotate-controls">
+    Yaw <input type="number" name="yaw" id="yaw" min="-180" max="180" step="10" value="0">
+    Pitch <input type="number" name="pitch" id="pitch" min="-90" max="90" step="5" value="0">
+    Roll <input type="number" name="roll" id="roll" min="-180" max="180" step="5" value="0">
+</div><p></p>
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+    const d3 = Object.assign({}, d3_all, d3_geo_projection);
+    import {map, loadTopoJSON, renderMap, updateMap, createProjectionSwitcher} from "../js/maps.js";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../data/world/world-medres.topojson";
+    const key  = "world";
+    map.projection = d3.geoMercator();
+    map.geoPath = d3.geoPath().projection(map.projection);
+    map.optimize = true;
+    map.rotation = [0, 0, 0];
+
+    const launch = [63.3052, 45.9646]; // Baikonur [lon, lat]
+    const inclination = 51.6;
+    const degreesPerSecond = 40;
+    let animationElapsed = 0;
+    let currentProjectionName = "Mercator";
+
+    // Rotation starting from launch site
+    const toLocal = d3.geoRotation([-launch[0], -launch[1], 0]);
+    const fromLocal = coords => toLocal.invert(coords);
+
+    // The orbital function, with inclination
+    const orbit = d3.geoRotation([0, 0, inclination]);
+
+    // Render the map
+    await loadTopoJSON(file, key)
+    renderMap(map.view);
+
+    // Launch site
+    map.view.append("circle").attr("class", "launch").attr("r", 3);
+    updateLaunchSite();
+
+    const star = d3.symbol().type(d3.symbolCross).size(40);
+    map.view.append("path").attr("class", "satellite").attr("d", star());
+    updateSatellite(0); // start animation
+
+    // Animation loop
+    d3.timer(elapsed => {
+        animationElapsed = elapsed;
+        updateSatellite(animationElapsed);
+    });
+
+    createProjectionSwitcher((evt, projections) => {
+        const selected = projections[+evt.target.value];
+        currentProjectionName = selected.name;
+        map.projection = selected.config;
+        map.projection.rotate(map.rotation); // Apply current rotation
+        map.geoPath.projection(map.projection);
+        updateMap(null, 0); // null = No extra selectors to update, 0 = Update without transition
+        updateSatellite(animationElapsed);
+        updateLaunchSite();
+    });
+
+    d3.selectAll("#rotate-controls input")
+      .on("change", () => {
+            map.rotation[0] = +d3.select("#yaw").node().value;
+            map.rotation[1] = +d3.select("#pitch").node().value;
+            map.rotation[2] = +d3.select("#roll").node().value;
+            map.projection.rotate(map.rotation);
+            updateMap(null, 0);
+            updateSatellite(animationElapsed);
+            updateLaunchSite();
+    });
+
+    // FUNCTIONS
+    // Deal with projections that hide the far side of the globe (Orthographic and Gnomonic)
+    function isVisible(coord) {
+        if(currentProjectionName !== "Orthographic" && currentProjectionName !== "Gnomonic") {
+            return true;
+        }
+        const centerGeo = map.projection.invert([map.dim.width / 2, map.dim.height / 2]);
+        return d3.geoDistance(centerGeo, coord) * 180 / Math.PI <= 90;
+    }
+
+    function updateLaunchSite() {
+        if(isVisible(launch)) {
+            const projected = map.projection(launch);
+            map.view.select(".launch").style("opacity", 1)
+                .attr("transform", `translate(${projected[0]}, ${projected[1]})`);
+        } else {
+            map.view.select(".launch").style("opacity", "0");
+        }
+    }
+
+    function updateSatellite(elapsed) {
+        const angle = (elapsed * degreesPerSecond) / 1000;
+
+        const driftAngle = (angle / 180) * 10;
+        const drift = d3.geoRotation([driftAngle, 0, 0]);  // drift 10° every 180° of phase
+
+        // When angle is 0, the satellite is at the launch site. When angle is 90, max inclination.
+        // When angle is 180, it's on the opposite side of the Earth.
+        const localPoint = orbit([angle, 0]);
+        const geoCoords = drift(fromLocal(localPoint));
+
+        if(isVisible(geoCoords)) {
+            const projected = map.projection(geoCoords);
+            map.view.select(".satellite").style("opacity", 1)
+                .attr("transform", `translate(${projected[0]}, ${projected[1]})`);
+        } else {
+            map.view.select(".satellite").style("opacity", "0");
+        }
+    }
+
+</script>
+</body>
+</html>
