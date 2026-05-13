@@ -32,7 +32,7 @@ to make the globe rotate on all three axes.</p>
             map.projection = projections[+evt.target.value].config;
             map.projection.rotate(map.rotation); // Apply current rotation
             map.geoPath.projection(map.projection);
-            updateMap(null, 0); // null = No extra selectors to update, 0 = Update without transition
+            updateMap();
         });
 
         const degreesPerSecond = 1000 / 60; // 1 degree every 60ms

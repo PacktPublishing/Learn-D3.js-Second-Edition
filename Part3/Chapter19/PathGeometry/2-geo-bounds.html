@@ -70,7 +70,7 @@ are projected rectangles that completely contain the feature on the globe, and t
         }
         const rotation = map.projection.rotate();
         map.projection.rotate([+d3.select("#yaw").node().value, rotation[1], rotation[2]]);
-        updateMap([".bounds", ".centroid"], 0);
+        updateMap([".bounds", ".centroid"]);
     });
 
 

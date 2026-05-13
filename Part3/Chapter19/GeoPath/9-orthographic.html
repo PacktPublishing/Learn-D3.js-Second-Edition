@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The orthographic projection</title>
+    <link rel="stylesheet" href="css/map.css">
+    <style>
+        svg {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+<h1>The orthographic projection</h1>
+<p>Click on the map to replace the Mercator projection with a slightly tilted orthographic projection.
+Click again to return to Mercator.</p>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    const data = await d3.json('../data/world/world-lowres.geojson');
+
+    const dim = {width: 960, height: 500};
+    const svg = d3.select("body").append("svg")
+                  .attr("width", dim.width).attr("height", dim.height);
+
+    // Set up geoPath with Mercator
+    let globe = false;
+    const geoPath = d3.geoPath().projection(d3.geoMercator());
+
+    svg.on("click", function() {
+        if(!globe) {
+            geoPath.projection(d3.geoOrthographic().rotate([20, -20, 0]));
+        } else {
+            geoPath.projection(d3.geoMercator()); // Reset to Mercator
+        }
+        svg.selectAll("path").attr("d", geoPath);
+        globe = !globe; // Toggle the globe state
+    });
+
+    svg.append("path")
+        .datum({type: "Sphere"})
+        .attr("d", geoPath)
+        .style("fill", "lightblue")
+        .style("stroke", "none");
+
+    svg.selectAll("path.feature")
+        .data(data.features)
+        .join("path")
+        .attr("class", "feature")
+        .attr("d", geoPath)
+        .style("fill", "green")
+        .style("stroke", "black");
+
+</script>
+
+</body>
+</html>

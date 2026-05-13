@@ -34,7 +34,7 @@ to produce a globe rotating on its axis.</p>
             map.projection = projections[+evt.target.value].config;
             map.projection.rotate(map.rotation); // Apply current rotation
             map.geoPath.projection(map.projection);
-            updateMap(null, 0); // null = No extra selectors to update, 0 = Update without transition
+            updateMap();
         });
 
         const paths = map.view.selectAll("path");
@@ -55,7 +55,7 @@ to produce a globe rotating on its axis.</p>
         map.rotation[1] = +d3.select("#pitch").node().value;
         map.rotation[2] = +d3.select("#roll").node().value;
         map.projection.rotate(map.rotation);
-        updateMap(null, 0);
+        updateMap();
     }
 </script>
 </body>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Versor drag rotation implemented with d3.drag</title>
+    <link rel="stylesheet" href="../css/maps.css">
+    <style>
+        svg {border: solid 1px gray;}
+    </style>
+</head>
+<body>
+<h1>Versor drag rotation implemented with <code>d3.drag</code></h1>
+<p>This implementation uses a quaternion (instead of euler angles) to compute rotation while dragging.
+This allows greater control and a correct response. The implementation is based on the <code>versor</code> library by
+    Jason Davies and Mike Bostock, which provides functions to convert between Euler angles and quaternions,
+    compute the difference between two quaternions, and apply a quaternion rotation to another quaternion.
+    See <a href="https://github.com/d3/versor">the GitHub repository for versor.js</a>, a
+    <a href="https://www.jasondavies.com/maps/rotate/">Tutorial about versor dragging by Jason Davies</a> and
+    <a href="https://observablehq.com/@d3/d3-versor-dragging">an interactive notebook by Mike Bostock</a>.
+    <p>This example doesn't implement zooming.
+    See <a href="10-versor-zoom-rotate.html">the next example</a>
+    for a version that implements both dragging and zooming using <code>d3.zoom</code>.
+</p>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {map, renderMap, updateMap, loadTopoJSON, createProjectionSwitcher} from "../js/maps.js";
+    import versor from "https://cdn.skypack.dev/versor@0.2";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../data/world/world-medres.topojson";
+    const key  = "world";
+    map.projection = d3.geoMercator();
+    map.geoPath = d3.geoPath().projection(map.projection);
+
+    // Setup zoomable container in the SVG viewport as the main view
+    const svg = d3.select("body").append("svg")
+                  .attr("width", map.dim.width).attr("height", map.dim.height);
+    map.view = svg.append("g").attr("class", "globe");
+
+    // Setup drag behavior and connect to the view container.
+    const drag = d3.drag().on("start", rotateStart).on("drag", rotating);
+    map.view.call(drag);
+
+    // Load and render the map, and setup other interactive controls
+    await loadTopoJSON(file, key);
+    renderMap(map.view);
+    createProjectionSwitcher((evt, projections) => {
+        map.projection = projections[+evt.target.value].config;
+        map.geoPath.projection(map.projection);
+        updateMap();
+    });
+
+    // VERSOR DRAG IMPLEMENTATION
+    // This object holds the initial pointer position in 3D space (cartesian coordinates),
+    // the rotation of the globe in Euler angles, and the rotation of the globe as a quaternion (versor).
+    const initial = {
+        xyzCoords: null,
+        rotationE: null,
+        rotationQ: null,
+    }
+
+    // The versor drag is based on the idea of representing the rotation of the globe as a quaternion
+    // (versor), which allows for smooth and continuous rotation without gimbal lock issues.
+    // See the following links for more information:
+    // - https://observablehq.com/@d3/d3-versor-dragging
+    // - library: https://github.com/Fil/versor/blob/master/src/versor.js
+    // - https://www.jasondavies.com/maps/rotate/
+    function rotateStart(evt) {
+        const pointerGeoCoords = map.projection.invert(d3.pointer(evt, map.view.node()));
+
+        initial.xyzCoords = versor.cartesian(pointerGeoCoords);     // mouse position as geo coords converted to cartesian coordinates in 3D space
+        initial.rotationE = map.projection.rotate();                // rotation in Euler angles
+        initial.rotationQ = versor(initial.rotationE);              // rotation as a quaternion (versor)
+
+        // Open console to see results
+        console.log("Initial geo coords", pointerGeoCoords);
+        console.log("Initial xyz coords", initial.xyzCoords);
+        console.log("Initial rotation angles",  initial.rotationE);
+        console.log("Initial rotation quaternion", initial.rotationQ);
+    }
+
+    function rotating(evt) {
+        // 1) Apply the initial rotation to the projection.
+        map.projection.rotate(initial.rotationE);
+
+        // 2) Getting the current mouse position in screen coordinates and convert to geo coordinates (longitude and latitude)
+        const pointerGeoCoords = map.projection.invert(d3.pointer(evt, map.view.node()));
+        console.log("\n\nFinal geo coords", pointerGeoCoords);
+
+        // 3) Convert the pointer geo coordinates to cartesian coordinates in 3D space
+        const xyzCoords = versor.cartesian(pointerGeoCoords);
+        console.log("Final xyz coords", xyzCoords);
+
+        // 4) Compute the rotation from the initial pointer coords in 3D space (pointer.xyzCoords)
+        //    to the final xyzCoords position as a quaternion (deltaQ)
+        const deltaQ = versor.delta(initial.xyzCoords, xyzCoords);
+        console.log("Final delta quaternion", deltaQ);
+
+        // 5) Applying the new rotation (deltaQ) to the initial rotation (pointer.quaternion)
+        //    to obtain the new rotation of the globe as a quaternion
+        const rotationQ = versor.multiply(initial.rotationQ, deltaQ);
+        console.log("Final rotation quaternion", rotationQ);
+
+        // 6) Convert back to Euler angles to apply to the projection
+        const rotationE = versor.rotation(rotationQ);
+        console.log("Final rotation angles", rotationE);
+
+        // 7) Apply the new rotation to the projection
+        map.projection.rotate(rotationE);
+
+        requestAnimationFrame(() => {
+            updateMap();
+        });
+    }
+
+</script>
+
+</body>
+</html>

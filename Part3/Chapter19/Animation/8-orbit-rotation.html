@@ -16,6 +16,9 @@
             stroke: white;
             stroke-width: 0.7;
         }
+        .trail {
+            fill: darkorange;
+        }
     </style>
 </head>
 <body>
@@ -29,7 +32,10 @@
     Yaw <input type="number" name="yaw" id="yaw" min="-180" max="180" step="10" value="0">
     Pitch <input type="number" name="pitch" id="pitch" min="-90" max="90" step="5" value="0">
     Roll <input type="number" name="roll" id="roll" min="-180" max="180" step="5" value="0">
-</div><p></p>
+    <button id="reset-rotation">Reset rotation</button><span>&nbsp;&nbsp;</span>
+    Draw trail <input type="checkbox" id="trail" checked>
+</div>
+<p></p>
 <script type="module">
     import * as d3_all from "https://cdn.skypack.dev/d3@7";
     import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
@@ -40,7 +46,7 @@
     const file = "../data/world/world-medres.topojson";
     const key  = "world";
     map.projection = d3.geoMercator();
-    map.geoPath = d3.geoPath().projection(map.projection);
+    map.geoPath = d3.geoPath().projection(map.projection).pointRadius(1.5); // points for satellite trail
     map.optimize = true;
     map.rotation = [0, 0, 0];
 
@@ -56,6 +62,13 @@
 
     // The orbital function, with inclination
     const orbit = d3.geoRotation([0, 0, inclination]);
+
+    // A GeoJSON to track the satellite trail. A MultiPoint can be rendered with a single SVG path element
+    // and is easier to update when the projection changes.
+    const satelliteTrail = {
+        type: "MultiPoint",
+        coordinates: []
+    };
 
     // Render the map
     await loadTopoJSON(file, key)
@@ -81,20 +94,26 @@
         map.projection = selected.config;
         map.projection.rotate(map.rotation); // Apply current rotation
         map.geoPath.projection(map.projection);
-        updateMap(null, 0); // null = No extra selectors to update, 0 = Update without transition
+        updateMap(); // null = No extra selectors to update, 0 = Update without transition
         updateSatellite(animationElapsed);
         updateLaunchSite();
     });
-
     d3.selectAll("#rotate-controls input")
       .on("change", () => {
             map.rotation[0] = +d3.select("#yaw").node().value;
             map.rotation[1] = +d3.select("#pitch").node().value;
             map.rotation[2] = +d3.select("#roll").node().value;
             map.projection.rotate(map.rotation);
-            updateMap(null, 0);
+            updateMap();
             updateSatellite(animationElapsed);
             updateLaunchSite();
+    });
+    d3.select("#reset-rotation").on("click", () => {
+        map.rotation = [0, 0, 0];
+        map.projection.rotate(map.rotation);
+        updateMap();
+        updateSatellite(animationElapsed);
+        updateLaunchSite();
     });
 
     // FUNCTIONS
@@ -107,6 +126,8 @@
         return d3.geoDistance(centerGeo, coord) * 180 / Math.PI <= 90;
     }
 
+    // Updates the lanch site positio (after projection or rotation changes).
+    // Hides in projections that hide the far side of the globe.
     function updateLaunchSite() {
         if(isVisible(launch)) {
             const projected = map.projection(launch);
@@ -117,23 +138,33 @@
         }
     }
 
+    // Updates the satellite's position based on elapsed time.
     function updateSatellite(elapsed) {
-        const angle = (elapsed * degreesPerSecond) / 1000;
+        const driftPerCycle = 20; // 20° degrees of drift every 360 degrees of phase
+        const cyclesToReturn = 360 / driftPerCycle; // number of cycles to return to initial longitude
 
-        const driftAngle = (angle / 180) * 10;
-        const drift = d3.geoRotation([driftAngle, 0, 0]);  // drift 10° every 180° of phase
+        const angle = ((elapsed * degreesPerSecond) / 1000) % (360*cyclesToReturn);
+        const driftAngle = (angle/cyclesToReturn);
+        const drift = d3.geoRotation([driftAngle, 0, 0]);
 
-        // When angle is 0, the satellite is at the launch site. When angle is 90, max inclination.
-        // When angle is 180, it's on the opposite side of the Earth.
-        const localPoint = orbit([angle, 0]);
-        const geoCoords = drift(fromLocal(localPoint));
+        // The satellite's position is the result of the launch rotation,
+        // then the orbit rotation, then the drift rotation
+        const geoCoords = drift(fromLocal(orbit([angle, 0])));
 
-        if(isVisible(geoCoords)) {
+        if(isVisible(geoCoords)) {  // Hide in projections that hide the far side of the globe
             const projected = map.projection(geoCoords);
             map.view.select(".satellite").style("opacity", 1)
                 .attr("transform", `translate(${projected[0]}, ${projected[1]})`);
         } else {
             map.view.select(".satellite").style("opacity", "0");
+        }
+
+        if(d3.select("#trail").property("checked")) {   // Draw the satellite trail if checked
+            satelliteTrail.coordinates.push(geoCoords);
+            map.view.selectAll(".trail").data([satelliteTrail])
+                .join("path")
+                .attr("class", "trail")
+                .attr('d', map.geoPath);
         }
     }
 

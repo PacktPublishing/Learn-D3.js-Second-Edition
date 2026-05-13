@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Zoom to rotated feature</title>
-    <link rel="stylesheet" href="../css/maps.css">
+    <link rel="stylesheet" href="../../Chapter19/css/maps.css">
     <style>
         svg {border: solid 1px gray;}
         .selected path {
@@ -33,23 +33,17 @@
 </p>
 <div id="rotate-controls">
     Rotate the axis (yaw) <input type="number" name="yaw" id="yaw" min="-180" max="180" step="10" value="0">
-</div>
+</div><p></p>
 <script type="module">
     import * as d3 from "https://cdn.skypack.dev/d3@7";
-    import {map, renderMap, updateMap, loadTopoJSON, createProjectionSwitcher} from "../js/maps.js";
-    import {isValid} from "../js/brush-utils.js";
+    import {map, renderMap, updateMap, loadTopoJSON, createProjectionSwitcher} from "../../Chapter19/js/maps.js";
+    import {isValid} from "../../Chapter19/js/brush-utils.js";
 
     map.dim = {width: 960, height: 500};
     const file = "../data/world/world-medres.topojson";
     const key  = "world";
     map.projection = d3.geoMercator();
     map.geoPath = d3.geoPath().projection(map.projection);
-
-    // An object to save initial projection parameters
-    const initial = {
-        scale: map.projection.scale(),
-        translate: map.projection.translate()
-    }
 
     // Set up SVG viewport and zoom container inside it as the main view
     const svg = d3.select("body").append("svg")
@@ -70,9 +64,7 @@
     // we are fitting the whole globe in the viewport
     map.view.on("dblclick", function(evt) {
         evt.stopPropagation();
-        map.projection
-            // .scale(initial.scale).translate(initial.translate)
-            .fitSize([map.dim.width, map.dim.height], {type: "Sphere"}); // fitting the globe
+        map.projection.fitSize([map.dim.width, map.dim.height], {type: "Sphere"}); // fitting the globe
         updateMap();
         resetDetails();
     });
@@ -94,7 +86,7 @@
         }
         const rotation = map.projection.rotate();
         map.projection.rotate([+d3.select("#yaw").node().value, rotation[1], rotation[2]]);
-        updateMap(null, 0);
+        updateMap();
         resetDetails();
     });
 
@@ -113,27 +105,24 @@
         updateMap(null, 250);    // uses a 500ms transition for a smooth change
     }
 
-    // A recursive function to rotate the globe (yaw and pitch) so that the centroid of
-    // the feature is in the center of the projection
     function rotateToView(feature) {
-        const rotate = d3.geoRotation(map.projection.rotate());  // create a rotation function based on the current projection rotation
         const centroid = d3.geoCentroid(feature);
+        const threshold = 1e-6;
+        const maxIterations = 10;
 
-        const rotation = rotate(centroid);  // apply the rotation to the feature's centroid to get the new rotation angles needed to center it
+        for (let i = 0; i < maxIterations; i++) {
+            const current = map.projection.rotate();
+            const rotation = d3.geoRotation(current)(centroid);
 
-        // Calculate the new rotation by adding the current rotation to the required rotation to center the feature
-        const lambda  = map.projection.rotate()[0] - rotation[0],
-              phi     = map.projection.rotate()[1] - rotation[1],
-              gamma   = map.projection.rotate()[2];
+            const next = [current[0] - rotation[0],
+                          current[1] - rotation[1],
+                          current[2]];
+            map.projection.rotate(next);
 
-        map.projection.rotate([lambda, phi, gamma]);
-
-        // Check if the rotation is close enough to the target, if not, call the function again to refine it
-        const epsilon = 1e-6;   // use this limit to decide when to stop
-        if(Math.abs(rotation[0]) >= epsilon || Math.abs(rotation[1]) >= epsilon) {
-            return rotateToView(feature);
+            if (Math.abs(rotation[0]) < threshold && Math.abs(rotation[1]) < threshold) {
+                break;
+            }
         }
-        return rotation;
     }
 
     function resetDetails() {

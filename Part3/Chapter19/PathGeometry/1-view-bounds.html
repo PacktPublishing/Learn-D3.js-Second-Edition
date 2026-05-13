@@ -68,7 +68,7 @@ always rectangles that completely contain the projected feature, and the centroi
         const rotation = map.projection.rotate();
         map.projection.rotate([+d3.select("#yaw").node().value, rotation[1], rotation[2]]);
         hideOverlays();
-        updateMap([".bounds", ".centroid"], 0);
+        updateMap([".bounds", ".centroid"]);
     });
 
     // FUNCTIONS

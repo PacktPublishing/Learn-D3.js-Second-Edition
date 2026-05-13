@@ -34,11 +34,7 @@ Rotating globe animations using different techniques (euler angles and quaternio
 
 __`Zoom/`__
 
-Examples of interactive zoom implementations, using SVG transforms and projection methods.
-
-__`Drag/`__
-
-Examples of interactive map rotation using `d3.drag`, `d3.zoom`, `versor` and `d3-inertia` libraries.
+Examples of interactive zoom implementations, using SVG transforms and projection methods, `d3.drag`, `d3.zoom`, `versor` and `d3-inertia` libraries.
 
 __`Examples/`__
 

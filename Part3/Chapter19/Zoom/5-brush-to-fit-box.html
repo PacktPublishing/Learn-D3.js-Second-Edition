@@ -15,7 +15,7 @@
 <b>Double-click</b> anywhere to return to the initial scale.</p>
 <div id="rotate-controls">
     Rotate the axis (yaw) <input type="number" name="yaw" id="yaw" min="-180" max="180" step="10" value="0">
-</div>
+</div><p></p>
 <script type="module">
     import * as d3 from "https://cdn.skypack.dev/d3@7";
     import {map, renderMap, updateMap, loadTopoJSON, createProjectionSwitcher} from "../js/maps.js";
@@ -27,11 +27,9 @@
     map.projection = d3.geoMercator();
     map.geoPath = d3.geoPath().projection(map.projection);
 
-    // An object to save initial projection parameters
-    const initial = {
-        scale: map.projection.scale(),
-        translate: map.projection.translate()
-    }
+    // Save initial projection parameters
+    map.scale = map.projection.scale();
+    map.translate = map.projection.translate();
 
     // Set up SVG viewport and brush container inside it as the main view
     const svg = d3.select("body").append("svg")
@@ -46,12 +44,12 @@
     const brush = d3.brush()
                     .extent([[0,0], [map.dim.width, map.dim.height]])
                     .on("end", boxZoom);
-    map.view.call(brush, boxZoom);
+    map.view.call(brush);
 
     // Click anywhere to unzoom
     map.view.on("dblclick", function(evt) {
         evt.stopPropagation();
-        map.projection.scale(initial.scale).translate(initial.translate)
+        map.projection.scale(map.scale).translate(map.translate)
         updateMap();
     });
 
@@ -71,7 +69,7 @@
         }
         const rotation = map.projection.rotate();
         map.projection.rotate([+d3.select("#yaw").node().value, rotation[1], rotation[2]]);
-        updateMap(null, 0);
+        updateMap();
     });
 
     // Create a GeoJSON bounding box from the brush selection and zoom to it using projection methods

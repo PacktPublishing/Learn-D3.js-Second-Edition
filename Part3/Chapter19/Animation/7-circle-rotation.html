@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Animating points on the surface of a sphere</title>
-    <link rel="stylesheet" href="../css/maps.css">
+    <link rel="stylesheet" href="css/animations.css">
     <style>
         svg {border: solid 1px gray;}
         text {
@@ -104,7 +104,7 @@
     // Draw the airports and routes over the map
     drawAirportRoutes(airports, validRoutes);
 
-    // Add one airplane marker per route, each moving back and forth.
+    // Create a list of airplane markers, one per route, each moving back and forth.
     const triangle = d3.symbol().type(d3.symbolTriangle).size(20);
     airplanes = validRoutes.map((route, i) => {
         const mover = createRouteMover(route.source.coordinates, route.target.coordinates, 10); // 10 degrees per second
@@ -118,14 +118,54 @@
         } else {
             marker.style("display", "none");
         }
-
-        return { marker, mover, phaseOffsetMs: i * 120 }; // Use a different phase offset for each airplane to spread them out along the route
+        return { marker, mover }; // airplane methods
     });
 
+    // Start the animation
     d3.timer(elapsed => {
         animationElapsed = elapsed;
         updateAirplanes(animationElapsed);
     });
+
+    // Gets and updates the position of each airplane based on the elapsed time and its own phase offset.
+    function updateAirplanes(t) {
+        airplanes.forEach(airplane => {
+            const coord = airplane.mover(t);
+            const projected = map.projection(coord);
+
+            if(!projected || projected.some(Number.isNaN) || !isVisibleOnProjection(coord)) {
+                airplane.marker.style("display", "none");
+                return;
+            }
+
+            // Estimate heading for the triangle marker
+            const nextCoord = airplane.mover(t + 80);
+            const nextProjected = map.projection(nextCoord);
+            const angle = nextProjected && !nextProjected.some(Number.isNaN)
+                ? Math.atan2(nextProjected[1] - projected[1], nextProjected[0] - projected[0]) * 180 / Math.PI + 90
+                : 0;
+
+            airplane.marker.style("display", null)
+                .attr("transform", `translate(${projected[0]},${projected[1]}) rotate(${angle})`);
+        });
+    }
+
+    // An interpolator to move the airplanes.
+    // Using d3.geoInterpolate for this example.
+    function createRouteMover(source, target, degreesPerSecond) {
+        const toDegrees = rad => rad * 180 / Math.PI;
+        const interpolate = d3.geoInterpolate(source, target);
+        const oneway = toDegrees(d3.geoDistance(source, target)); // converting radians to degrees
+        const roundtrip = oneway * 2; // total cycle length for back-and-forth movement
+
+        return elapsedMs => {
+            const traveled = (elapsedMs / 1000) * degreesPerSecond;
+            if(oneway <= 0) return interpolate(1);
+            const phase = traveled % roundtrip; // convert phase into t for the interpolator
+            const t = phase <= oneway ? phase/oneway : (roundtrip - phase)/oneway;
+            return interpolate(t);
+        };
+    }
 
     function drawAirportRoutes(airports, routes) {
         // color and width scales
@@ -154,48 +194,6 @@
                 d3.select(this).append("text").text(d.id).attr("x", 7)
                     .attr("transform", `translate(${map.geoPath.centroid(d)})`);
             });
-    }
-
-    // Create a mover for the shortest path (great-circle), matching the rendered route.
-    // Using d3.geoInterpolate for this example.
-    function createRouteMover(source, target, degreesPerSecond) {
-        const toDeg = rad => rad * 180 / Math.PI;
-        const interpolate = d3.geoInterpolate(source, target);
-        const routeLengthDeg = toDeg(d3.geoDistance(source, target));
-        const cycleLengthDeg = routeLengthDeg * 2;
-
-        return elapsedMs => {
-            const traveledDeg = (elapsedMs / 1000) * degreesPerSecond;
-            if(routeLengthDeg <= 0) {
-                return interpolate(1);
-            }
-            const phase = traveledDeg % cycleLengthDeg;
-            const t = phase <= routeLengthDeg ? phase / routeLengthDeg : (cycleLengthDeg - phase) / routeLengthDeg;
-            return interpolate(t);
-        };
-    }
-
-    function updateAirplanes(elapsedMs) {
-        airplanes.forEach(airplane => {
-            const t = elapsedMs + airplane.phaseOffsetMs;
-            const coord = airplane.mover(t);
-            const projected = map.projection(coord);
-
-            if(!projected || projected.some(Number.isNaN) || !isVisibleOnProjection(coord)) {
-                airplane.marker.style("display", "none");
-                return;
-            }
-
-            // Estimate heading for the triangle marker
-            const nextCoord = airplane.mover(t + 80);
-            const nextProjected = map.projection(nextCoord);
-            const angle = nextProjected && !nextProjected.some(Number.isNaN)
-                ? Math.atan2(nextProjected[1] - projected[1], nextProjected[0] - projected[0]) * 180 / Math.PI + 90
-                : 0;
-
-            airplane.marker.style("display", null)
-                    .attr("transform", `translate(${projected[0]},${projected[1]}) rotate(${angle})`);
-        });
     }
 
     // Hide points on the hidden side for clipped globe projections (e.g., Orthographic).

@@ -19,7 +19,7 @@
     map.dim = {width: 960, height: 500};
     const file = "../data/world/world-medres.topojson";
     const key  = "world";
-    map.projection = d3.geoMercator();
+    map.projection = d3.geoMercator().scale(100);
     map.geoPath = d3.geoPath().projection(map.projection);
 
     loadTopoJSON(file, key).then(() => {
@@ -28,6 +28,10 @@
 
         createProjectionSwitcher((evt, projections) => {
             map.projection = projections[+evt.target.value].config;
+            const name = projections[+evt.target.value].name;
+            if(name === "Mercator" || name === "Azimuthal Equidistant" || name === "Stereographic") {
+                map.projection.scale(90).clipAngle(170);
+            }
             map.geoPath.projection(map.projection);
             updateMap([".indicatrix", ".tissot"]);
         });

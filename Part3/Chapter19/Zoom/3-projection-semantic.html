@@ -14,7 +14,7 @@
    This implementation provides semantic zooming and panning using projection scaling and translating.</p>
 <div id="rotate-controls">
     Rotate the axis (yaw) <input type="number" name="yaw" id="yaw" min="-180" max="180" step="10" value="0">
-</div>
+</div><p></p>
 <script type="module">
     import * as d3 from "https://cdn.skypack.dev/d3@7";
     import {map, renderMap, updateMap, loadTopoJSON, createProjectionSwitcher} from "../js/maps.js";
@@ -24,13 +24,12 @@
     const key  = "world";
     map.projection = d3.geoMercator();
     map.geoPath = d3.geoPath().projection(map.projection);
+    map.optimize = true; // using mesh and merged instead of features to speed up rendering and zooming
     let currentTransform = d3.zoomIdentity; // to keep track of the current zoom transform
 
-    // An object to save initial projection parameters
-    const initial = {
-        scale: map.projection.scale(),
-        translate: map.projection.translate()
-    }
+    // Save initial projection parameters
+    map.scale = map.projection.scale();
+    map.translate = map.projection.translate();
 
     // Setup zoomable container in the SVG viewport as the main view
     const svg = d3.select("body").append("svg")
@@ -43,7 +42,6 @@
         .translateExtent([[0, 0], [map.dim.width, map.dim.height]])
         .extent([[0, 0], [map.dim.width, map.dim.height]])
         .on('zoom', projectionZoom);
-
     map.view.call(zoom);
 
     // Load and render the map, and setup other interactive controls
@@ -54,11 +52,11 @@
         map.projection = projections[+evt.target.value].config;
         const {k, x, y} = currentTransform;
         map.projection
-            .scale(k * initial.scale)
-            .translate([x + initial.translate[0] * k, y + initial.translate[1] * k]);
+            .scale(k * map.scale)
+            .translate([x + map.translate[0] * k, y + map.translate[1] * k]);
 
         map.geoPath.projection(map.projection);
-        updateMap();
+        updateMap(null, 250);
         d3.select("#yaw").node().value = map.projection.rotate()[0].toFixed(0);
     });
 
@@ -70,18 +68,18 @@
         }
         const rotation = map.projection.rotate();
         map.projection.rotate([+d3.select("#yaw").node().value, rotation[1], rotation[2]]);
-        updateMap(null, 0);
+        updateMap();
     });
 
     // Semantic zoom using projection methods
     function projectionZoom(evt) {
         const {k, x, y} = evt.transform;
-        map.projection.scale(k * initial.scale)
+        map.projection.scale(k * map.scale)
                       .translate([
-                          x + initial.translate[0] * k,
-                          y + initial.translate[1] * k
+                          x + map.translate[0] * k,
+                          y + map.translate[1] * k
                       ]);
-        svg.selectAll(".feature path, .graticule, .background, .outline").attr("d", map.geoPath);
+        updateMap(); // performs map.view.selectAll(".feature path, .graticule, .background, .outline").attr("d", map.geoPath);
         currentTransform = evt.transform;
     }
 

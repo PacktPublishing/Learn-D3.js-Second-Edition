@@ -2,12 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Ticks - without forces</title>
+    <title>Simple simulation with one force</title>
     <link rel="stylesheet" href="css/force.css">
 </head>
 <body>
 <div id="label">Ticks</div>
-<p>Open your console and inspect the <code>nodes</code> array to see the added properties.</p>
+<p>Open your console and inspect the <code>nodes</code> array to see the added properties.
+This is identical to <code>2-dynamic.html</code>, but all the code is in the HTML. In other examples,
+the drawing code is moved to <code>js/force.js</code> so we can focus on the simulation configurations.</p>
 <script type="module">
     import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
@@ -31,6 +33,7 @@
 
     // SIMULATION
     const sim = d3.forceSimulation(nodes);
+    sim.force("manybody", d3.forceManyBody());  // Added a force to make the nodes repel each other
     sim.on("tick", ticked)
     draw();
 

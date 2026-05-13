@@ -1,3 +1,20 @@
+body {
+    width: 960px;
+    margin: auto;
+}
+
+h1, h2 {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    color: #333;
+}
+
+p, div, li {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: #333;
+}
+
 svg {
     border: 1px solid black;
 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Earth rotating on its axis - using quaternions</title>
-    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="css/animations.css">
     <style>
         svg {background-color:black;}
     </style>
@@ -43,7 +43,7 @@
             map.projection = projections[+evt.target.value].config;
             map.projection.rotate(map.rotation); // Apply current rotation
             map.geoPath.projection(map.projection);
-            updateMap(null, 0);
+            updateMap();
         });
 
         d3.interval(function() {
@@ -64,7 +64,7 @@
         map.rotation = [map.rotation[0], pitch, roll];
         q = versor(map.rotation);                    // re-sync quaternion state
         map.projection.rotate(map.rotation);
-        updateMap(null, 0);
+        updateMap();
     }
 </script>
 </body>

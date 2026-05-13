@@ -51,7 +51,7 @@
     createProjectionSwitcher((evt, projections) => {
         map.projection = projections[+evt.target.value].config;
         map.geoPath.projection(map.projection);
-        updateMap();
+        updateMap(null, 250); // add a transition to make the switch smoother
         d3.select("#yaw").node().value = map.projection.rotate()[0].toFixed(0);
     });
 
@@ -63,7 +63,7 @@
         }
         const rotation = map.projection.rotate();
         map.projection.rotate([+d3.select("#yaw").node().value, rotation[1], rotation[2]]);
-        updateMap(null, 0);
+        updateMap();
     });
 
     function getStrokes() {

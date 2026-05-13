@@ -76,7 +76,7 @@
                 .rotate([0, -tilt, 0]);
         }
         map.geoPath.projection(map.projection);
-        updateMap(null, 0);
+        updateMap();
         updateShadow(currentSeason);
     });
 
@@ -92,7 +92,7 @@
         map.rotation[1] = +d3.select("#pitch").node().value;
         map.rotation[2] = +d3.select("#roll").node().value;
         map.projection.rotate(map.rotation);
-        updateMap(null, 0);
+        updateMap();
     }
 
     function createSeasonSwitcher(callback) {

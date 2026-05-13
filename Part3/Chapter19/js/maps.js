@@ -22,7 +22,7 @@ export const map = {
     data: {},                           // {topology, geometries, features} object
     geoPath: null,                      // the current geoPath
     projection: null,                   // the current projection {name, config}
-    optimize: false,                     // whether to use topojson.merge and topojson.mesh for rendering (faster but less flexible)
+    optimize: false,                    // whether to use topojson.merge and topojson.mesh for rendering (faster but less flexible)
     onAfterDraw: null                   // optional callback(ctx, map) for app-specific overlays
 };
 
@@ -61,18 +61,22 @@ export function renderMap(view = null, geoPath = null, dim = null) {
     drawGraticule(view, geoPath);
 }
 
-// Update map after changes in geoPath or projection
-export function updateMap(selectors = null, duration = 250) {
+// Update map after changes in geoPath or projection. Automatically updates the default selectors:
+// .features, .graticule, .outline, .background, .merged and .mesh.
+// Provide additional selectors if necessary as an array or space-separated string (e.g. ".feature path, .graticule")
+// Provide duration for animated transitions (default: 0, no transition)
+export function updateMap(selectors = null, duration = 0) {
     const apply = selection => duration > 0
         ? selection.transition().duration(duration)
         : selection;
 
-    apply(map.view.selectAll("g.feature path")).attr("d", map.geoPath);
     apply(map.view.selectAll(".graticule, .outline, .background")).attr("d", map.geoPath);
 
     if(map.optimize) {
         apply(map.view.selectAll(".merged")).attr("d", map.geoPath);
         apply(map.view.selectAll(".mesh")).attr("d", map.geoPath);
+    } else {
+        apply(map.view.selectAll("g.feature path")).attr("d", map.geoPath);
     }
 
     if(selectors) {

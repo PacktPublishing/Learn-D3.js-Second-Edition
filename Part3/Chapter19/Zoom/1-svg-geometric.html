@@ -25,6 +25,7 @@ to provide a very basic zooming and panning feature to a map.</p>
     const key  = "world";
     map.projection = d3.geoMercator();
     map.geoPath = d3.geoPath().projection(map.projection);
+    map.optimize = true; // using mesh and merged instead of features to speed up rendering and zooming
 
     // Setup zoomable container in the SVG viewport as the main view
     const svg = d3.select("body").append("svg")
@@ -46,7 +47,7 @@ to provide a very basic zooming and panning feature to a map.</p>
     createProjectionSwitcher((evt, projections) => {
         map.projection = projections[+evt.target.value].config;
         map.geoPath.projection(map.projection);
-        updateMap();
+        updateMap(); // add a transition to make the switch smoother
         d3.select("#yaw").node().value = map.projection.rotate()[0].toFixed(0);
     });
 
@@ -58,7 +59,7 @@ to provide a very basic zooming and panning feature to a map.</p>
         }
         const rotation = map.projection.rotate();
         map.projection.rotate([+d3.select("#yaw").node().value, rotation[1], rotation[2]]);
-        updateMap(null, 0);
+        updateMap();
     });
 
 </script>

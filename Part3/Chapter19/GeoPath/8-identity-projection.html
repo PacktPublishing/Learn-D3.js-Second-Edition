@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The orthographic projection</title>
+    <link rel="stylesheet" href="css/map.css">
+    <style>
+        svg {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+<h1>The identity projection</h1>
+<p>Creating a geoPath and not assigning a projection will assign the identity projection (<code>d3.geoIdentity()</code>
+    as the current projection. This projection will treat longitudes as x coordinates, and latitudes as y coordinates.
+    The final map will have dimensions of 360 by 180 pixels.</p>
+<p>Since the viewport's origin is located at top-left, it will contain the center of the map, which is also projected
+with an inverted longitude (pointing downwards). The <code>reflectY()</code> method can be used to fix this, and translating
+the map to the center of the viewport will display it completely. Click to see this effect. Click again to revert.</p>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    const data = await d3.json('../data/world/world-lowres.geojson');
+
+    const dim = {width: 960, height: 500};
+    const svg = d3.select("body").append("svg")
+        .attr("width", dim.width).attr("height", dim.height);
+
+    // Adjust the projection to invert the y-axis and translate the map to the center of the viewport
+    let adjust = false;
+    const geoPath = d3.geoPath(); // no projection means the identity projection is used
+
+    svg.on("click", function() {
+        if(!adjust) {
+            geoPath.projection(d3.geoIdentity().reflectY(true).translate([dim.width / 2, dim.height / 2]));
+        } else {
+            geoPath.projection(d3.geoIdentity()); // Reset to the original identity projection
+        }
+        svg.selectAll("path").attr("d", geoPath);
+        adjust = !adjust;
+    });
+
+    // background
+    svg.append("path")
+        .datum(d3.geoGraticule().outline())  // d3.geoIdentity() does not support the Sphere geometry, but it does support the graticule outline
+        .attr("d", geoPath)
+        .style("fill", "lightblue")
+        .style("stroke", "none");
+
+    svg.selectAll("path.feature")
+        .data(data.features)
+        .join("path")
+        .attr("class", "feature")
+        .attr("d", geoPath)
+        .style("fill", "green")
+        .style("stroke", "black");
+</script>
+
+</body>
+</html>

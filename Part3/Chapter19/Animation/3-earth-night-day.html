@@ -88,7 +88,7 @@
         map.rotation[0] = map.yaw.spin + map.yaw.viewer;
         map.projection.rotate(map.rotation);
         updateShadow(currentDayOfYear);
-        updateMap(null, 0); // see ../js/maps-canvas.js
+        updateMap(); // see ../js/maps-canvas.js
     }
 
     // Get tilt angle for day of year (23.5 degree tilt and March equinox at day 80).)

@@ -36,7 +36,7 @@
 Current zoom level: <b><span id="zoom-level">1</span>x</b></p>
 <div id="rotate-controls">
     Rotate the axis (yaw) <input type="number" name="yaw" id="yaw" min="-180" max="180" step="10" value="0">
-</div>
+</div><p></p>
 <script type="module">
     import * as d3 from "https://cdn.skypack.dev/d3@7";
     import {map, renderMap, updateMap, loadTopoJSON, createProjectionSwitcher} from "../js/maps.js";
@@ -48,11 +48,9 @@ Current zoom level: <b><span id="zoom-level">1</span>x</b></p>
     map.geoPath = d3.geoPath().projection(map.projection);
     let currentTransform = d3.zoomIdentity; // to keep track of the current zoom transform
 
-    // An object to save initial projection parameters
-    const initial = {
-        scale: map.projection.scale(),
-        translate: map.projection.translate()
-    }
+    // Save initial projection parameters
+    map.scale = map.projection.scale();
+    map.translate = map.projection.translate();
 
     // Setup zoomable container in the SVG viewport as the main view
     const svg = d3.select("body").append("svg")
@@ -82,11 +80,11 @@ Current zoom level: <b><span id="zoom-level">1</span>x</b></p>
 
         // Apply zoom transform to scale & translate the map projection
         map.projection
-            .scale(k * initial.scale)
-            .translate([x + initial.translate[0] * k, y + initial.translate[1] * k]);
+            .scale(k * map.scale)
+            .translate([x + map.translate[0] * k, y + map.translate[1] * k]);
 
         map.geoPath.projection(map.projection);
-        updateMap(null, 0);
+        updateMap();
 
         updateGraticuleLabels();
 
@@ -107,7 +105,7 @@ Current zoom level: <b><span id="zoom-level">1</span>x</b></p>
         }
         const rotation = map.projection.rotate();
         map.projection.rotate([+d3.select("#yaw").node().value, rotation[1], rotation[2]]);
-        updateMap(null, 0);
+        updateMap();
         updateGraticuleLabels();
     });
 
@@ -158,10 +156,10 @@ Current zoom level: <b><span id="zoom-level">1</span>x</b></p>
         const {k, x, y} = evt.transform;
 
         // Use the zoom transform applied to initial projection scale and translate
-        map.projection.scale(k * initial.scale)
+        map.projection.scale(k * map.scale)
                       .translate([
-                          x + initial.translate[0] * k,
-                          y + initial.translate[1] * k
+                          x + map.translate[0] * k,
+                          y + map.translate[1] * k
                       ]);
 
         // Semantic graticule label effects based on zoom level
