@@ -22,7 +22,7 @@
     import * as d3_all from "https://cdn.skypack.dev/d3@7";
     import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
     const d3 = Object.assign({}, d3_all, d3_geo_projection);
-    import {map, makeMap, createProjectionSwitcher} from "../../js/maps.js";
+    import {map, loadTopoJSON, renderMap, createProjectionSwitcher} from "../../js/maps.js";
 
     map.dim = {width: 960, height: 500};
     const file = "../../data/world/world-medres.topojson";
@@ -35,7 +35,9 @@
     map.projection = projections[0].config;
     map.geoPath = d3.geoPath().projection(map.projection);
 
-    makeMap(file, key);
+    loadTopoJSON(file, key).then(() => {
+        renderMap();
+    });
 
     // Adds a radio-button switcher at #switcher
     createProjectionSwitcher(projections, "switcher", changeProjection);

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reusable map demonstration with projection switcher</title>
+    <link rel="stylesheet" href="../css/maps.css">
+</head>
+<body>
+<h1>Reusable map with projection switcher demonstration</h1>
+<p>This is a demonstration of the reusable map module used in several examples.
+This example uses a projection switcher.</p>
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+    const d3 = Object.assign({}, d3_all, d3_geo_projection);
+    import {map, loadTopoJSON, renderMap, updateMap, createProjectionSwitcher} from "../js/maps.js";
+
+    const file = "../data/world/world-medres.topojson";
+    const key  = "world";
+
+    // Load and parse
+    await loadTopoJSON(file, key);
+    // Render map using defaults
+    renderMap();
+
+    // Add projection switcher
+    createProjectionSwitcher((evt, projections) => {
+        map.projection = projections[+evt.target.value].config;
+        map.geoPath.projection(map.projection);
+        updateMap();
+    });
+
+    // When adding code, use the projection switcher callback for any necessary updates.
+</script>
+
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Creating a choropleth</title>
+    <link rel="stylesheet" href="css/map.css">
+    <style>
+        svg {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+<h1>Creating a choropleth</h1>
+<p>A choropleth is a thematic map where areas are colored based on a data variable.
+    In this example, we color countries based on their population using a sequential color scale.
+    Graticules are not necessary since we are focusing on the data. A legend can be included to
+    add extra information. Tooltips can be used for specific values.
+</p>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as topojson from "https://cdn.skypack.dev/topojson-client@3";
+
+    // 1) Load the data and convert to GeoJSON
+    const tjdata = await d3.json('../data/world/world-lowres.topojson');
+    const key = "world";
+    const data = topojson.feature(tjdata, tjdata.objects[key]);
+
+    // Set up the view
+    const dim = {width: 960, height: 530};
+    const svg = d3.select("body").append("svg").attr("width", dim.width).attr("height", dim.height);
+
+    // Create a scale to encode population data as color.
+    // An fourth root scale will pull lower values up making it easier to compare populations.
+    const popExtent = d3.extent(data.features, d => d.properties.pop);
+    const [popMin, popMax] = popExtent;
+
+    const color = d3.scaleSequentialPow(d3.interpolateRdYlGn).exponent(0.25)
+                    .domain([popMax, popMin]); // reverse the domain to have higher population in darker colors
+
+    // Use the Equal Earth projection, which is a good general-purpose projection for world maps.
+    // It is an equal-area projection, so it preserves the relative size of features,
+    // is not conformal, so it distorts angles and shapes.
+    const geoPath = d3.geoPath().projection(d3.geoEqualEarth());
+
+    // Render the background
+    svg.append("path")
+        .datum({type: "Sphere"})
+        .attr("d", geoPath)
+        .style("fill", "lightblue")
+        .style("stroke", "none");
+
+    // Render the map and apply the color scale to the fill based on population.
+    svg.selectAll("path.feature")
+       .data(data.features)
+         .join("path")
+           .attr("class", "feature")
+           .attr("d", geoPath)
+           .style("fill", d => color(d.properties.pop))
+           .style("stroke-width", .5).style("stroke", "blue");
+
+
+
+    // Legend implementation - This is an exercise - you can make a simpler one!
+    const legendWidth = dim.width * 0.8;
+    const legendHeight = 10;
+    const legendX = (dim.width - legendWidth) / 2;  // place it centered at the bottom of the map
+    const legendY = dim.height - legendHeight - 25;
+
+    // A scale for the levnd
+    const legendAxisScale = d3.scalePow().exponent(0.25).domain(popExtent).range([0, legendWidth]);
+
+    // Choose tick values for the legend axis. We want to include the min and max population,
+    // but also some round numbers in between
+    const tickCandidates = [popMin, 5e5, 5e7, 5e8, 1e9, popMax];
+    const tickValues = [...new Set(tickCandidates)].filter(v => v >= popMin && v <= popMax).sort((a, b) => a - b);
+
+    // The axis
+    const fmt = d3.format(".2s");
+    const legendAxis = d3.axisBottom(legendAxisScale).tickValues(tickValues).tickFormat(d => fmt(d).replace("G", "B"));
+
+    // Now we can create the legend
+    const legendSvg = svg.append("g").attr("class", "legend")
+                         .attr("transform", `translate(${legendX}, ${legendY})`);
+
+    // A 100-bin legend with thin rects using the same color scale as the countries.
+    const legendBins = 100;
+    const binData = d3.range(legendBins).map(i => {
+        const x0 = (i * legendWidth) / legendBins;
+        const x1 = ((i + 1) * legendWidth) / legendBins;
+        // Sample the value at the center of each visible bin so colors align with axis values.
+        const value = legendAxisScale.invert((x0 + x1) / 2);
+        return {x0, x1, value};
+    });
+
+    // Draw the rectangles
+    legendSvg.selectAll(".legend-bin")
+             .data(binData)
+               .join("rect")
+                 .attr("class", "legend-bin")
+                 .attr("x", d => d.x0)
+                 .attr("y", 0)
+                 .attr("width", d => d.x1 - d.x0 + 0.5)
+                 .attr("height", legendHeight)
+                 .style("fill", d => color(d.value));
+
+    // Add the axis
+    legendSvg.append("g").attr("transform", `translate(0, ${legendHeight})`).call(legendAxis);
+
+</script>
+
+</body>
+</html>

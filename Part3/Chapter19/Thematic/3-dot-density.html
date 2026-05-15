@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>A dot density map</title>
+    <link rel="stylesheet" href="css/map.css"> <!-- styles were moved to separate file for cleaner code -->
+    <style>
+        .city path {
+            stroke: none;
+            fill: saddlebrown;
+        }
+        .feature, .background {
+            opacity: .5;
+        }
+    </style>
+</head>
+<body>
+<h1>A dot density map</h1>
+<p>Shows distribution of human presence</p>
+<p>Each dot is a town or city. This map shows the distribution of humans on the planet, but does not highlight
+population differences. A large city and a small town has the same weight.</p>
+<div>
+    Choose projection: <input type="radio" name="projection" value="0"> Orthographic
+    <input type="radio" name="projection" value="1"> Mercator
+    <input type="radio" name="projection" value="2" checked> Equal Earth
+</div>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as topojson from "https://cdn.skypack.dev/topojson-client@3";
+
+    // Load the data and convert to GeoJSON
+    const tjdata = await d3.json('../data/world/world-lowres.topojson');
+    const key = "world";
+    const data = topojson.feature(tjdata, tjdata.objects[key]);
+
+    // Set up the view
+    const dim = {width: 960, height: 500};
+    const svg = d3.select("body").append("svg").attr("width", dim.width).attr("height", dim.height);
+
+    // Tet the projection and geoPath.
+    const projections = [d3.geoOrthographic().rotate([20,-20,0]), d3.geoMercator(), d3.geoEqualEarth()];
+    let projection = projections[2];
+    const geoPath = d3.geoPath().projection(projection);
+
+    // Render the background
+    svg.append("path").attr("class", "background")
+        .datum({type: "Sphere"})
+        .attr("d", geoPath)
+        .style("fill", "lightblue")
+        .style("stroke", "none");
+
+    // Render the map and apply the color scale to the fill based on population.
+    svg.selectAll("path.feature")
+       .data(data.features)
+         .join("path")
+           .attr("class", "feature")
+           .attr("d", geoPath)
+           .style("stroke-width", .5).style("stroke", "gray").style("fill", "lightyellow");
+
+
+    // Since this is a big file, we let the map render before we load the cities.
+    // Get the data - we only need the coordinates.
+    const cities = await d3.csv("../data/world/cities1000.csv",
+                                row =>  ({coords: [+row.longitude, +row.latitude]}));
+
+    // A GeoJSON object for the cities
+    const geocities = {
+        type: "FeatureCollection",
+        features: cities.map(d => ({
+            type: "Feature",
+            geometry: { type: "Point", coordinates: d.coords}
+        }))
+    };
+
+    // Draw the points
+    svg.selectAll("g.city")
+        .data(geocities.features)
+        .join("g").attr("class", "city")
+        .append("path").attr("d", geoPath.pointRadius(.5));
+
+    d3.select("div").selectAll("input[name='projection']")
+        .on("change", function() {
+            projection = projections[+this.value];
+            geoPath.projection(projection);
+            svg.selectAll("path").attr("d", geoPath);
+        });
+</script>
+
+</body>
+</html>

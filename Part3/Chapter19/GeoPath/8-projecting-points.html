@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Placing points using the projection function</title>
+    <style>
+        svg {
+            background: black;
+        }
+        body {
+            width: 960px;
+            margin: auto;
+        }
+
+        h1, h2 {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            color: #333;
+        }
+
+        p, div, li {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .path {
+            fill: none;
+            stroke: black;
+        }
+        .background {
+            fill: seagreen;
+            stroke: none;
+        }
+        .feature {
+            fill: lightgreen;
+            stroke: green;
+        }
+        .graticules {
+            fill: none;
+            stroke: cyan;
+            stroke-width: 0.5px;
+        }
+        .city circle {
+            fill: red;
+            stroke: black;
+        }
+        .city text {
+            font: bold 12px sans-serif;
+            fill: white;
+            text-anchor: middle;
+        }
+    </style>
+</head>
+<body>
+<h1>Placing points using the projection function</h1>
+<p>The projection function works like a scale converting spatial coordinates to screen coordinates.
+    Use it to place points on the map knowing their latitudes and longitudes. This example projects
+    cities on the viewport rendered as SVG <code>&lt;circle&gt;</code> elements.</p>
+<p>This solution works well with projections that show the entire globe. Using an orthographic projection
+(click on the map to switch) will not hide cities that are on the hidden side (e.g. Tokyo, Sydney, Beijing).
+    The simplest solution is to use GeoJSON 'Point' geometries (see next example).</p>
+
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    const data = await d3.json('../data/world/world-lowres.geojson');
+
+    // An array with 10 cities, populations and their coordinates in the form [longitude, latitude].
+    const cities = [
+        {name: "New York", coordinates: [-74.006, 40.7128], population: 8336817},
+        {name: "London", coordinates: [-0.1276, 51.5074], population: 8982000},
+        {name: "Tokyo", coordinates: [139.6917, 35.6895], population: 13960000},
+        {name: "Sydney", coordinates: [151.2093, -33.8688], population: 5312000},
+        {name: "Cairo", coordinates: [31.2357, 30.0444], population: 10250000},
+        {name: "Rio de Janeiro", coordinates: [-43.1729, -22.9068], population: 6211000},
+        {name: "Moscow", coordinates: [37.6173, 55.7558], population: 13100000},
+        {name: "Mexico City", coordinates: [-99.1332, 19.4326], population: 9200000},
+        {name: "Beijing", coordinates: [116.4074, 39.9042], population: 21890000},
+        {name: "Mumbai", coordinates: [72.8777, 19.076], population: 12440000},
+        {name: "Lagos", coordinates: [3.3792, 6.5244], population: 15300000},
+    ];
+
+    // Set up the view
+    const dim = {width: 960, height: 500};
+    const svg = d3.select("body").append("svg").attr("width", dim.width).attr("height", dim.height);
+
+    // Set up geoPath with Mercator
+    let globe = false;
+    let projection = d3.geoMercator();
+    const geoPath = d3.geoPath().projection(projection);
+
+    // Click to try a different projection (orthographic)
+    svg.on("click", function() {
+        if(!globe) {
+            projection = d3.geoOrthographic().rotate([20, -20, 0]);
+        } else {
+            projection = d3.geoMercator();
+        }
+        geoPath.projection(projection);
+
+        // redraw the features and city groups with the new projection
+        svg.selectAll("path").attr("d", geoPath);
+        svg.selectAll("g.city")
+           .attr("transform", d => `translate(${projection(d.coordinates)})`) // plots all points, even hidden ones;
+        globe = !globe; // Toggle the globe state
+    });
+
+    // Rendering
+    svg.append("path")
+       .datum({type: "Sphere"})
+         .attr("d", geoPath)
+         .style("fill", "lightseagreen")
+         .style("stroke", "none");
+
+    svg.selectAll("path.feature")
+       .data(data.features)
+         .join("path")
+           .attr("class", "feature")
+           .attr("d", geoPath)
+           .style("fill", "forestgreen")
+           .style("stroke", "blue");
+
+    // Draw the points
+    svg.selectAll("g.city")
+       .data(cities)
+        .join("g").attr("class", "city")
+          .attr("transform", d => `translate(${projection(d.coordinates)})`) // project [lon,lat] degrees to [x,y] pixels
+          .each(function(d) {
+              d3.select(this).append("circle").attr("r", 3);
+              d3.select(this).append("text").text(d.name).attr("y", -10); // place the text above the circle
+          });
+
+</script>
+
+</body>
+</html>

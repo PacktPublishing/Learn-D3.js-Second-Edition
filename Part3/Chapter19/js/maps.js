@@ -16,12 +16,13 @@ import {createProjectionSwitcher} from "./projection-switcher.js";
 export {d3, topojson, createProjectionSwitcher};
 
 // A container object for map-related data in TopoJSON format
+// You can override the default values if necessary.
 export const map = {
-    dim: {width: 960, height: 480},     // default dimensions
-    view: null,                         // the <g> or <svg> where the map and graticules are rendered
-    data: {},                           // {topology, geometries, features} object
-    geoPath: null,                      // the current geoPath
-    projection: null,                   // the current projection {name, config}
+    dim: {width: 960, height: 500},     // default dimensions
+    view: null,                         // the <g> or <svg> where the map and graticules are rendered - override in renderMap if necessary
+    data: {},                           // {topology, geometries, features} object - populated by loadTopoJSON
+    projection: d3.geoMercator(),       // the current projection
+    geoPath: d3.geoPath(d3.geoMercator()), // the current geoPath (override in renderMap if necessary)
     optimize: false,                    // whether to use topojson.merge and topojson.mesh for rendering (faster but less flexible)
     onAfterDraw: null                   // optional callback(ctx, map) for app-specific overlays
 };
@@ -36,13 +37,6 @@ export async function loadTopoJSON(file, key) {
         map.data.merged     = topojson.merge(data, map.data.geometries);
         map.data.mesh       = topojson.mesh(data, map.data.topology);
     }
-}
-
-// Loads and renders the map in one step (use if no async processing is needed after loading the map data)
-export function makeMap(file, key, view = null, geoPath = null, dim = null) {
-    loadTopoJSON(file, key).then(() => {
-        renderMap(view, geoPath, dim);
-    });
 }
 
 // Renders the map.

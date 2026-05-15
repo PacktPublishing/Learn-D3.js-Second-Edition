@@ -7,6 +7,7 @@
     <style>
         svg {
             border: 1px solid black;
+            background: black;
         }
     </style>
 </head>
@@ -38,18 +39,18 @@ Click again to return to Mercator.</p>
     });
 
     svg.append("path")
-        .datum({type: "Sphere"})
-        .attr("d", geoPath)
-        .style("fill", "lightblue")
-        .style("stroke", "none");
+       .datum({type: "Sphere"})
+         .attr("d", geoPath)
+         .style("fill", "lightblue")
+         .style("stroke", "none");
 
     svg.selectAll("path.feature")
-        .data(data.features)
-        .join("path")
-        .attr("class", "feature")
-        .attr("d", geoPath)
-        .style("fill", "green")
-        .style("stroke", "black");
+       .data(data.features)
+         .join("path")
+           .attr("class", "feature")
+           .attr("d", geoPath)
+           .style("fill", "forestgreen")
+           .style("stroke", "blue");
 
 </script>
 

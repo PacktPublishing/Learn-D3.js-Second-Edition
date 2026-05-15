@@ -43,18 +43,18 @@ the map to the center of the viewport will display it completely. Click to see t
 
     // background
     svg.append("path")
-        .datum(d3.geoGraticule().outline())  // d3.geoIdentity() does not support the Sphere geometry, but it does support the graticule outline
-        .attr("d", geoPath)
-        .style("fill", "lightblue")
-        .style("stroke", "none");
+       .datum(d3.geoGraticule().outline())  // d3.geoIdentity() does not support the Sphere geometry, but supports the graticule outline (see 12-graticule.html)
+         .attr("d", geoPath)
+         .style("fill", "lightblue")
+         .style("stroke", "none");
 
     svg.selectAll("path.feature")
-        .data(data.features)
-        .join("path")
-        .attr("class", "feature")
-        .attr("d", geoPath)
-        .style("fill", "green")
-        .style("stroke", "black");
+       .data(data.features)
+          .join("path")
+            .attr("class", "feature")
+            .attr("d", geoPath)
+            .style("fill", "forestgreen")
+            .style("stroke", "blue");
 </script>
 
 </body>

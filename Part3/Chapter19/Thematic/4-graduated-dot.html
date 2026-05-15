@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>A graduated dot map</title>
+    <link rel="stylesheet" href="css/map.css"> <!-- styles were moved to separate file for cleaner code -->
+    <style>
+        .city path {
+            stroke: none;
+            fill: saddlebrown;
+        }
+        .feature, .background {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+<h1>A graduated dot map</h1>
+<p>Shows population distribution</p>
+<p>Each dot is a town or city. The radius of each city is proportional to its population.</p>
+<div>
+    Choose projection: <input type="radio" name="projection" value="0"> Orthographic
+    <input type="radio" name="projection" value="1"> Mercator
+    <input type="radio" name="projection" value="2" checked> Equal Earth
+</div>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as topojson from "https://cdn.skypack.dev/topojson-client@3";
+
+    // 1) Load the data and convert to GeoJSON
+    const shapesFile = '../data/world/world-lowres.topojson';
+    const citiesFile = "../data/world/cities10000.csv";  // A smaller cities file.
+    const key = "world";
+
+    const tjdata = await d3.json(shapesFile);
+    const data = topojson.feature(tjdata, tjdata.objects[key]);
+
+    // Set up the view
+    const dim = {width: 960, height: 500};
+    const svg = d3.select("body").append("svg").attr("width", dim.width).attr("height", dim.height);
+
+    const projections = [d3.geoOrthographic().rotate([20,-20,0]), d3.geoMercator(), d3.geoEqualEarth()];
+    let projection = projections[2];
+    const geoPath = d3.geoPath().projection(projection);
+
+    // Render the background
+    svg.append("path").attr("class", "background")
+        .datum({type: "Sphere"})
+        .attr("d", geoPath)
+        .style("fill", "lightblue")
+        .style("stroke", "none");
+
+    // Render the map and apply the color scale to the fill based on population.
+    svg.selectAll("path.feature")
+       .data(data.features)
+         .join("path")
+           .attr("class", "feature")
+           .attr("d", geoPath)
+           .style("stroke-width", .5).style("stroke", "gray").style("fill", "lightyellow");
+
+    // Since this is a big file, we let the map render before we load the cities.
+    // Get the points
+    const cities = await d3.csv(citiesFile, function(row) {
+        return {
+            name: row.asciiname,
+            coords: [+row.longitude, +row.latitude],
+            pop: +row.population
+        }
+    });
+    cities.sort((a,b) => d3.ascending(a.pop, b.pop)); // sort cities by population so that smaller cities are drawn on top of larger ones
+
+    // A GeoJSON object for the cities.
+    const geocities = {
+        type: "FeatureCollection",
+        features: cities.map(d => ({
+            type: "Feature",
+            geometry: { type: "Point", coordinates: d.coords },
+            properties: { name: d.name, pop: d.pop }
+        }))
+    };
+
+    // Scales to apply to differentiate cities by population.
+    const [max,min] = d3.extent(cities, d => d.pop);
+    const radius = d3.scaleSqrt().domain([max,min]).range([.1, 15]);
+    const opacity = d3.scaleSqrt().domain([min,max]).range([.5, 1]);
+    const color = d3.scaleSequentialPow(d3.interpolateRdYlGn).domain([min,max]).exponent(.25);
+
+    geoPath.pointRadius(d => d.properties ? radius(d.properties.pop) : 0);
+
+    // Draw the points
+    svg.selectAll("g.city")
+       .data(geocities.features)
+         .join("g").attr("class", "city")
+           .append("path")
+             .attr("d", geoPath)
+             .style("fill-opacity", d => opacity(d.properties.pop))
+             .style("stroke-opacity", d => 1 - opacity(d.properties.pop))
+             .style("fill", d => color(d.properties.pop))
+             .style("stroke", "black").style("stroke-width", 1);
+
+    d3.select("div").selectAll("input[name='projection']")
+        .on("change", function() {
+            projection = projections[+this.value];
+            geoPath.projection(projection);
+            svg.selectAll("path").attr("d", geoPath);
+        });
+</script>
+
+</body>
+</html>

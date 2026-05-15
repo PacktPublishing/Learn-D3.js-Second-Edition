@@ -15,9 +15,23 @@ p, div, li {
     color: #333;
 }
 
-svg {
-    border: 1px solid black;
+body {
+    width: 960px;
+    margin: auto;
 }
+
+h1, h2 {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    color: #333;
+}
+
+p, div, li {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: #333;
+}
+
 .path {
     fill: none;
     stroke: black;
@@ -30,7 +44,7 @@ svg {
     fill: lightgreen;
     stroke: green;
 }
-.graticule {
+.graticules {
     fill: none;
     stroke: cyan;
     stroke-width: 0.5px;
