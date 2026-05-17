@@ -5,7 +5,9 @@
     <title>Title</title>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
-    <script src="../../Chapter19/Examples/js/planetary-positions.js"></script>
+    <script src="https://unpkg.com/versor"></script>
+    <script src="https://unpkg.com/d3-inertia"></script>
+    <script src="../../Chapter19/Examples_TODO/js/planetary-positions.js"></script>
     <style>
         text {
             font-family: "Yanone Kaffeesatz", sans-serif;
@@ -27,9 +29,11 @@
     const colorScale     = d3.scalePow().exponent(1.2).range(['white','orangered']);
     const rightAscension = d3.scaleLinear().domain([0,24]).range([180,-180]);
 
-    const projection = d3.geoMercator();
+    const projection = d3.geoStereographic();
 
     const geoPath = d3.geoPath().projection(projection);
+
+    d3.geoInertiaDrag(svg, function() { render(); }, projection);
 
     Promise.all([
                 d3.json("../Data/planetary-data.json"),
@@ -52,9 +56,8 @@
                 magnitudeRadiusScale.domain(d3.extent(starData, d => d.magnitude));
 
                 // Planets
-                //const now = new Date();
-                const dayNumber = astro.dayNumber(2023, now.getMonth(), now.getDate(), (now.getHours() + now.getMinutes()/60));
-                dayNumber = 0;
+                const now = new Date();
+                const dayNumber = astro.dayNumber(2022, now.getMonth(), now.getDate(), (now.getHours() + now.getMinutes()/60));
                 console.log(now)
 
                 const planetaryData = [];
@@ -69,6 +72,18 @@
                 drawStars(starData);
                 drawPlanets(planetaryData);
             });
+
+    function render() {
+        //projection.rotate([projection.rotate()[0], 0, 0]);
+        svg.selectAll(".graticule path, .equator path")
+                .attr('d', geoPath)
+        svg.selectAll(".planet")
+                .attr("transform", d => `rotate(-45,${geoPath.projection()(d.coordinates)}) translate(${geoPath.projection()(d.coordinates)})`)
+        svg.selectAll(".ecliptic path")
+                .attr('d', geoPath)
+        svg.selectAll(".star")
+                .attr("transform", d => `translate(${geoPath.projection()(d.coordinates)})`)
+    }
 
     function drawPlanets(data) {
         console.log(data)
@@ -96,6 +111,14 @@
     function drawEcliptic() {
         svg.append("g").attr("class","ecliptic")
                 .datum(d3.geoCircle().center([90,-66.5]))
+                .append("path")
+                .attr('d', geoPath)
+                .style("stroke", "green")
+                .style("fill", "none")
+                .style('stroke-width', 2)
+                .style('stroke-opacity', .5);
+        svg.append("g").attr("class","ecliptic")
+                .datum(d3.geoCircle().center([-90,66.5]))
                 .append("path")
                 .attr('d', geoPath)
                 .style("stroke", "green")
