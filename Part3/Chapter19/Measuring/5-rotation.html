@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Example using d3.rotation()</title>
+    <link rel="stylesheet" href="../css/maps.css">
+    <style>
+        svg {border: solid 1px gray;}
+        text {
+            font-family: sans-serif;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<h1>Example using d3.geoRotation()</h1>
+<p>Use <code>d3.geoRotation()</code> functions to move objects on the globe.</p>
+<p>Choose an initial target point (Longitude, Latitude) and set it.
+    Then choose a rotation (yaw, pitch, roll) and press a button to apply the rotation
+    or its inverse to change the current target point. Open the console for more results.</p>
+<div id="rotate-controls">
+<p>Initial target: [Lon <input type="number" name="lon" id="lon" min="0" max="960" step="10" value="0">,
+            Lat <input type="number" name="lat" id="lat" min="0" max="500" step="10" value="0">]
+            <button id="set-target">Set target</button>
+</p>
+<p>Rotation = [Yaw <input type="number" name="yaw" id="yaw" min="-180" max="180" step="1" value="0">,
+    Pitch <input type="number" name="pitch" id="pitch" min="-90" max="90" step="1" value="0">,
+    Roll <input type="number" name="roll" id="roll" min="-180" max="180" step="1" value="0">]
+    <button id="apply-rotation">Apply rotation from target</button>
+    <button id="apply-inverse">Apply inverse rotation from target</button>
+</div>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {map, renderMap, updateMap, loadTopoJSON, createProjectionSwitcher} from "../js/maps.js";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../data/world/world-lowres.topojson";
+    const key  = "world";
+    map.projection = d3.geoMercator().scale(80);
+    map.geoPath = d3.geoPath().projection(map.projection).pointRadius(10);
+
+    await loadTopoJSON(file, key);
+    renderMap(map.view);
+
+    const projectionList = [
+        {name: "Mercator", config: d3.geoMercator().scale(80)},
+        {name: "Orthographic", config: d3.geoOrthographic().rotate([20, -30, 0])},
+        {name: "Stereographic", config: d3.geoStereographic()}
+    ];
+
+    createProjectionSwitcher((evt, projections) => {
+        map.projection = projections[+evt.target.value].config;
+        map.geoPath.projection(map.projection);
+        updateMap();
+        d3.selectAll(".base, .object").remove();
+    }, projectionList);
+
+    // Initial target position (lon, lat)
+    let target = [0, 0];
+
+    // a rotation function that will be created by user input.
+    let toPosition = null;
+
+    d3.select("#set-target").on("click", () => {
+        d3.selectAll(".base, .object").remove();
+        target[0] = +d3.select("#lon").node().value;
+        target[1] = +d3.select("#lat").node().value;
+        // setting new values for the rotation function.
+        toPosition = d3.geoRotation([+d3.select("#yaw").node().value,
+                                     +d3.select("#pitch").node().value,
+                                     +d3.select("#roll").node().value]);
+        drawCircles();
+    });
+
+    d3.select("#apply-rotation").on("click", () => {
+        toPosition = d3.geoRotation([+d3.select("#yaw").node().value,
+                                     +d3.select("#pitch").node().value,
+                                     +d3.select("#roll").node().value]);
+        target = toPosition(target);
+        console.log("New target after rotation", [-target[0], -target[1]])
+        moveCircle();
+    });
+
+    d3.select("#apply-inverse").on("click", () => {
+        toPosition = d3.geoRotation([+d3.select("#yaw").node().value,
+                                     +d3.select("#pitch").node().value,
+                                     +d3.select("#roll").node().value]);
+        const fromPosition = toPosition.invert;
+        target = fromPosition(target);
+        console.log("New target after inverse rotation", [-target[0], -target[1]])
+        moveCircle();
+    });
+
+
+    // draw two circles at this position.
+    function drawCircles() {
+        console.log("Initial position", target)
+        map.view.append("path").attr("class", "base")
+                .datum({type: "Point", coordinates: target})
+                .style("fill", "none")
+                .style("stroke", "black")
+                .style("stroke-dash-array", "5 5").transition()
+                .attr("d", map.geoPath)
+        map.view.append("path").attr("class", "object")
+                .datum({type: "Point", coordinates: target})
+                .style("fill", "red").transition()
+                .attr("d", map.geoPath)
+    }
+
+    // Applying the rotation
+    function moveCircle() {
+        map.view.select("#object")
+            .datum({type: "Point", coordinates: target})
+            .transition()
+            .attr("d", map.geoPath)
+    }
+</script>
+
+</body>
+</html>

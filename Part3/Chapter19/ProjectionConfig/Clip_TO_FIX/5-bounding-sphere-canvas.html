@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Clipping to the bounding sphere</title>
+    <link rel="stylesheet" href="../../css/maps.css">
+    <link rel="stylesheet" href="../css/projection-config.css">
+</head>
+<body>
+<h1>Clipping to the bounding sphere</h1>
+<p>Interrupted projections from <code>d3-geo-projection</code> require clipping applied
+    to features, graticules and other geometry to render correctly. Using an SVG <code>clipPath</code>
+    element with a path of the bounding sphere (the "Sphere" path) is one way to achieve this.
+    The example below shows the interrupted homolosine projection with and without clipping.
+    Note: <code>d3-geo-polygon</code> projections are updated and don't require clipping.
+</p>
+
+<script type="module">
+    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
+    const d3 = Object.assign({}, d3_all, d3_geo_projection);
+    import {map, loadTopoJSON, renderMap} from "../../js/maps.js";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../../data/world/world-medres.topojson";
+    const key  = "world";
+
+    loadTopoJSON(file, key).then(() => {
+        drawMap();        // Without SVG clipping.
+        drawMap(true);    // Use SVG clipping to remove paths that appear outside the globe outline (the "Sphere" path).
+    });
+
+    function drawMap(clip) {
+        const dim = {width: map.dim.width/2, height: map.dim.height/2};
+        const projection = d3.geoInterruptedHomolosine()
+                             .fitExtent([[10,10], [dim.width-20, dim.height-20]], {type: "Sphere"});
+        const geoPath = d3.geoPath().projection(projection);
+
+        const svg = d3.select("body").append("svg")
+                      .attr("width", dim.width).attr("height", dim.height)
+                      .style("margin-right", "10px");
+        if(clip) {
+            svg.append("defs")
+                .append("clipPath").attr("id", "clip")
+                    .append("path")
+                        .datum({type: "Sphere"})
+                        .attr("d", geoPath);
+        }
+
+        renderMap(svg, geoPath, dim);
+
+        if(clip) {
+            svg.selectAll(".feature, .graticule") // clipping paths
+               .attr("clip-path", "url(#clip)");
+            svg.append("text").attr("x", 5).attr("y", 15).text(`Clipped`);
+        } else {
+            svg.append("text").attr("x", 5).attr("y", 15).text(`Not clipped`);
+        }
+    }
+
+
+</script>
+
+</body>
+</html>

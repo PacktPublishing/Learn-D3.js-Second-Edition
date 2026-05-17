@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Geographical bounds and centroid of features</title>
+    <link rel="stylesheet" href="../css/maps.css">
+    <style>
+        svg {border: solid 1px gray;}
+        .planar.bounds {
+            fill: blueviolet;
+            stroke: darkblue;
+        }
+        .geo.bounds {
+            fill: red;
+            stroke: darkred;
+        }
+        .geo.centroid {
+            fill: white;
+            stroke: red;
+            stroke-width: 2px;
+        }
+        .planar.centroid {
+            fill: white;
+            stroke: blue;
+            stroke-width: 2px;
+        }
+    </style>
+</head>
+<body>
+<h1>Bounds and centroids of features</h1>
+<p>This visualization shows bounds and centroids of features using planar coordinates
+    (using <code>geoPath.bounds()</code> and <code>geoPath.centroid()</code>) and in geographical coordinates
+    (using <code>d3.geoBounds()</code> and <code>d3.geoCentroid()</code>). The bounds
+    are rendered as rectangles that completely contain the feature and the centroid is its geometric center.
+    Spherical coordinates do not change with the projection. Planar coordinates can change dramatically
+    depending on the projection and rotation.</p>
+<div id="rotate-controls">
+    Rotation = [Yaw <input type="number" name="yaw" id="yaw" min="-180" max="180" step="10" value="0">,
+    Pitch <input type="number" name="pitch" id="pitch" min="-90" max="90" step="10" value="0">,
+    Roll <input type="number" name="roll" id="roll" min="-180" max="180" step="10" value="0">]
+</div>
+<div id="domain-controls">
+    <input type="radio" name="domain" value="0" id="planar" checked><label for="planar" checked>Use planar coordinates</label>
+    <input type="radio" name="domain" value="1" id="spherical"><label for="spherical">Use spherical coordinates</label>
+</div>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import {map, renderMap, updateMap, loadTopoJSON, createProjectionSwitcher} from "../js/maps.js";
+    import {resample} from "../js/wgs84_resampling.js";
+
+    map.dim = {width: 960, height: 500};
+    const file = "../data/world/world-lowres.topojson";
+    const key  = "world";
+    map.projection = d3.geoMercator().scale(80); // Full Mercator
+    map.geoPath = d3.geoPath().projection(map.projection).pointRadius(3); // radius for the centroid
+    map.rotation = [0, 0, 0]; // [yaw, pitch, roll]
+
+    await loadTopoJSON(file, key);
+
+    renderMap(map.view);
+    createProjectionSwitcher((evt, projections) => {
+        map.projection = projections[+evt.target.value].config;
+        map.geoPath.projection(map.projection);
+        map.projection.rotate(map.rotation);
+        if(projections[+evt.target.value].name === 'Mercator') {
+            map.projection.scale(80); // Full Mercator
+        }
+        updateMap([".bounds", ".centroid"]);
+    });
+
+    d3.selectAll(".feature path")
+        .on('mouseenter', showBoundsAndCentroid)
+        .on('mouseleave', hideOverlays);
+
+    d3.selectAll("#domain-controls input")
+        .on("change", evt => {
+            if(evt.target.value === "0") {
+                d3.selectAll(".feature path")
+                    .on('mouseenter', showBoundsAndCentroid)
+                    .on('mouseleave', hideOverlays);
+            } else {
+                d3.selectAll(".feature path")
+                    .on('mouseenter', showGeoBoundsAndCentroid)
+                    .on('mouseleave', hideOverlays);
+            }
+        });
+
+    // Draw hidden bounds and centroids paths
+    // GeoBounds need to be paths, because they will be projected as GeoJSON
+    map.view.append("path").attr("class", "geo bounds").style("opacity", 0).style("fill-opacity", .5);
+    map.view.append("path").attr("class", "geo centroid").style("opacity", 0);
+    map.view.append("rect").attr("class", "planar bounds").style("opacity", 0).style("fill-opacity", .5);
+    map.view.append("circle").attr("class", "planar centroid").attr("r", 3).style("opacity", 0);
+
+    // Interactive rotation
+    d3.selectAll("#rotate-controls input")
+        .on("change", () => {
+            map.rotation[0] = +d3.select("#yaw").node().value;
+            map.rotation[1] = +d3.select("#pitch").node().value;
+            map.rotation[2] = +d3.select("#roll").node().value;
+            map.projection.rotate(map.rotation);
+            updateMap([".bounds", ".centroid"]);
+        });
+
+    // FUNCTIONS
+
+    // Planar
+    function showBoundsAndCentroid(evt, feature) {
+        logBoundsAndCentroid(feature);
+
+        // draw bounds
+        const [minXY, maxXY] = map.geoPath.bounds(feature);
+        const [minX, minY] = minXY;
+        const [maxX, maxY] = maxXY;
+
+        d3.select(".planar.bounds").raise().style("opacity", .5).attr("pointer-events", "none")
+            .attr("width", maxX - minX)
+            .attr("height", maxY - minY)
+            .attr("transform", `translate(${minXY})`);
+
+        // draw centroid
+        d3.select(".planar.centroid").raise().style("opacity", 1)
+            .attr("transform", `translate(${map.geoPath.centroid(feature)})`);
+    }
+
+    // Geographical
+    function showGeoBoundsAndCentroid(evt, feature) {
+        logGeoBoundsAndCentroid(feature);
+
+        // This time the data are geographical coordinates.
+        const [minLngLat, maxLngLat] = d3.geoBounds(feature);
+        const [minLng, minLat] = minLngLat;
+        const [maxLng, maxLat] = maxLngLat;
+
+        // Coords are the four corners of the rectangle. The first and last are the same to close the polygon.
+        const coords = [minLngLat, [minLng,maxLat], maxLngLat, [maxLng,minLat], minLngLat];
+
+        // If the feature is near the antimeridian, the bounds will be computed incorrectly and the rectangle
+        // will be inverted (e.g. See Russia and Fiji). In this case, we need to correct the longitude of
+        // the left corners by subtracting 360 degrees.
+        if(minLng > maxLng) {
+            coords[0][0] = coords[1][0] = coords[4][0] = minLng - 360;
+        }
+
+        // Besides placing the coordinates in a GeoJSON Polygon, it is also necessary to interpolate the rectangle.
+        // The call to resample() (see js/wgs84_resampling.js) interpolates points along the sides of the rectangle
+        // so that they are projected correctly on the sphere.
+        d3.select(".geo.bounds").raise().style("opacity", 1)
+          .datum(resample({type: 'Polygon', coordinates: [coords]}))
+            .attr("d", map.geoPath)
+            .attr("pointer-events", "none");
+
+        // Project the point at the feature's centroid and display it as a circle
+        d3.select(".geo.centroid").raise().style("opacity", 1)
+            .datum({type: "Point", coordinates: d3.geoCentroid(feature)})
+            .attr("d", map.geoPath);   // radius is defined by geoPath.pointRadius(3) (see above)
+    }
+
+    function logGeoBoundsAndCentroid(feature) {
+        console.log('=======\nfeature: ', feature.id);
+        console.log('geo-bounds', d3.geoBounds(feature));
+        console.log('geo-centroid', d3.geoCentroid(feature));
+    }
+
+    function logBoundsAndCentroid(feature) {
+        console.log('=======\nfeature: ', feature.id);
+        console.log('bounds', map.geoPath.bounds(feature));
+        console.log('centroid', map.geoPath.centroid(feature));
+    }
+
+    function hideOverlays() {
+        map.view.selectAll(".bounds, .centroid").style("opacity", 0);
+    }
+
+</script>
+
+</body>
+</html>

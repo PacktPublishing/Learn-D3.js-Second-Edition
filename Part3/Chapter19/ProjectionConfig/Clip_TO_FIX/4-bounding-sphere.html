@@ -2,14 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Clipping an interrupted projection</title>
+    <title>Clipping to the bounding sphere</title>
     <link rel="stylesheet" href="../../css/maps.css">
     <link rel="stylesheet" href="../css/projection-config.css">
 </head>
 <body>
-<h1>Clipping an interrupted projection with an SVG clip-path</h1>
+<h1>Clipping to the bounding sphere</h1>
 <p>Interrupted projections from <code>d3-geo-projection</code> require clipping applied
-    to features, graticules and other geometry to render correctly.
+    to features, graticules and other geometry to render correctly. Using an SVG <code>clipPath</code>
+    element with a path of the bounding sphere (the "Sphere" path) is one way to achieve this.
+    The example below shows the interrupted homolosine projection with and without clipping.
     Note: <code>d3-geo-polygon</code> projections are updated and don't require clipping.
 </p>
 

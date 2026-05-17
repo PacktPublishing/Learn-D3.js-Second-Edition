@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Madagascar GeoJSON feature - using fitExtent</title>
+    <link rel="stylesheet" href="css/map.css">
+    <style>
+        svg {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+<h1>Rendering a GeoJSON feature - using fitExtent to enlarge it</h1>
+<p>Loading a and displaying a single GeoJSON feature, containing a geometry and a properties section.
+    See <code><a href="../data/africa/medres-madagascar.geojson">data/africa/medres-madagascar.geojson</a></code>.
+    A simpler file is available in <code><a href="../data/africa/lowres-madagascar.geojson">data/africa/lowres-madagascar.geojson</a></code>.</p>
+<script type="module">
+    import * as d3 from "https://cdn.skypack.dev/d3@7";
+
+    // Load the feature
+    // Inspect this file - it contains a single feature object containing a geometry, properties and id.
+    const feature = await d3.json('../data/africa/medres-madagascar.geojson');
+
+    // Set up the view port
+    const dim = {width: 960, height: 500};
+    const svg = d3.select("body").append("svg")
+                  .attr("width", dim.width).attr("height", dim.height);
+
+    // Get the centroid of the geometry (in [longitude, latitude] format)
+    const centroid = d3.geoCentroid(feature);
+
+    // Using fitExtent to automatically calculate the projection's translate and scale values
+    const projection = d3.geoMercator()
+                         // .center(centroid).scale(1500)
+                         .fitExtent([dim.width - 50, dim.height - 50], feature); // ignores scale + translate
+    const geoPath = d3.geoPath().projection(projection);
+
+    // Draw the shape (will extract the geometry from the feature object automatically)
+    svg.append("path")
+        .attr("d", geoPath(feature))
+        .style("fill", "green")
+        .style("stroke", "black");
+
+    // Use data from the feature's properties to a text label at the centroid
+    svg.append("text")
+        .attr("transform", `translate(${projection(centroid)})`) // project the centroid to screen coordinates
+        .text(feature.properties.name)
+        .style("font-size", "19px")
+        .style("font-family", "Arial, sans-serif")
+        .style("fill", "white")
+        .style("text-anchor", "middle")
+
+</script>
+
+</body>
+</html>

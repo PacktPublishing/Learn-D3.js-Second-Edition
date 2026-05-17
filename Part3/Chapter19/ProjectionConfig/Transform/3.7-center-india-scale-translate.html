@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Zooming in to the geographic center at Tokyo</title>
+    <title>Zooming in and panning from India</title>
     <link rel="stylesheet" href="../css/projection-config.css">
     <link rel="stylesheet" href="../../css/maps.css">
 </head>
 <body>
-<h1>Translating the geographic center at Tokyo</h1>
+<h1>Zooming in and panning from India</h1>
 <p>Translating moves the place where the geographical center is anchored in the viewport.
-The center is still on Tokyo, but now it was moved to x = 240 pixels (1/4 of the horizontal viewport).</p>
+The geo center is still in India, but now it was moved to x = 240 pixels (1/4 of the horizontal viewport).</p>
 
 <script type="module">
     import * as d3_all from "https://cdn.skypack.dev/d3@7";
@@ -23,8 +23,8 @@ The center is still on Tokyo, but now it was moved to x = 240 pixels (1/4 of the
 
     map.projection = d3.geoMercator()
                         .translate([240,250])   // This is the default *viewport* center (pixels) for the world map
-                        .center([139,35])       // This is the chosen *geographic* center (lon, lat)
-                        .scale(1000);
+                        .center([78,22])        // This is the chosen *geographic* center (lon, lat)
+                        .scale(750);
 
     map.geoPath = d3.geoPath().projection(map.projection);
     loadTopoJSON(file, key).then(() => {

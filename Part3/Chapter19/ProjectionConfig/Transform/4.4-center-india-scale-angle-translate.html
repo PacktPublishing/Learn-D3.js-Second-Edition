@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Translating Mercator to (720, 375)</title>
+    <title>Center, scale, angle and translate combined</title>
     <link rel="stylesheet" href="../css/projection-config.css">
     <link rel="stylesheet" href="../../css/maps.css">
 </head>
 <body>
-<h1>Translating Mercator projection</h1>
-<p>Projection center (lon=0, lat=0), where equator and meridians cross, was translated down and left to (720,375) pixels.</p>
+<h1>Center, scale, angle and translate combined</h1>
+<p>Using all planar transformation methods centered on India (78,22).</p>
+
 <script type="module">
     import * as d3_all from "https://cdn.skypack.dev/d3@7";
     import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
@@ -20,7 +21,10 @@
     const key  = "world";
 
     map.projection = d3.geoMercator()
-                        .translate([480+240,250+125]); // Translate the center of the projection to the middle of the top-left quadrant of the viewport (480+240,250+125) = (720,375)
+                        .center([78,22])  // center uses geographic coordinates (lon,lat)
+                        .scale(750) // scale around the geo center (78,22)
+                        .angle(20)  // rotate features 20 degrees counterclockwise around the geo center (78,22)
+                        .translate([480 - 200,250]);    // translate uses pixel coordinates (x,y)
 
     map.geoPath = d3.geoPath().projection(map.projection);
     loadTopoJSON(file, key).then(() => {

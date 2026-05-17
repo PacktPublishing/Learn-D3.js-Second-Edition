@@ -2,16 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Setting the geographic center at Tokyo</title>
+    <title>Geometric rotation using Orthographic projection</title>
     <link rel="stylesheet" href="../css/projection-config.css">
     <link rel="stylesheet" href="../../css/maps.css">
 </head>
 <body>
-<h1>Setting the geographic center at Tokyo</h1>
-<p>Use <code>center()</code> to rotate the globe to a different center.
-    Default is the point where the prime meridian and equator crosses.
-    Here the center was changed to Longitude 139, Latitude 35 (Tokyo).</p>
-
+<h1>Geometric rotation using Orthographic projection</h1>
+<p>Use <code>angle()</code> to rotate the projection (not the globe). Orthographic projection rotated 45 degrees.</p>
 <script type="module">
     import * as d3_all from "https://cdn.skypack.dev/d3@7";
     import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
@@ -22,17 +19,14 @@
     const file = "../../data/world/world-medres.topojson";
     const key  = "world";
 
-    map.projection = d3.geoMercator()
-                    //   .translate([480,250])   // This is the default *viewport* center (pixels) for the world map
-                       .center([139,35])         // This is the chosen *geographic* center (lon, lat)
-                    //   .scale(153);            // The default scale for Mercator in D3 (cutting at 70 latitude)
+    map.projection = d3.geoOrthographic()
+                       .angle(45);
 
     map.geoPath = d3.geoPath().projection(map.projection);
     loadTopoJSON(file, key).then(() => {
         renderMap();
         drawViewportAxes(map);
     });
-
 </script>
 
 </body>

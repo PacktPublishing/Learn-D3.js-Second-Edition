@@ -90,10 +90,19 @@ function hide() {
 // Console log functions - testing measure(), geoLength(), geoDistance(), geoArea() and geoInterpolate()
 function measureLog(d) {
     console.log('---------\nRoute', d.id);
+    console.log('coordinates: ', d.coordinates);
     console.log('measure (in projection):', map.geoPath.measure(d) + " pixels"); // length of the line in pixels
     console.log('geoLength (absolute):', d3.geoLength(d) + " radians"); // same as geoLength, with GeoJSON as source
-    console.log('geoDistance (absolute):', d3.geoDistance(d.coordinates[0], d.coordinates[1]) + " radians"); // same as geoLength (with points as source)
-}
+    if(d.coordinates.length === 2) {
+        console.log('geoDistance (absolute):', d3.geoDistance(d.coordinates[0], d.coordinates[1]) + " radians"); // same as geoLength (with points as source)
+    } else { // if the line was resampled, sum the distances between consecutive points
+        let totalDistance = 0;
+        for(let i = 0; i < d.coordinates.length - 1; i++) {
+            totalDistance += d3.geoDistance(d.coordinates[i], d.coordinates[i + 1]);
+        }
+        console.log('geoDistance (absolute, resampled):', totalDistance + " radians");
+    }
+ }
 
 function areaLog(d) {
     console.log('---------\nFeature', d.id);

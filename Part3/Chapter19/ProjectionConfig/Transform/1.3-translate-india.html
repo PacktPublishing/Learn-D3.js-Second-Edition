@@ -2,14 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Viewing a region: translate</title>
+    <title>Translating Mercator to (272, 310)</title>
     <link rel="stylesheet" href="../css/projection-config.css">
     <link rel="stylesheet" href="../../css/maps.css">
 </head>
 <body>
-<h1>Viewing a region: translate</h1>
-<p>Combine center, scale and translate to view any part of the map.</p>
-
+<h1>Translating Mercator projection to (272, 310)</h1>
+<p>The original projection center (lon=0, lat=0), indicated with red axes) where equator and meridians cross,
+    was translated down and left by (272,310) pixels which is the projection of longitude -78, latitude -22.
+    This places the centroid of India (78,22) at the center.
+    It is much easier to do this using <code>center()</code>!
+</p>
 <script type="module">
     import * as d3_all from "https://cdn.skypack.dev/d3@7";
     import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
@@ -20,12 +23,11 @@
     const file = "../../data/world/world-medres.topojson";
     const key  = "world";
 
-    map.projection = d3.geoMercator()
-                        .center([78,22])
-                        .scale(750)
-                        .angle(20)
-                        .translate([480 - 200,250]);
+    const indiaInvPixels = map.projection([-78,-22]); // negative coordinates to move the map down and left and center on India
+    console.log(indiaInvPixels);
 
+    map.projection = d3.geoMercator()
+                        .translate(indiaInvPixels); // Move the map so India is at the center of the view
     map.geoPath = d3.geoPath().projection(map.projection);
     loadTopoJSON(file, key).then(() => {
         renderMap();
