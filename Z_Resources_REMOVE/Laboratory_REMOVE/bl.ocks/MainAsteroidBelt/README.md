@@ -1,1 +1,0 @@
-This is a server-side (Java) generated SVG that uses JPL planetary data. You can generate others at http://www/argonavis.com.br/astronomia/orbitas (in Portuguese).

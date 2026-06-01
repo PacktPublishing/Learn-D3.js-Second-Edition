@@ -33,6 +33,4 @@ Code for Chapter 13 - Transitions and animations
 __`Chapter14/`__
 Code for Chapter 14 - Events and interactive behaviors
 
-## 2) CodePen links to selected examples
-
-## 3) Observable notebooks of interactive examples and exercises
+See links to additional material in the README files for each chapter.

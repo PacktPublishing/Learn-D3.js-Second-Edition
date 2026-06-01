@@ -26,22 +26,23 @@
     const width = 960, height = 500;
     const dataFile = '../data/world/world-lowres.topojson';
 
+
+
     const all = [
-        "geoPolyhedralVoronoi",
-        "geoCubic",
-        "geoDodecahedral",
-        //"geoRhombic",
-        //"geoDeltoidal",
-        "geoIcosahedral",
-        "geoAirocean",
-        "geoCahillKeyes",
-        "geoImago",
         "geoTetrahedralLee",
         "geoCox",
-        "geoComplexLog",
+        "geoCubic",
         "geoPolyhedralButterfly",
         "geoPolyhedralCollignon",
+        "geoIcosahedral",
+        "geoDodecahedral",
+        "geoRhombic",
+        "geoDeltoidal",
         "geoPolyhedralWaterman",
+        "geoCahillKeyes",
+        "geoAirocean",
+        "geoImago",
+        "geoComplexLog",
         "geoBerghaus",
         "geoGingery",
         "geoHealpix",
@@ -51,8 +52,8 @@
         "geoInterruptedMollweideHemispheres",
         "geoInterruptedSinuMollweide",
         "geoInterruptedSinusoidal",
-     //  "geoTwoPointEquidistant",
         "geoTwoPointEquidistantUsa",
+        "geoPolyhedralVoronoi"  // here using default parameters = same as Gnomonic default (see separate example)
     ];
 
     const projections = all.map(p => {

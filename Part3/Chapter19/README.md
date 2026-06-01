@@ -4,9 +4,9 @@ Files and exercises for chapter 19.
 
 ## 1) Description of each subfolder in this folder
 
-__`MapMaking/`__
+__`GeoPath/`__
 
-A practical hands-on introduction to the `d3-geo` module, `d3.geoPath()`, and GeoJSON.
+A practical hands-on introduction to the `d3-geo` module, `d3.geoPath()`, GeoJSON, and TopoJSON.
 
 __`Projections/`__
 
@@ -20,11 +20,15 @@ __`Circles/`__
 
 Examples using `d3.geoCircle()`.
 
+__`Projections/`__
+
+Interactive pages demonstrating different projections.
+
 __`ProjectionConfig/`__
 
 Examples using projection methods.
 
-__`PathGeometry/`__
+__`Measuring/`__
 
 Examples using methods and functions to compute areas, lengths, centroids, bounds, containment, etc.
 
@@ -56,4 +60,6 @@ __`css/`__
 
 Style sheets used in several examples.
 
+## 2) Observable notebooks
 
+## 3) Online tutorials and CodePens

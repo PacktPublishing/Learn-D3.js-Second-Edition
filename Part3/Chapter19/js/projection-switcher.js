@@ -11,7 +11,7 @@ export const projectionList = [
     {name: "Orthographic", config: d3.geoOrthographic().rotate([20, -30, 0])},
     {name: "Stereographic", config: d3.geoStereographic()},
     {name: "Natural Earth", config: d3.geoNaturalEarth1()},
-    {name: "Plate Carée", config: d3.geoEquirectangular()},
+    {name: "Plate Carrée", config: d3.geoEquirectangular()},
     {name: "Equal Area", config: d3.geoCylindricalEqualArea()},
     {name: "Gnomonic", config: d3.geoGnomonic()},
     {name: "Azimuthal Equidistant", config: d3.geoAzimuthalEquidistant().rotate([30, -80, -20]).center([0, 0]).scale(300)}

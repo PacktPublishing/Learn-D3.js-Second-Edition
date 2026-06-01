@@ -80,10 +80,10 @@
     };
 
     // Scales to apply to differentiate cities by population.
-    const [max,min] = d3.extent(cities, d => d.pop);
-    const radius = d3.scaleSqrt().domain([max,min]).range([.1, 15]);
-    const opacity = d3.scaleSqrt().domain([min,max]).range([.5, 1]);
-    const color = d3.scaleSequentialPow(d3.interpolateRdYlGn).domain([min,max]).exponent(.25);
+    const [min,max] = d3.extent(cities, d => d.pop);
+    const radius = d3.scaleSqrt().domain([min,max]).range([.1, 15]);
+    const opacity = d3.scaleSqrt().domain([max,min]).range([.5, 1]); // inverted scale
+    const color = d3.scaleSequentialPow(d3.interpolateRdYlGn).domain([max,min]).exponent(.25); // inverted color scale
 
     geoPath.pointRadius(d => d.properties ? radius(d.properties.pop) : 0);
 

@@ -26,8 +26,6 @@ Description.
 
 __`data/`__
 
-Description.
-
 Resources used by examples and exercises in the other folders (they are loaded using relative URLs).
 
 

@@ -14,3 +14,5 @@ Code for Chapter 3 - Essential SVG for D3
 
 __`Chapter04/`__
 Code for Chapter 4 - Quick Start with D3
+
+See links to additional material in the README files for each chapter.

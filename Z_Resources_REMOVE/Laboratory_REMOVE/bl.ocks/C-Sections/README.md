@@ -1,5 +1,0 @@
-This cloropleth shows the rate of births by Caesarean section in the municipalities of the state of São Paulo, Brazil, from 2000 to 2015. The average rate increases year after year and only drops a bit near the end. The tables list the 10 municipalities with the lowest and highest rates. Some municipalities reach the level of 100% (all the babies in that year were born by means of a surgical procedure). 
-
-Click on the years (or on the arrows) to see which municipalities have the highest and lowest rates in different years. Move the mouse over the map and the tables for more information.
-
-The birth data was obtained from the public databases of the Health Department of the State Government of São Paulo (http://www.saude.sp.gov.br/links/matriz). The maps were obtained in GIS .SHP format, converted to GeoJSON and then to TopoJSON. They were obtained from the public databases of the Brazilian Institute of Geography and Statistics (IBGE) (http://www.ibge.gov.br).

@@ -55,7 +55,7 @@ function showMeasure(evt, d) {
     interpolateLog(d);
 
     // Compute values
-    const radians = 2 * Math.PI; // radians in 180 deg
+    const radians = 2 * Math.PI; // radians in 360 deg
     const earth = 40075; // circumference of the earth
     const km = d3.geoLength(d) / radians * earth;
     const miles = km * 0.621371;
