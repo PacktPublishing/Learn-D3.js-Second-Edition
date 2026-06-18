@@ -11,7 +11,7 @@
 <p>Use <code>angle()</code> to rotate the flattened projection (not the globe) around the geographical center.
     Here the geographical center was shifted to (lon 25, lat 40) before rotating 45 degrees.</p>
 <script type="module">
-    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_all from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
     import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
     const d3 = Object.assign({}, d3_all, d3_geo_projection);
     import {map, renderMap, loadTopoJSON, drawViewportAxes} from "../../js/maps.js";

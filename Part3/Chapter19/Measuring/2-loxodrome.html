@@ -33,7 +33,7 @@
 <p>To render the red line, it must be resampled so that its points are projected correctly on the map. </p>
 <p><button id="rotate" disabled>rotate([60, -60, 0]).scale(600)</button></p>
 <script type="module">
-    import * as d3 from "https://cdn.skypack.dev/d3@7";
+    import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
     import {map, renderMap, updateMap, loadTopoJSON, createProjectionSwitcher} from "../js/maps.js";
     import {showMeasure, hide, setupTooltip} from "./js/geometry.js";
     import {resample} from "../js/wgs84_resampling.js";

@@ -10,7 +10,7 @@
 <h1>Default scale for Mercator</h1>
 <p>Default scale for the Mercator projection (153) in D3 cuts at 70 latitude. For full Mercator in this viewport, use scale(80).</p>
 <script type="module">
-    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_all from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
     import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
     const d3 = Object.assign({}, d3_all, d3_geo_projection);
     import {map, renderMap, loadTopoJSON, drawViewportAxes} from "../../js/maps.js";

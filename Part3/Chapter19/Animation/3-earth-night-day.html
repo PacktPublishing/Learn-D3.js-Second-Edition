@@ -7,6 +7,7 @@
     <style>
         svg {background-color:black;}
         .background {fill: slategray;}
+        .merged {fill: darkslategray;}
         input[type="range"] {
             width: 750px;
             margin-left: 0.5rem;
@@ -24,7 +25,7 @@
 <div id="season"></div>
 <p></p>
 <script type="module">
-    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_all from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
     import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
     const d3 = Object.assign({}, d3_all, d3_geo_projection);
     import {map, loadTopoJSON, renderMap, updateMap, createProjectionSwitcher} from "../js/maps.js";

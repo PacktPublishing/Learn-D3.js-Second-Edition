@@ -5,7 +5,7 @@
  * Version 2.0
  */
 
-import * as d3_all from "https://cdn.skypack.dev/d3@7";
+import * as d3_all from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
 const d3 = Object.assign({}, d3_all, d3_geo_projection);
 import * as topojson from "https://cdn.skypack.dev/topojson-client@3";

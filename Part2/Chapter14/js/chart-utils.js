@@ -16,7 +16,7 @@
  * @version 4.0 2025-03-22
  */
 
-import * as d3 from 'https://cdn.skypack.dev/d3@7.9.0';
+import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7/+esm';
 
 export {cartesianAxes, radialAxes, legend, p2c, c2p, updateTextLabels, pieLabels, direction};
 

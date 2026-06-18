@@ -27,7 +27,8 @@ path {
 
 .graticule.major {
     stroke-width: 2;
-    stroke: darkslategrey;
+    stroke: steelblue;
+    stroke-opacity: .6;
 }
 
 .outline {

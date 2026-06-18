@@ -1,6 +1,8 @@
 # Part 3
 Advanced D3
 
+Contains code examples and exercises related to the first part of the book. Each subfolder represents a chapter.
+
 ## 1) Description of each subfolder in this folder
 
 __`Chapter15/`__

@@ -1,7 +1,7 @@
 // A simple projection switcher to compare different projections.
 // Callback to update the map is required.
 
-import * as d3 from "https://cdn.skypack.dev/d3@7";
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 // A basic list of projections for testing
 export const projectionList = [

@@ -2,7 +2,7 @@
  * Created by helderdarocha on 17/01/19.
  */
 
-import * as d3 from 'https://cdn.skypack.dev/d3@7.9.0';
+import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7/+esm';
 
 // Diverging colors (blue is negative, red is positive)
 const colors = ['#b2182b','#d6604d','#f4a582','#fddbc7','#f7f7f7','#d1e5f0','#92c5de','#4393c3','#2166ac'];

@@ -11,7 +11,7 @@
 <p>This code uses <code>projection.inverse()</code> to convert pixel positions to projected geographical coordinates.
     Click anywhere in the map to view coordinates. View pixel results in JavaScript console.</p>
 <script type="module">
-    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_all from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
     import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
     const d3 = Object.assign({}, d3_all, d3_geo_projection);
     import {map, renderMap, updateMap, loadTopoJSON, createProjectionSwitcher} from "../../js/maps.js";

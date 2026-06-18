@@ -1,4 +1,4 @@
-import * as d3_all from "https://cdn.skypack.dev/d3@7.9.0";
+import * as d3_all from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import * as d3_sankey from "https://cdn.skypack.dev/d3-sankey@0";
 const d3 = Object.assign({}, d3_all, d3_sankey);
 

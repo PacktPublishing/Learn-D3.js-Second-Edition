@@ -1,6 +1,6 @@
 /* Base code for projection examples */
 
-import * as d3_all from "https://cdn.skypack.dev/d3@7";
+import * as d3_all from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
 import * as d3_geo_polygon from "https://cdn.skypack.dev/d3-geo-polygon@1";
 import * as topojson from 'https://cdn.skypack.dev/topojson-client@3';

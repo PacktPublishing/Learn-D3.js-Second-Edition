@@ -4,13 +4,21 @@ Files and exercises for chapter 4.
 
 ## 1) Description of each subfolder in this folder
 
-__`StaticBar/`__
+__`1_BarStatic/`__
 
-This folder contains 12 steps to create a static bar chart. 
+This folder contains the files that represent 9 steps to create and style a static bar chart, using dummy data.
 
-__`DynamicBar/`__
+__`2_BarData/`__
 
-This folder contains 5 additional steps showing how to update the bar chart with new data, adding interactive events that switch views and data, and animated transitions.
+This folder contains additional steps to refactor and then feed external data to the chart.
+
+__`3_BarDynamic/`__
+
+This folder contains 5 more steps showing how to update the bar chart with new data, adding interactive events that switch views and data, and animated transitions.
+
+__`4_BarFinal/`__
+
+This folder contains a final implementation of the data visualization, using a recommended multi-file setup, separating modules, style sheets and views.
 
 __`WorldMap/`__
 

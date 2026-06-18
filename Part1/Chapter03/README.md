@@ -1,9 +1,14 @@
 # Chapter03
 
-Files and exercises for chapter 3.
-Each directory contains two or more subdirectories: the `SVG` subdirectory contains code written in SVG (and pure JavaScript, if it contains scripts). The `D3` subdirectory implements the same examples using D3 and using recommended D3 features. This chapter is intended as a reference about essential SVG features you should know to efficiently use D3.
+Files and exercises for the online Chapter 3 - Essential SVG for D3.
 
-## 1) Description of each subfolder in this folder
+## 1) Access the chapter online
+
+This chapter is a reference about essential SVG features you should know to efficiently use D3. You can [read this chapter online](index.html) or [download it in PDF](Chapter03.pdf) (kB).
+
+## 2) Description of each subfolder in this folder
+
+Each directory contains two or more subdirectories: the `SVG` subdirectory contains code written in SVG (and pure JavaScript, if it contains scripts). The `D3` subdirectory implements the same examples using D3 and using recommended D3 features. Some directories also contain a `DOM` subfolder. 
 
 __`Shapes/`__
 
@@ -44,16 +49,3 @@ Examples using the SVG DOM API to obtain information from SVG elements and apply
 __`data/`__
 
 Image files used by some examples.
-
-## 2) Observable notebooks
-
-The following *Observable* notebooks are available for this chapter:
-
-- []()
-- []()
-
-## 3) Data gists
-
-The following data files are available for this chapter, via GitHub gists:
-
-- []()

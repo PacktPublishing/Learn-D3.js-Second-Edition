@@ -10,7 +10,7 @@
 <h1>Tilt rotation by -10 degrees (roll, gamma)</h1>
 <p>Using <code>rotate([0, 0, -10])</code>. Tilt the globe 10 degrees clockwise.</p>
 <script type="module">
-    import * as d3_all from "https://cdn.skypack.dev/d3@7";
+    import * as d3_all from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
     import * as d3_geo_projection from "https://cdn.skypack.dev/d3-geo-projection@4";
     const d3 = Object.assign({}, d3_all, d3_geo_projection);
     import {map, loadTopoJSON, renderMap, updateMap, createProjectionSwitcher} from "../../js/maps.js";

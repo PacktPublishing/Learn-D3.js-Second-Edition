@@ -4,7 +4,7 @@ svg {
 }
 line.axes {
     stroke: red;
-    stroke-width: 1;
+    stroke-width: 1.5;
 }
 
 .clipped .background {

@@ -1,4 +1,4 @@
-import * as d3 from 'https://cdn.skypack.dev/d3@7.9.0';
+import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7/+esm';
 import {dim, app} from './common-1.6.js';
 import {drawLegend} from './legend-1.1.js';
 import * as tooltip from './tooltips-1.1.js';

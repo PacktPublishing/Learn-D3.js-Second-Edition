@@ -1,20 +1,20 @@
 # Chapter01/Module-frontend
 
-This section shows several examples on how to import the D3 library using frontend JavaScript or HTML. 
-Although using individual modules is recommended, we will import the full D3 bundle in most examples in this book. 
-Optimization techniques and other advanced topics will be covered in the last chapters.
+This section shows several examples on how to import the D3 library using frontend JavaScript or HTML. Although using individual modules is recommended, we will import the full D3 bundle in most examples in this book.
 
 ## 2) Description of each file in this folder
 
+__`modules`__
+
+JavaScript files used in the examples. They are imported in the HTML files using relative URLs.
+
 __`1-legacy-cdn.html`__
 
-Loads D3 library from a CDN using the &lt;script> tag. The type="module" attribute allows modern browsers to defer
-loading the script after rendering the page. Older browsers will ignore this.
+Loads D3 library from a CDN using the `&lt;script>` tag. The `type="module"` attribute allows modern browsers to defer loading the script after rendering the page. Older browsers will ignore this.
 
 __`2-legacy-local.html`__
 
-Loads D3 library from a local file using the &lt;script> tag. The type="module" attribute allows modern browsers to
-defer loading the script after rendering the page. Older browsers will ignore this.
+Loads D3 library from a local file using the `&lt;script> tag`. The `type="module"` attribute allows modern browsers to defer loading the script after rendering the page. Older browsers will ignore this.
 
 __`3-import-esm-cdn.html`__
 
@@ -56,4 +56,4 @@ __`12-import-transitive-test-legacy.html`__
 
 In non-ESM code, it's simpler to import the default bundle, to avoid too many script imports in HTML.
 
-See also examples in `Chapter21/` for importing modules using NPM.
+See also examples in `Appendix/` for importing modules using a Node.js environment (npm).
