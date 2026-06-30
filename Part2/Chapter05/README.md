@@ -16,7 +16,7 @@ __`Parsing/`__
 
 Examples using tabular data (DSV, CVS, TSV) parsers from the d3-dsv module.
 
-__`Formatting/`__
+__`Format/`__
 
 An example using text formatting functions from the d3-dsv module.
 
@@ -28,6 +28,8 @@ __`Exercises/`__
 
 Exercises. Use files from the Templates folder as starting points (follow the comments). 
 The solutions are in the Solutions folder.
+
+__`Examples/`__
 
 __`data/`__
 

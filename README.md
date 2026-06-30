@@ -1,6 +1,9 @@
 # Learn-D3js-2025
 Repository for the second edition of Learn D3.js, a comprehensive guide to mastering D3.js for data visualization. This repository contains all the code examples, exercises, and resources used in the book.
 
+### Version
+0.37.9 (2026-06-26) - This is the last incomplete version. There are a few sections and files missing. The next version, 1.0.0 (July 02, 2026), will contain the complete code for the book.
+
 ## 1) Description of each subfolder in this folder
 
 __`Part1/`__
