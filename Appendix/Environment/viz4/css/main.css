@@ -1,0 +1,17 @@
+path.months {
+    stroke-width: 1px;
+    fill: none;
+    opacity: .75;
+}
+h1, p, text {
+    font-family: sans-serif;
+}
+text.year {
+    font-weight: bold;
+    font-size: 12px;
+    text-anchor: start;
+    alignment-baseline: middle;
+}
+.chart {
+    pointer-events: none;
+}
