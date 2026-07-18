@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>World map with SVG polygons - alternative scaling</title>
+    <style>
+        svg {
+            background-color: #cceaff;
+        }
+        polygon {
+            stroke: black;
+            stroke-width: .2px;
+        }
+    </style>
+</head>
+<body>
+<!-- The viewBox and transform attributes are removed,
+     and the lat/lon scaling is applied to the coordinates in the GeoJSON data -->
+<svg id="world-map" width="800" height="400"></svg>
+
+<script type="module">
+    import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+    const url = "../../data/world-lowres.geojson";
+    const rand = d3.randomUniform(256);
+
+    const data = await d3.json(url);
+
+    // EXERCISE
+    // Set up linear scales for latitude and longitude to map them to SVG coordinates
+    const lat = null;
+    const lon = null;
+
+    // EXERCISE
+    // You need to apply the lat/lon scaling to the coordinates in the GeoJSON data
+    // Depending on the geometry type, we need to handle Polygon and MultiPolygon differently
+    // For each Feature, check if it is a Polygon or MultiPolygon, and apply the scaling to the coordinates accordingly.
+    // In a polygon, feature.geometry.coordinates is an array of arrays of points, where each point is an array of [lon, lat].
+    // In a multipolygon, feature.geometry.coordinates is an array of arrays of polygons, where each polygon is an array of points.
+    // ADD CODE HERE
+
+    // Now that the coordinates are scaled, we can draw the map as before
+
+    drawMap(data.features);
+
+    function drawMap(countries) {
+        const shapes = d3.select("#world-map")
+                         .selectAll(".country")
+                             .data(countries) // many countries
+                                .join("g")
+                                .attr("class", "country");
+
+        shapes.selectAll("polygon")
+              .data(s => s.geometry.coordinates) // many points
+                  .join("polygon")
+                      .attr("points", d => d)
+                      .style("fill", () => `rgb(${rand()},${rand()},${rand()})`);
+    }
+</script>
+
+</body>
+</html>

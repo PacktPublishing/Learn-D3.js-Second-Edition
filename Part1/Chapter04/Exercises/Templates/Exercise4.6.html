@@ -15,7 +15,7 @@
      interface that will allow the user to choose the desired decade and show the
      corresponding chart. Make sure to animate your transitions.
 
-
+    See comments for code to implement.
 -->
 <script type="module">
     import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7/+esm';
@@ -44,7 +44,7 @@
     const url = "../../data/populations.json";
 
     // EXERCISE: load the JSON file and then call makeDataset, renderChart and renderControls
-    const data = await d3.json(url);
+    const data = null;  // ADD CODE HERE - replace null with a command to load the JSON file (EXERCISE)
 
     makeDataset(data); // populates the dataset array with selected data (EXERCISE)
     renderChart();     // draws the initial chart (EXERCISE)
@@ -66,14 +66,8 @@
         });
 
         // Create the dataset with continent and a map of population by year
-        // EXERCISE: populate app.data preserving continent, population, and color.
-        data.forEach((object, i) => {
-            app.data.push({
-                continent: object.continent,
-                population: new Map(object.values.map(obj => [obj.year, obj.population])),
-                color: app.color(i)
-            });
-        });
+        // EXERCISE: populate app.data preserving continent, population, and color for each entry.
+        // ADD CODE HERE!
 
         const populations = data.map(d => d.values.map(v => v.population)).flat();
         console.log(populations)
@@ -86,53 +80,24 @@
     }
 
     // EXERCISE: implement this function to draw the chart for the current year (app.current)
+    // ADD CODE AFTER EACH COMMENT
     function renderChart() {
-        // sort the dataset by population for the current year
-        sortData();
+        // sort the dataset by population for the current year (call sortData)
 
-        // draw the chart
         // Append a title (h1) with the current year and a span to be updated when the year changes
-        body.append("h1")
-            .text(' (billions)')
-            .append("span").lower()
-               .attr('id', 'title')
-               .text(app.charts.get(app.current).title);
 
         // Create the SVG container
-        const svg = body.append("svg")
-                        .attr("id", "bar-chart")
-                        .attr("width", dim.width)
-                        .attr("height", dim.height);
 
-        // Bind the data to the entries and create a group for each entry (via join)
+        // Bind the data to the entries and create a group for each entry (via join);
         // Use a transform to translate each group vertically using the yscale
-        const entries = svg.selectAll(".entry")
-                           .data(app.data)
-                              .join("g")
-                                 .attr("class", "entry")
-                                 .attr("transform", d => `translate(70, ${app.yscale(d)})`);
 
         // Append a rectangle for each entry, starting at the left margin
         // The width is determined by the population value scaled to the xScale
-        entries.append("rect")
-                .attr("class", "bar")
-                .attr("height", app.barHeight)
-                .attr("width", d => app.xscale(d.population.get(app.current)))
-                .style("fill", d => d.color);
 
         // Append text elements for continent names
-        entries.append("text")
-                .attr("class", "category")
-                .attr("x", -5)
-                .attr("y", app.barHeight/2)
-                .text(d => d.continent);
 
         // Append text elements for population values
-        entries.append("text")
-                .attr("class", "value")
-                .attr("x", d => app.xscale(d.population.get(app.current)) + 5)
-                .attr("y", app.barHeight/2)
-                .text(d => `${app.fmt(d.population.get(app.current)/1e6)}`);
+
     }
 
     /**
@@ -158,40 +123,22 @@
     }
 
     // EXERCISE: implement this function to update the chart when a new year is selected
+    // ADD CODE AFTER EACH COMMENT
     function update(event) {
         // Set the curent chart (app.current) by slicing the year from the button id (e.g. y2020)
-        app.current = +event.target.id.slice(1);
 
         // Update the interface (#title) and update button states (disable selected, enable others)
-        d3.select("#title")
-            .text(app.charts.get(app.current).title);
-        d3.selectAll("button")
-            .property("disabled", false);
-        d3.select(`#y${app.current}`)
-            .property("disabled", true);
 
         // Resort the array
-        sortData();
 
         // Select the entries and bind the new data (app.data), then transition to the new positions
-        const entries = body.select("#bar-chart")
-                            .selectAll(".entry")
-                              .data(app.data)
-                                .transition().duration(1000).delay((d,i) => i*50); // Add transition
 
         // Select .bar and update the width and color
-        entries.select(".bar")
-               .style("fill", d => d.color) // needs update, because the order changed
-               .attr("width", d => app.xscale(d.population.get(app.current)));
 
         // Select .category and update the text
-        entries.select(".category")
-               .text(d => d.continent); // needs update, because the order changed
 
         // Select .value and update the text and position
-        entries.select(".value")
-               .attr("x", d => app.xscale(d.population.get(app.current)) + 5)
-               .text(d => `${app.fmt(d.population.get(app.current)/1e6)}`);
+
     }
 
 

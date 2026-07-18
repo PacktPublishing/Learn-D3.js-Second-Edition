@@ -67,34 +67,22 @@
         app.xscale.domain([0, d3.max(app.data, d => d.max)]);
 
         // EXERCISE: Add a title to the chart
-        body.append("h1")
-            .text("Distance from the Sun");
+        // ADD CODE HERE
 
         // EXERCISE: Create the SVG container and set its width and height
-        const svg = body.append("svg")
-                        .attr("id", "bar-chart")
-                        .attr("width", dim.width)
-                        .attr("height", dim.height);
+        // ADD CODE HERE
 
         // EXERCISE: Create a group for each entry (planet) and position it vertically based on the yscale
         // (Bind app.data to the entries, join, and set the transform attribute to translate each group vertically using the yscale)
-        const entries = svg.selectAll(".entry")
-                           .data(app.data)
-                              .join("g")
-                                 .attr("class", "entry")
-                                 .attr("transform", d => `translate(${dim.margin.left}, ${app.yscale(d)})`);
+        // ADD CODE HERE
 
         // EXERCISE: for each of the three datasets, draw a bar and value label
         // (Call drawBars for each dataset, passing the entries, dataset name, and position)
-        app.datasets.forEach((d, i) => drawBars(entries, d, i));
+        // ADD CODE HERE
 
         // EXERCISE: Draw the category label for each entry (three bars)
         // (Append a text element to the entries,set the x and y positions and the text - name of the entry)
-        entries.append("text")
-            .attr("class", "category")
-            .attr("x", -dim.padding.text)
-            .attr("y", (app.barHeight * 3/2))
-            .text(d => d.name);
+        // ADD CODE HERE
     }
 
     /**
@@ -111,16 +99,9 @@
     //      For example: "bar min" and "value min" for the minimum dataset, "bar avg" and "value avg" for the average dataset
     function drawBars(entries, dataset, position) {
         entries.append("rect")
-            .attr("class", `bar ${dataset}`)
-            .attr("y", app.barHeight * position)
-            .attr("height", app.barHeight - 1)
-            .attr("width", d => app.xscale(d[dataset]))
-            .style("fill", app.color[dataset]);
+            // ADD CODE HERE (set attributes)
         entries.append("text")
-            .attr("class", `value ${dataset}`)
-            .attr("y", app.barHeight/2 + (app.barHeight * position))
-            .attr("x", d => app.xscale(d[dataset]) + dim.padding.text)
-            .text(d => `${app.fmt(d[dataset])} AU`);
+            // ADD CODE HERE (set attributes and text)
     }
 
     function drawLegend() {

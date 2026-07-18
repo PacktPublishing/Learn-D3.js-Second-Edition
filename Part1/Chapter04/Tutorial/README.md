@@ -235,7 +235,7 @@ _Figure 3 – A world map rendered with SVG polygons and public domain GeoJSON d
 
 Another way to adjust the viewport to fit geographical coordinates is using two `d3.scaleLinear()` functions and a simple SVG tag (without any `viewBox` configuration). You will learn this in *Chapter 9* but can also try it as an exercise.
 
-Geographical maps are a very important topic in data visualization, and D3 provides specific tools to create and interact efficiently with maps using different projections and spherical geometry in the *d3-geo* modules. This will be covered in detail in *Chapters 19* and *20*.
+Geographical maps are a very important topic in data visualization, and D3 provides specific tools to create and interact efficiently with maps using different projections and spherical geometry in the *d3-geo* modules. This will be covered in detail in *Chapter 19*.
 
 ## Exercise: Using an alternative scale
 
