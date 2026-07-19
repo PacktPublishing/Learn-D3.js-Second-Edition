@@ -42,7 +42,7 @@
 
     let graph = [];
 
-    d3.csv("../../data/EuropeUSSR_1990_2010_nodes-REDUCED.csv", function(row) {
+    d3.csv("../../data/EuropeUSSR_1990_2010.csv", function(row) {
         if(row.Containers.length > 0 &&  row.Id != 'WB') { // don' include West berlin
             const groups = row.Containers.split('|');
             groups.forEach(function(group) {

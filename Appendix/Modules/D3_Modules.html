@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>D3 Modules</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        td:nth-child(1) {
+            font-family: monospace;
+            width: 150px;
+        }
+    </style>
+</head>
+<body>
+<h1>List of modules in D3 version 7</h1>
+<script type="module">
+    import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+    const modules = await d3.dsv("|", "./d3-modules-v7.dsv");
+    console.log(modules);
+
+    const body = d3.select("body");
+    const table = body.append("table");
+    const thead = table.append("thead");
+    const tbody = table.append("tbody");
+
+    thead.selectAll("th")
+        .data(modules.columns)
+        .join("th")
+        .text(d => d);
+
+    tbody.selectAll("tr")
+         .data(modules)
+           .join("tr")
+             .selectAll("td")
+             .data(d => modules.columns.map(c => d[c]))
+             .join("td")
+             .text(d => d);
+</script>
+</body>
+</html>

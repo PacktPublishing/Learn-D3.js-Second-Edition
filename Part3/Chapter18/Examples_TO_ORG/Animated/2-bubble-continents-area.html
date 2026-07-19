@@ -17,7 +17,7 @@
     import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
     const width = 1200;
-    const height = 800;
+    const height = 900;
     const margin = 100;
 
     const color = d3.scaleOrdinal(d3.schemeCategory10);
@@ -26,7 +26,7 @@
     const links = [];
     const continentSet = new Set();
 
-    d3.csv('../data/un_regions.csv', function(row) {
+    d3.csv('../../data/un_regions.csv', function(row) {
         continentSet.add(row.Continent);
         return {node: row.Country, value: +row.Area_km2, group: row.Continent};
     }).then(function(countries) {
@@ -69,7 +69,7 @@
         const sim = d3.forceSimulation(nodes)
         .force("manybody", d3.forceManyBody().strength(-100))
         .force("center", d3.forceCenter())
-        .force("y", d3.forceY().strength(.75))
+        .force("y", d3.forceY().strength(.36))
         .force("link", d3.forceLink(links).strength(1.5))
         .force("collide", d3.forceCollide(d => radius(d.value) + 1).iterations(15))
         .alphaDecay(.38);

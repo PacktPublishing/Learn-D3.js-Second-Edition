@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Drawing a world map with GeoJSON</title>
+    <style>
+        svg {border: solid 1px gray;}
+        .country {
+            stroke: white;
+            stroke-width: .5px;
+        }
+    </style>
+</head>
+<body>
+<h1>Drawing a world map with GeoJSON</h1>
+<p>This GeoJSON file contains outlines for all countries in medium resolution.</p>
+<script type="module">
+    import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+    const width = 960;
+    const height = 500;
+
+    const dataFile = "../../../data/world/world-medres.geojson";
+
+    // This file contains medium-resolution outlines of the world's countries
+    // properties.ISO_A3 contains a country code, properties.ADMIN contains a name
+    d3.json(dataFile)
+            .then(function(data) {
+
+            const color = d3.scaleOrdinal(d3.schemeCategory10);
+            const svg = d3.select("body").append("svg")
+                          .attr("width", width).attr("height", height);
+
+            const geoPath = d3.geoPath().projection(d3.geoMercator());
+
+            svg.selectAll(".country")
+                .data(data.features)
+                .join("path").attr("class", "country")
+                .attr('d', geoPath)
+                .style("fill", (d,i) => color(i))
+    })
+</script>
+
+</body>
+</html>

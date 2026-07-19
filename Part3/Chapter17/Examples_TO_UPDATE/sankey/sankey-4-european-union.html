@@ -42,7 +42,7 @@
             .nodeId(d => d.Id)
             .iterations(500);
 
-    d3.csv("../../data/EuropeUSSR_1990_2010_nodes.csv", function(row) {
+    d3.csv("../../data/EuropeUSSR_1990_2010.csv", function(row) {
         if (row.Containers.length > 0 && row.Id !== 'WB' && row.Id !== 'DDR' && row.Id !== 'FRG') {
             const groups = row.Containers.split('|');
             groups.forEach(function (group) {

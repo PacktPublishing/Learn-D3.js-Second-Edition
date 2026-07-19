@@ -20,6 +20,4 @@ __`Modules/`__
 
 A list of D3.js modules, describing their purpose, usage, and which chapters in the book use them. This folder also code examples of modules not covered in the book.
 
-Resources used by examples and exercises in the other folders (they are loaded using relative URLs).
-
 

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Drawing lines and shapes with GeoJSON</title>
+    <style>
+        svg {border: solid 1px gray;}
+        .continent {
+            stroke: white;
+        }
+    </style>
+</head>
+<body>
+<script type="module">
+    import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+    const width = 960;
+    const height = 500;
+
+    const dataFile = '../../../data/geojson/africa-simple.geojson';
+
+    d3.json(dataFile).then(function(data) {
+
+        console.log(data);
+
+        const svg = d3.select("body").append("svg")
+                      .attr("width", width).attr("height", height);
+
+        const geoPath = d3.geoPath()
+                          .projection(d3.geoMercator())
+                          .pointRadius(3);
+
+        // Using a single path - no color, just the outlines
+        svg.append("path").attr("class","africa")
+           .datum({type: "FeatureCollection", features: data.features})
+             .attr("d", geoPath)
+             .style("fill", "none")
+             .style("stroke", "black");
+    })
+
+</script>
+
+</body>
+</html>
