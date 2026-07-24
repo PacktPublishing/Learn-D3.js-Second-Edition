@@ -1,0 +1,44 @@
+﻿Module|Bundled|Version|Chapter|Description|Dependencies|Deprecated|
+d3-array|TRUE|3.2.3|7|Several array utilities that extend the basic ES6 functions, optimized for use with datasets.|none|FALSE|
+d3-random|TRUE|3.0.1|7|Random number generators.|none|FALSE|
+d3-dsv|TRUE|3.0.1|5|Parser functions for delimiter-separated data.|none|FALSE|
+d3-interpolate|TRUE|3.0.1|7, 10|Several functions for interpolating numbers, colors, strings, etc.|d3-color(1-3)|FALSE|
+d3-scale|TRUE|4.0.2|9|Generator functions to map data dimensions to graphical dimensions.|d3-array(2.10-3),d3-format(1-3),d3-interpolate(1.2-3),d3-time-format(2.1.1-3),d3-time(2-4)|FALSE|
+d3-time|TRUE|3.1.0|7|API for operations with time (intervals, ranges, etc.).|none|FALSE|
+d3-format|TRUE|3.1.0|7|Locale-sensitive methods for number formatting.|none|FALSE|
+d3-time-format|TRUE|4.1.0|7|Locale-sensitive methods for date/time formatting.|d3-time(1-3)|FALSE|
+d3-selection|TRUE|3.0.0|6|Contains the essencial DOM API for selection and manipulation of DOM elements.|none|FALSE|
+d3-transition|TRUE|3.0.1|13|Methods to configure the transition applied to a selection.|d3-interpolate(1-3),d3-ease(1-3),d3-dispatch(1-3),d3-timer(1-3), d3-color(1-3)|FALSE|
+d3-ease|TRUE|3.0.1|13|Easing functions for animations.|none|FALSE|
+d3-zoom|TRUE|3.0.0|14|Pan and Zoom in HTML, SVG or Canvas using mouse or touch.|d3-dispatch(1-3),d3-drag(2-3),d3-interpolate(1-3),d3-selection(2-3),d3-transition(2-3)|FALSE|
+d3-drag|TRUE|3.0.0|14|Drag and drop SVG, HTML or Canvas using mouse or touch.|d3-dispatch(1-3),d3-selection(3)|FALSE|
+d3-brush|TRUE|3.0.0|14|Selects a one or two-dimensional region using the mouse or touch.|d3-dispatch(1-3),d3-drag(2-3),d3-interpolate(1-3),d3-selection(3),d3-transition(3)|FALSE|
+d3-quadtree|TRUE|3.0.1||Partitions two-dimensional space recursively into squares. Used to calculate regions for brushing and zooming.|none|FALSE|
+d3-timer|TRUE|3.0.1|13|A queue for managing concurrent animations.|none|FALSE|
+d3-dispatch|TRUE|3.0.1||Mechanism for event dispatching to named callbacks.|none|FALSE|
+d3-color|TRUE|3.1.0|10|Support for several color spaces. Supports RGB, HSL, Cubehelix, Lab (CIELAB) and HCL (CIELCH).|none|FALSE|
+d3-scale-chromatic|TRUE|3.0.0|10|Sequential, diverging and categorical color schemes and palettes.|d3-color(1-3),d3-interpolate(1-3)|FALSE|
+d3-fetch|TRUE|3.0.1|5|Methods for fetching files asynchronously using Ajax. Also includes parsing methods for several data formats.|d3-dsv(1-3)|FALSE|
+d3-shape|TRUE|3.2.0|11, 12|Generators and utility functions to create and manipulate arcs, curves, lines, areas, stacks, curves, pie charts, symbols and links.|d3-path(3.1.0)|FALSE|
+d3-axis|TRUE|3.0.0|8|Generates SVG axes.|none|FALSE|
+d3-path|TRUE|3.1.0|12|A Canvas API that generates SVG paths (which can be rendered as a Canvas or SVG).|none|FALSE|
+d3-polygon|TRUE|3.0.1||Several utility functions for two-dimensional polygons.|none|FALSE|
+d3-geo|TRUE|3.1.0|19|Generators for geographic paths and standard projections, spherical shapes and trigonometric functions, transforms, streams and other utilities.|d3-array(2.5.0-3)|FALSE|
+d3-contour|TRUE|4.0.2||Creates contour polygons, which are commonly used to create geographical heat, density or relief maps.|d3-array(3.2.0)|FALSE|
+d3-hierarchy|TRUE|3.1.2|15|Generator functions for hierachic layouts such as node-link, adjacency and enclosure diagrams. Functions create stratifications, clusters, trees, dendograms, treemaps, circle packs and partitions.|none|FALSE|
+d3-force|TRUE|3.0.0|18|Implementation of a force simulation (uses the Stormer-Verlet method), which can be used for interactive visualizations of graphs, networks and hierarchies.|d3-dispatch(1-3),d3-quadtree(1-3),d3-timer(1-3)|FALSE|
+d3-chord|TRUE|3.0.1|16|Generator function and utilities for creating chord flow diagrams.|d3-path(1-3)|FALSE|
+d3-selection-multi|FALSE|1.0.1||Adds support for setting multiple attributes, styles or properties in selections and transitions using an object syntax.|d3-selection(1),d3-transition(1)|FALSE|
+d3-hsv|FALSE|0.1.0|10|Support for the HSV color space.|d3-color(1)|FALSE|
+d3-hcg|FALSE|0.0.10|10|Support for the HCG color space.|d3-color(1)|FALSE|
+d3-cam16|FALSE|0.0.1|10|Support for the CIECAM16 color space.|d3-color(1.0.3)|FALSE|
+d3-geo-projection|FALSE|4.0.0|19|Additional projections for d3-geo.|d3-geo(1.12.0-3),d3-array(1-3)|FALSE|
+d3-geo-polygon|FALSE|1.12.1|19|Several utility functions for spherical polygons.|d3-geo(1.12.0-2),d3-array(1-2)|FALSE|
+d3-require|FALSE|1.3.0||Supports AMD for loading modules and dependencies.|none|FALSE|
+d3-sankey|FALSE|0.12.3|17|Generator function and utilities for creating sankey flow diagrams.|d3-array(1-2),d3-shape(1.2.0)|FALSE|
+d3-tile|FALSE|1.0.0||A layout for working with raster image-based tiles, normally used for displaying tiles of geographic maps behind a vector layer.|none|FALSE|
+d3-hexbin|FALSE|0.2.2||Generator function and utilities for creating scatterplots of hexagonal bins, useful for color-encoded heatmaps.|none|FALSE|
+d3-delaunay|FALSE|6.0.3||A library to compute the Delaunay triangulation of a set of points: a simpler and faster method to create Voronoi diagrams.|none|FALSE|
+d3-queue|FALSE|3.0.7||Supports queueing of concurrent asynchronous requests.|none|TRUE|
+d3-collection|FALSE|1.0.7||"Maps and sets optimized for use with datasets| functions for object collections and nesting data."|none|TRUE|
+d3-voronoi|FALSE|1.1.4||Generator functions and utilities for creating Voronoi diagrams (nature-like diagrams that show regions in a plane that are nearest to a point).|none|TRUE|

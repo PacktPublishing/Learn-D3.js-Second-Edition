@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Exercise 4.6: Adding animated transitions</title>
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        text {font-size: 13px;}
+    </style>
+</head>
+<body>
+<!--
+4.6. The file data/populations-by-year.json contains a time series dataset with population
+     for different continents during five decades. First, analyze the file and discover
+     how to load and parse a single decade to draw a simple bar chart. Then, create an
+     interface that will allow the user to choose the desired decade and show the
+     corresponding chart. Make sure to animate your transitions.
+
+    See comments for code to implement.
+-->
+<script type="module">
+    import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7/+esm';
+
+    const dim = {width: 700, height: 200};
+
+    // handle for this page's body tag
+    const body = d3.select("body");
+
+    // Place functions and objects used by the functions in a single object
+    const app = {
+        xscale: d3.scaleLinear().range([0, dim.width-140]),
+        yscale:  d3.scaleBand().range([1, dim.height]).padding(0.1),
+        color: d3.scaleOrdinal(d3.schemeTableau10),
+        fmt: d3.format(".2f"),
+        current: 2020,
+        barHeight: 0,
+        data: [],
+    }
+
+    // For debugging purposes (access via console)
+    window.app = app;
+    window.d3 = d3;
+
+    // Load and render
+    const url = "../../data/populations.json";
+
+    // EXERCISE: load the JSON file and then call makeDataset, renderChart and renderControls
+    const data = null;  // ADD CODE HERE - replace null with a command to load the JSON file (EXERCISE)
+
+    makeDataset(data); // populates the dataset array with selected data (EXERCISE)
+    renderChart();     // draws the initial chart (EXERCISE)
+    renderControls();  // draws the chart selector panel (DONE)
+
+    //debugger;   // uncomment to allow inspection of the object in console
+
+
+
+    // Creates a dataset with the continent and a Map with year and population
+    // EXERCISE: populate app.data preserving continent, population, and color.
+    function makeDataset(data) {
+
+        // Create a Map with the years as keys
+        const years = data[0].values.map(d => d.year);
+        app.charts = new Map();
+        years.forEach(year => {
+            app.charts.set(year, {title: `Population in ${year}`});
+        });
+
+        // Create the dataset with continent and a map of population by year
+        // EXERCISE: populate app.data preserving continent, population, and color for each entry.
+        // ADD CODE HERE!
+
+        const populations = data.map(d => d.values.map(v => v.population)).flat();
+        console.log(populations)
+
+        // computations
+        app.barHeight = dim.height / app.data.length - 5;
+        app.yscale.domain(app.data)
+        app.xscale.domain([0, d3.max(populations)]);
+        app.color.domain(app.yscale.domain());
+    }
+
+    // EXERCISE: implement this function to draw the chart for the current year (app.current)
+    // ADD CODE AFTER EACH COMMENT
+    function renderChart() {
+        // sort the dataset by population for the current year (call sortData)
+
+        // Append a title (h1) with the current year and a span to be updated when the year changes
+
+        // Create the SVG container
+
+        // Bind the data to the entries and create a group for each entry (via join);
+        // Use a transform to translate each group vertically using the yscale
+
+        // Append a rectangle for each entry, starting at the left margin
+        // The width is determined by the population value scaled to the xScale
+
+        // Append text elements for continent names
+
+        // Append text elements for population values
+
+    }
+
+    /**
+     * Sorts the dataset
+     */
+    function sortData() {
+        app.data.sort((a, b) => d3.descending(a.population.get(app.current), b.population.get(app.current)));
+    }
+
+    /**
+     * Renders control buttons to select which chart is to be displayed
+     */
+    function renderControls() {
+        const form = body.append("form");
+        app.charts.forEach( (value, key) => {
+            form.append("button")
+                .attr("type", "button")
+                .attr("id", `y${key}`)
+                .property("disabled", app.current === key)
+                .on("click", update)
+                .text(value.title);
+        })
+    }
+
+    // EXERCISE: implement this function to update the chart when a new year is selected
+    // ADD CODE AFTER EACH COMMENT
+    function update(event) {
+        // Set the curent chart (app.current) by slicing the year from the button id (e.g. y2020)
+
+        // Update the interface (#title) and update button states (disable selected, enable others)
+
+        // Resort the array
+
+        // Select the entries and bind the new data (app.data), then transition to the new positions
+
+        // Select .bar and update the width and color
+
+        // Select .category and update the text
+
+        // Select .value and update the text and position
+
+    }
+
+
+</script>
+
+</body>
+</html>

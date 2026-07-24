@@ -1,0 +1,71 @@
+import * as d3 from 'd3';
+
+// data
+const data = d3.range(0,100,10);
+
+// scale
+const scale = d3.scaleBand()
+    .domain(data)
+    .range([0,800]);
+
+// format percent
+const per = d3.format(".0%");
+const fmt = d3.format(".2f");
+
+// display
+d3.select("#domain").text(`[${scale.domain()}]`);
+d3.select("#range").text(`[${scale.range()}]`);
+d3.select("#piv").text(`${scale.paddingInner()}`);
+d3.select("#pov").text(`${scale.paddingOuter()}`);
+d3.select("#alignv").text(`${scale.align()}`);
+d3.select("#step").text(`${fmt(scale.step())}`);
+d3.select("#bandwidth").text(`${fmt(scale.bandwidth())}`);
+
+// event listeners
+d3.select("#pi").node().addEventListener("input", function() {
+    scale.paddingInner(this.value);
+    d3.select("#piv").text(`${scale.paddingInner()} (${per(scale.paddingInner())} of step)`);
+    d3.select("#step").text(`${fmt(scale.step())}`);
+    d3.select("#bandwidth").text(`${fmt(scale.bandwidth())}`);
+    update();
+});
+
+d3.select("#po").node().addEventListener("input", function() {
+    scale.paddingOuter(this.value);
+    d3.select("#pov").text(`${scale.paddingOuter()} step(s)`);
+    d3.select("#step").text(`${fmt(scale.step())}`);
+    d3.select("#bandwidth").text(`${fmt(scale.bandwidth())}`);
+    update();
+});
+
+d3.select("#align").node().addEventListener("input", function() {
+    scale.align(this.value);
+    d3.select("#alignv").text(`${scale.align()}  (${per(scale.align())})`);
+    update();
+});
+
+const colorScale = d3.scaleSequential(d3.interpolatePlasma).domain([0,200]);
+
+d3.select("body").append("svg").attr("height", 650).attr("width", 850);
+
+d3.select("svg").append("g").attr("transform", "translate(10,0)")
+    .selectAll("rect")
+    .data(data)
+    .join("rect")
+    .attr("y",22)
+    .attr("height", () => Math.random() * 200)
+    .attr("fill", (d,i,n) => colorScale(d3.select(n[i]).attr("height")));
+
+d3.select("svg").append("g").attr("id", "x-axis").attr("transform", "translate(10,20)")
+const xAxis = d3.axisTop(scale);
+
+update();
+d3.selectAll("input").dispatch('input');
+
+function update() {
+    d3.select("svg").selectAll("rect")
+        .attr("x", scale)
+        .attr("width", scale.bandwidth());
+
+    d3.select("#x-axis").call(xAxis);
+}

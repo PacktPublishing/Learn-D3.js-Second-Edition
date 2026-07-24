@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Data visualizations: environment</title>
+</head>
+<body>
+<h1>Data visualizations: environment</h1>
+<p>While the book's examples rely on CDN-provided libraries, this app demonstrates how to use D3
+    in an `npm` / `docker` environment, which is recommended for production.</p>
+
+<p>This simple app demonstrates how to use D3 in an `npm` / `docker` environment. See `README.md`
+    for a description of the setup, how to install, preview, build a static distribution and
+    Docker container. This demo links to four D3 visualizations that were created in previous
+    chapters importing online CDN-provided libraries. These visualizations import local libraries.
+    You can add more visualizations using the same approach. Edit `webpack.config.js` to add new
+    entry points and output files. The `package.json` file contains the dependencies for this project.</p>
+
+<p>This is a minimal example of how to set up a D3 project with `npm` and `docker`. Tests,
+    front-end frameworks, and responsive design are not included in this example.
+<ul>
+    <li><a href="viz1.html">Brush select with zoom (Chapter 14)</a></li>
+    <li><a href="viz2.html">Force-directed bubble chart (Chapter 18)</a></li>
+    <li><a href="viz3.html">Rotation implemented with d3.geoInertiaDrag (Chapter 19)</a></li>
+    <li><a href="viz4/index.html">Global temperatures 1880 to 2025 - spiral (Chapter 11)</a></li>
+    <li><a href="viz5.html">An interactive bar chart demonstrating the use of the band scale (Chapter 9)</a></li>
+</ul>
+</body>
+</html>

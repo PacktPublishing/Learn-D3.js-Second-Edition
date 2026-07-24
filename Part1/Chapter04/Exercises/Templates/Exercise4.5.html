@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Exercise 4.5</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<!--
+4.5. Create a static horizontal bar chart with three bars displaying all the data
+     in a single chart. Choose separate colors for average, minimum and maximum distances.
+     See comments in the code for hints on how to do this.
+-->
+<script type="module">
+    import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7/+esm';
+
+    // Dimensions used in the chart
+    const dim = {
+        width: 600,
+        height: 600,
+        padding: {bar: 8, text: 5},
+        margin: {top: 20, right: 140, bottom: 20, left: 70}
+    };
+
+    // Functions and objects used by the app
+    const app = {
+        datasets: ['min','avg','max'],     // datasets per planet
+        data: [],
+        xscale: d3.scaleLinear().range([0, dim.width - dim.margin.right]),
+        yscale: d3.scaleBand().range([0, dim.height]).padding(0.1),
+        fmt: d3.format(".2f"),
+        color: {min: "blue", avg: "green", max: "red"}
+    }
+
+    const body = d3.select("body");
+    const url = "../../data/sol_2019.json";
+
+    d3.json(url)
+        .then(data => {
+            makeDataset(data, 'planets');
+            renderChart();
+            drawLegend();
+            //debugger;  // uncomment to access the module in the console
+        });
+
+    // Makes a dataset for the given section (planets or asteroids)
+    function makeDataset(data, section) {
+        data[section].forEach(object => {
+            app.data.push(
+                {
+                    name: object.name,
+                    avg: +object.semiMajorAxisAU,
+                    min: +object.periheliumAU,
+                    max: +object.apheliumAU,
+                }
+            );
+        });
+    }
+
+    // Renders the chart
+    // EXERCISE: Add the missing code after the comments to complete the chart
+    function renderChart() {
+        app.data.sort((a, b) => d3.ascending(a.avg, b.avg));
+
+        // computations and scales - bar height is band divided by number of datasets (3 in this case)
+        app.barHeight = app.yscale.bandwidth() / (app.data.length * app.datasets.length)
+        app.yscale.domain(app.data)
+        app.xscale.domain([0, d3.max(app.data, d => d.max)]);
+
+        // EXERCISE: Add a title to the chart
+        // ADD CODE HERE
+
+        // EXERCISE: Create the SVG container and set its width and height
+        // ADD CODE HERE
+
+        // EXERCISE: Create a group for each entry (planet) and position it vertically based on the yscale
+        // (Bind app.data to the entries, join, and set the transform attribute to translate each group vertically using the yscale)
+        // ADD CODE HERE
+
+        // EXERCISE: for each of the three datasets, draw a bar and value label
+        // (Call drawBars for each dataset, passing the entries, dataset name, and position)
+        // ADD CODE HERE
+
+        // EXERCISE: Draw the category label for each entry (three bars)
+        // (Append a text element to the entries,set the x and y positions and the text - name of the entry)
+        // ADD CODE HERE
+    }
+
+    /**
+     * Draws the bars and value labels for a given dataset
+     * @param entries
+     * @param dataset
+     * @param position
+     */
+    // EXERCISE: Implement this function to draw the bars and value labels for a given dataset
+    // (Draw a rect and a text label, append them to the entries, set class, y, height, width, fill, x, and text attributes)
+    // Hints:
+    //   1) Use the app.xscale to determine the width of the bars and the app.fmt to format the value labels
+    //   2) Set the classes as "bar" and "value" for the rect and text elements, respectively, and add the dataset name as a class to each
+    //      For example: "bar min" and "value min" for the minimum dataset, "bar avg" and "value avg" for the average dataset
+    function drawBars(entries, dataset, position) {
+        entries.append("rect")
+            // ADD CODE HERE (set attributes)
+        entries.append("text")
+            // ADD CODE HERE (set attributes and text)
+    }
+
+    function drawLegend() {
+        const sets =
+            body.select("svg")
+                .selectAll(".legend")
+                  .data(app.datasets)
+                    .join("g")
+                      .attr("class", "legend")
+                      .attr("transform", (d,i) => `translate(${dim.width - dim.margin.right + 10}, ${i*20 + 100})`);
+
+        sets.append("rect")
+            .attr("width", 10)
+            .attr("height", 10)
+            .style("fill", d => app.color[d]);
+
+        sets.append("text")
+            .attr("x", 15)
+            .attr("y", 5)
+            .text(d => d);
+    }
+
+</script>
+
+</body>
+</html>

@@ -22,7 +22,11 @@ This folder contains a final implementation of the data visualization, using a r
 
 __`WorldMap/`__
 
-How to render the map of the world in SVG using D3 and a GeoJSON file containing the shapes of the countries.
+How to render the map of the world in SVG using D3 and a GeoJSON file containing the shapes of the countries. See the `Tutorial/` folder for a step-by-step guide.
+
+__`Tutorial/`__
+
+A step-by-step guide to create a world map using D3. The code is in the `WorldMap/` folder.
 
 __`Exercises/`__
 

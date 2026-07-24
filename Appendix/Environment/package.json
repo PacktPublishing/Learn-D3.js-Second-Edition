@@ -1,0 +1,28 @@
+{
+  "name": "environment-demo",
+  "version": "1.0.0",
+  "description": "D3 environment demo migrated from CDN to npm with webpack bundling (scoped to Appendix/Environment)",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "webpack serve --config webpack.config.js --mode development",
+    "build": "webpack --config webpack.config.js --mode production",
+    "clean": "rm -rf dist",
+    "preview": "npx serve -s dist -l 8080"
+  },
+  "dependencies": {
+    "d3": "^7.9.0",
+    "d3-geo-projection": "^4.0.0",
+    "d3-inertia": "^0.4.0",
+    "topojson-client": "^3.1.0"
+  },
+  "devDependencies": {
+    "copy-webpack-plugin": "^12.0.2",
+    "css-loader": "^7.1.2",
+    "html-webpack-plugin": "^5.6.0",
+    "style-loader": "^4.0.0",
+    "webpack": "^5.92.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.0.4"
+  }
+}

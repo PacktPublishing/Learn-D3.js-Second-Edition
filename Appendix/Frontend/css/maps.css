@@ -1,0 +1,62 @@
+body {
+    width: 960px;
+    margin: auto;
+}
+
+h1, h2 {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    color: #333;
+}
+
+p, div, li {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: #333;
+}
+
+path {
+    fill: none;
+}
+
+.graticule {
+    stroke: green;
+    stroke-width: 0.25;
+    stroke-opacity: .5;
+}
+
+.graticule.major {
+    stroke-width: 2;
+    stroke: steelblue;
+    stroke-opacity: .6;
+}
+
+.outline {
+    stroke: navy;
+    stroke-width: 1;
+}
+
+.background {
+    fill: lightblue;
+    fill-opacity: 1;
+}
+
+.feature, .feature path, .merged, .mesh {
+    stroke: white;
+    fill: darkslategray;
+    stroke-width: 0.5;
+    stroke-opacity: 0.5;
+}
+
+.merged {
+    stroke-width: 1;
+}
+
+.mesh {
+    fill: none;
+}
+
+/* remove pointer events from tooltips */
+text, .tooltip rect, .graticule, .circle, .hemisphere {
+    pointer-events: none;
+}

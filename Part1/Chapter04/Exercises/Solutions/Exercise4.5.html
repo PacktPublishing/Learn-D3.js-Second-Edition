@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Exercise 4.3</title>
+    <title>Exercise 4.5</title>
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
 <!--
 4.5. Create a static horizontal bar chart with three bars displaying all the data
      in a single chart. Choose separate colors for average, minimum and maximum distances.
+     See comments in the code for hints on how to do this.
 -->
 <script type="module">
     import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7/+esm';
@@ -56,6 +57,7 @@
     }
 
     // Renders the chart
+    // EXERCISE: Add the missing code after the comments to complete the chart
     function renderChart() {
         app.data.sort((a, b) => d3.ascending(a.avg, b.avg));
 
@@ -64,25 +66,30 @@
         app.yscale.domain(app.data)
         app.xscale.domain([0, d3.max(app.data, d => d.max)]);
 
-        // draw the chart
+        // EXERCISE: Add a title to the chart
         body.append("h1")
             .text("Distance from the Sun");
 
+        // EXERCISE: Create the SVG container and set its width and height
         const svg = body.append("svg")
                         .attr("id", "bar-chart")
                         .attr("width", dim.width)
                         .attr("height", dim.height);
 
+        // EXERCISE: Create a group for each entry (planet) and position it vertically based on the yscale
+        // (Bind app.data to the entries, join, and set the transform attribute to translate each group vertically using the yscale)
         const entries = svg.selectAll(".entry")
                            .data(app.data)
                               .join("g")
                                  .attr("class", "entry")
                                  .attr("transform", d => `translate(${dim.margin.left}, ${app.yscale(d)})`);
 
-        // for each of the three datasets, draw a bar and value label
+        // EXERCISE: for each of the three datasets, draw a bar and value label
+        // (Call drawBars for each dataset, passing the entries, dataset name, and position)
         app.datasets.forEach((d, i) => drawBars(entries, d, i));
 
-        // Draws the category label for each entry (three bars)
+        // EXERCISE: Draw the category label for each entry (three bars)
+        // (Append a text element to the entries,set the x and y positions and the text - name of the entry)
         entries.append("text")
             .attr("class", "category")
             .attr("x", -dim.padding.text)
@@ -90,7 +97,18 @@
             .text(d => d.name);
     }
 
-    // Draws a bar and value label for a dataset
+    /**
+     * Draws the bars and value labels for a given dataset
+     * @param entries
+     * @param dataset
+     * @param position
+     */
+    // EXERCISE: Implement this function to draw the bars and value labels for a given dataset
+    // (Draw a rect and a text label, append them to the entries, set class, y, height, width, fill, x, and text attributes)
+    // Hints:
+    //   1) Use the app.xscale to determine the width of the bars and the app.fmt to format the value labels
+    //   2) Set the classes as "bar" and "value" for the rect and text elements, respectively, and add the dataset name as a class to each
+    //      For example: "bar min" and "value min" for the minimum dataset, "bar avg" and "value avg" for the average dataset
     function drawBars(entries, dataset, position) {
         entries.append("rect")
             .attr("class", `bar ${dataset}`)
